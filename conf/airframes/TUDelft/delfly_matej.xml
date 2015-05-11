@@ -79,11 +79,14 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
       <configure name="USE_MAGNETOMETER" value="0"/>
       <define name="AHRS_USE_GPS_HEADING" value="TRUE"/>
     </subsystem>
+    <!--
     <subsystem name="gps" type="ublox">
       <configure name="GPS_PORT" value="UART3"/>
       <configure name="GPS_BAUD" value="B38400"/>
     </subsystem>
-
+    -->
+    <subsystem name="gps" type="datalink"/>
+    
     <subsystem name="actuators" type="pwm">
       <define name="SERVO_HZ" value="400"/>
       <define name="USE_SERVOS_1AND2"/>
@@ -99,8 +102,8 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
 
   <modules main_freq="512"> <!-- NEW (512hz) -->
     <!--load name="baro_sim.xml"/-->
-    <load name="gps_ubx_ucenter.xml"/>
-    <load name="send_imu_mag_current.xml"/> <!-- NEW -->
+    <!--load name="gps_ubx_ucenter.xml"/-->
+    <!--load name="send_imu_mag_current.xml"/--> <!-- NEW -->
     <!--load name="nav_line.xml"/-->
     <!--<load name="geo_init"/>-->
   </modules>
