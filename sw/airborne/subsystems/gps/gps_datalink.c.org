@@ -33,7 +33,7 @@
 /** GPS initialization */
 void gps_impl_init(void)
 {
-  gps.fix = GPS_FIX_3D;
+  gps.fix = GPS_FIX_NONE;
   gps.gspeed = 700; // To enable course setting
   gps.cacc = 0; // To enable course setting
 }
@@ -44,27 +44,38 @@ void parse_gps_datalink(uint8_t numsv, int32_t ecef_x, int32_t ecef_y, int32_t e
                         int32_t hmsl, int32_t ecef_xd, int32_t ecef_yd, int32_t ecef_zd, uint32_t tow, int32_t course)
 {
 
-  gps.lla_pos.lat = 600;
-  gps.lla_pos.lon =700;
-  gps.lla_pos.alt = 200;
-  gps.hmsl        = 210;
+  gps.lla_pos.lat = lat;
+  gps.lla_pos.lon = lon;
+  gps.lla_pos.alt = alt;
+  gps.hmsl        = hmsl;
 
-  gps.ecef_pos.x = 100;
-  gps.ecef_pos.y = 110;
-  gps.ecef_pos.z = 120;
+  gps.ecef_pos.x = ecef_x;
+  gps.ecef_pos.y = ecef_y;
+  gps.ecef_pos.z = ecef_z;
 
-  gps.ecef_vel.x = 10;
-  gps.ecef_vel.y = 12;
-  gps.ecef_vel.z = 14;
+  gps.ecef_vel.x = ecef_xd;
+  gps.ecef_vel.y = ecef_yd;
+  gps.ecef_vel.z = ecef_zd;
 
-  gps.course = 1;
-  gps.num_sv = 8;
-  gps.tow = 21333;
+  gps.course = course;
+  gps.num_sv = numsv;
+  gps.tow = tow;
   gps.fix = GPS_FIX_3D;
 
-  #warning: gps code
-
-
+#if GPS_USE_LATLONG
+  // Computes from (lat, long) in the referenced UTM zone
+  struct LlaCoor_f lla_f;
+  LLA_FLOAT_OF_BFP(lla_f, gps.lla_pos);
+  struct UtmCoor_f utm_f;
+  utm_f.zone = nav_utm_zone0;
+  // convert to utm
+  utm_of_lla_f(&utm_f, &lla_f);
+  // copy results of utm conversion
+  gps.utm_pos.east = utm_f.east * 100;
+  gps.utm_pos.north = utm_f.north * 100;
+  gps.utm_pos.alt = gps.lla_pos.alt;
+  gps.utm_pos.zone = nav_utm_zone0;
+#endif
 
   // publish new GPS data
   uint32_t now_ts = get_sys_time_usec();

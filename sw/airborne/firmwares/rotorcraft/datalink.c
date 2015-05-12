@@ -141,6 +141,8 @@ void dl_parse_msg(void)
       // Check if the GPS is for this AC
       if (DL_REMOTE_GPS_ac_id(dl_buffer) != AC_ID) { break; }
 
+	#warning gps_used
+
       // Parse the GPS
       parse_gps_datalink(
         DL_REMOTE_GPS_numsv(dl_buffer),
