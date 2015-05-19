@@ -93,6 +93,7 @@ void sd_logger_periodic(void)
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 20]);
       sd_logger_int32_to_buffer(imu.gyro_unscaled.r,
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 24]);
+      /* 
       sd_logger_int32_to_buffer(actuators_pwm_values[0],
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 28]);
       sd_logger_int32_to_buffer(actuators_pwm_values[2],
@@ -105,6 +106,21 @@ void sd_logger_periodic(void)
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 44]);
       sd_logger_int32_to_buffer(0,
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 48]); // reserved for something
+                                */
+      sd_logger_int32_to_buffer(0,
+                                &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 28]);
+      sd_logger_int32_to_buffer(0,
+                                &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 32]);
+      sd_logger_int32_to_buffer(0,
+                                &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 36]);
+      sd_logger_int32_to_buffer(0,
+                                &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 40]);
+      sd_logger_int32_to_buffer(0,
+                                &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 44]);
+      sd_logger_int32_to_buffer(0,
+                                &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 48]); // reserved for something
+
+
       sdlogger.buffer_addr += SD_LOGGER_PACKET_SIZE;
 
       /* Check if the buffer is now full. If so, write to SD card */
