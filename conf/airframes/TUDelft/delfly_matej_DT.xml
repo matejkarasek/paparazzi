@@ -44,8 +44,8 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
       <!-- the  periodic frequency is 60 by default in fixed wing, 512 in rotorcraft -->
       <!-- AHRS_PROPAGATE_FREQUENCY mus be < PERIODIC_FREQUENCY -->
 
-      <configure name="AHRS_PROPAGATE_FREQUENCY" value="120"/>
-      <configure name="PERIODIC_FREQUENCY" value="120"/>  <!-- 120 seams to be the max of the barometer -->
+      <configure name="AHRS_PROPAGATE_FREQUENCY" value="512"/>
+      <configure name="PERIODIC_FREQUENCY" value="512"/>  <!-- 120 seams to be the max of the barometer -->
       <define name="USE_PERSISTENT_SETTINGS" value="TRUE"/>
 
     </target>
@@ -69,7 +69,7 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
     <!--define name="AUTOPILOT_DISABLE_AHRS_KILL"/-->  <!-- NEW -->
     
     <subsystem name="telemetry" type="transparent">
-        <configure name="MODEM_BAUD" value="B57600"/>
+        <configure name="MODEM_BAUD" value="B115200"/>
         <configure name="MODEM_PORT" value="UART1"/>
     </subsystem>
     <!--
@@ -106,13 +106,10 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
   </firmware>
 
   <modules main_freq="512"> <!-- NEW (512hz) -->
-    <!--load name="baro_sim.xml"/-->
-    <!--load name="gps_ubx_ucenter.xml"/-->
-    <!--load name="send_imu_mag_current.xml"/--> <!-- NEW -->
-    <!--load name="nav_line.xml"/-->
-    <!--<load name="geo_init"/>-->
+    <load name="gps_ubx_ucenter.xml"/>
+    <load name="send_imu_mag_current.xml"/>
+    <load name="sd_logger_spi_direct.xml"/>
   </modules>
-
 
 
   <servos driver="Pwm">

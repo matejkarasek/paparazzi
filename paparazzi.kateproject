@@ -1,0 +1,4 @@
+{
+  "name": "paparazzi"
+  , "files": [ { "directory": "paparazzi", "filters": ["*.c", "*.h", "*.xml"], "recursive": 1 } ]
+}
