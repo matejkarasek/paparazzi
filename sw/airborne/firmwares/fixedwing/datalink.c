@@ -242,8 +242,8 @@ void dl_parse_msg(void)
         DL_REMOTE_GPS_course(dl_buffer));
       break;
 #endif
-                { /* Last else */
+                {} /* Last else */
                   /* Parse modules datalink */
                   modules_parse_datalink(msg_id);
-                }
+                
 }
