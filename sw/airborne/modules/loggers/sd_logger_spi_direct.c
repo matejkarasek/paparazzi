@@ -48,6 +48,10 @@
 
 /* Definition of the sdlogger */
 struct SdLogger sdlogger;
+uint8_t recording_status;
+uint8_t elevator_hack;
+int32_t iii;
+int8_t jj;
 
 /**
  * @brief Start function called during initialization of the autopilot.
@@ -57,6 +61,10 @@ void sd_logger_start(void)
 {
   sdcard_spi_init(&sdcard1, &(SD_LOGGER_SPI_LINK_DEVICE), SD_LOGGER_SPI_LINK_SLAVE_NUMBER);
   sdlogger.status = SdLogger_Initializing;
+  recording_status = 0;
+  elevator_hack = 0;
+  iii=0;
+  jj=0;
 }
 
 /**
@@ -71,13 +79,14 @@ void sd_logger_periodic(void)
     sdlogger.cmd = SdLoggerCmd_StartLogging;
     sd_logger_command();
     sd_logger_previous_switch_state = TRUE;
+    iii=0;
+    jj=0;
   } else if (USEC_OF_RC_PPM_TICKS(ppm_pulses[4]) < 1300 && sd_logger_previous_switch_state == TRUE) {
     /* Stop logging */
     sdlogger.cmd = SdLoggerCmd_StopLogging;
     sd_logger_command();
     sd_logger_previous_switch_state = FALSE;
   }
-
 
   /* Keep the SDCard running at the same rate */
   sdcard_spi_periodic(&sdcard1);
@@ -97,6 +106,28 @@ void sd_logger_periodic(void)
       /* Logging data, write data to buffer */
     case SdLogger_Logging:
       sdlogger.packet_count++;
+  
+      /* Automated elevator / rudder deflection hack */
+      int elev_on=128;
+      int elev_off=128;
+      int repet=3;
+
+      if (jj<repet)
+      {
+        if (iii<elev_off)
+          { iii++; elevator_hack = 0; }
+        else if (iii<elev_off+elev_on)
+          { iii++; elevator_hack = 1; }
+        else
+          { 
+            jj++;
+            elevator_hack = 0; 
+            if (jj<repet) { iii=0; }
+          }
+      }
+      recording_status = 1;
+
+
       sd_logger_uint32_to_buffer(sdlogger.packet_count, &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr]);
       sd_logger_int32_to_buffer(imu.accel_unscaled.x,
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 4]);
@@ -231,6 +262,10 @@ void sd_logger_command(void)
 
       /* Stop logging command, write last block and fill with zeros if necessary */
     case SdLoggerCmd_StopLogging:
+      
+      recording_status = 0;
+      elevator_hack = 0;
+
       /* Cannot stop if not logging */
       if (sdlogger.status != SdLogger_Logging) {
         break;
