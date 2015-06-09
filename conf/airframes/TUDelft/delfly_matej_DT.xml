@@ -91,6 +91,7 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
     <!--
     <subsystem name="gps" type="datalink"/>
     -->
+    <subsystem name="rpm_sensor" type="eagletree"/>
     
     <subsystem name="actuators" type="pwm">
       <define name="SERVO_HZ" value="400"/>
@@ -104,6 +105,10 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
     <subsystem name="ins" type="alt_float"/>
     
   </firmware>
+
+<section name="RPM_SENSOR" prefix="RPM_SENSOR_">
+  <define name="PULSES_PER_ROTATION" value="6"/>
+</section>
 
   <modules main_freq="512"> <!-- NEW (512hz) -->
     <load name="gps_ubx_ucenter.xml"/>
