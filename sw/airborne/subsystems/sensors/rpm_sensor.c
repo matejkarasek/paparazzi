@@ -34,17 +34,16 @@
 #include "subsystems/sensors/rpm_sensor.h"
 
 struct RpmSensor rpm_sensor;
-int32_t test_2var = 234;
+volatile float test_2var = 234;
 
-
-static void send_rpm(struct transport_tx *trans, struct link_device *dev)
+/*static void send_rpm(struct transport_tx *trans, struct link_device *dev)
 {
-  pprz_msg_send_TCAS_DEBUG(trans, dev, AC_ID, 0, &rpm_sensor.motor_frequency);
-}
+  pprz_msg_send_ESTIMATOR(trans, dev, AC_ID, &test_2var, (float *) (&recording_status));
+}*/
 
 void rpm_sensor_init(void)
 {
-  register_periodic_telemetry(DefaultPeriodic, "TCAS_DEBUG", send_rpm);
+  //register_periodic_telemetry(DefaultPeriodic, "ESTIMATOR", send_rpm);
   rpm_sensor_arch_init();
 }
 
@@ -56,12 +55,9 @@ void rpm_sensor_process_pulse(uint16_t cnt, uint8_t overflow_cnt)
   if ((cnt > rpm_sensor.previous_cnt && overflow_cnt > 0) || (overflow_cnt > 1)) {
     rpm_sensor.motor_frequency = 0.0f;
   } else {
-    //rpm_sensor.motor_frequency = 281250.0/diff/10.0;
-    rpm_sensor.motor_frequency = 11.23;
+    rpm_sensor.motor_frequency = 281250.0/diff/10.0;
   }
 
-  rpm_sensor.motor_frequency = 23.23;
-  //rpm_sensor.int_frequency = 234;
   test_2var = 666;
 
   /* Remember count */

@@ -39,11 +39,10 @@ struct RpmSensor {
   uint16_t previous_cnt;
   float previous_frequency;
   float motor_frequency;
-  int32_t int_frequency;
 };
 
 extern struct RpmSensor rpm_sensor;
-extern int32_t test_2var;
+extern volatile float test_2var;
 
 extern void rpm_sensor_init(void);
 extern void rpm_sensor_process_pulse(uint16_t cnt, uint8_t overflow_cnt);

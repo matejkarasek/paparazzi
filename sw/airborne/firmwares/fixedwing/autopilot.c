@@ -59,6 +59,7 @@ bool_t power_switch;
 #if PERIODIC_TELEMETRY
 #include "subsystems/datalink/telemetry.h"
 #include "generated/settings.h"
+#include "subsystems/sensors/rpm_sensor.h"
 
 void send_autopilot_version(struct transport_tx *trans, struct link_device *dev)
 {
@@ -97,10 +98,17 @@ static void send_attitude(struct transport_tx *trans, struct link_device *dev)
                          &(att->phi), &(att->psi), &(att->theta));
 };
 
-static void send_estimator(struct transport_tx *trans, struct link_device *dev)
+/*static void send_estimator(struct transport_tx *trans, struct link_device *dev)
 {
   pprz_msg_send_ESTIMATOR(trans, dev, AC_ID,
                           &(stateGetPositionUtm_f()->alt), &(stateGetSpeedEnu_f()->z));
+}*/
+
+static void send_estimator(struct transport_tx *trans, struct link_device *dev)
+{
+  float est = recording_status;
+  pprz_msg_send_ESTIMATOR(trans, dev, AC_ID,
+                          &test_2var, &est);
 }
 
 static void send_bat(struct transport_tx *trans, struct link_device *dev)

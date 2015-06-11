@@ -109,6 +109,7 @@ void sd_logger_periodic(void)
       sdlogger.packet_count++;
   
       /* Automated elevator / rudder deflection hack */
+      
       int elev_on=128;
       int elev_off=128;
       int repet=3;
@@ -128,7 +129,7 @@ void sd_logger_periodic(void)
       }
       recording_status = 1;
 
-      int32_t test_var=test_2var;
+      float test_var=test_2var;
 
 
       sd_logger_uint32_to_buffer(sdlogger.packet_count, &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr]);

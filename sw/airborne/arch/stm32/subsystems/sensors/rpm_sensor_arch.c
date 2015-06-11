@@ -64,10 +64,10 @@
 
 static uint8_t rpm_sensor_arch_overflow_cnt;
 
-static void send_rpm(struct transport_tx *trans, struct link_device *dev)
+/*static void send_rpm(struct transport_tx *trans, struct link_device *dev)
 {
-  pprz_msg_send_TCAS_DEBUG(trans, dev, AC_ID, 0, &rpm_sensor.motor_frequency);
-}
+  pprz_msg_send_ESTIMATOR(trans, dev, AC_ID, &rpm_sensor.motor_frequency, 0);
+}*/
 
 
 void rpm_sensor_arch_init(void)
