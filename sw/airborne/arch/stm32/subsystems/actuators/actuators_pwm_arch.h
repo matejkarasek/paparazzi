@@ -37,6 +37,7 @@
 extern int32_t actuators_pwm_values[ACTUATORS_PWM_NB];
 
 extern void actuators_pwm_commit(void);
+extern volatile float test_3var;
 
 #define SERVOS_TICS_OF_USEC(_v) (_v)
 

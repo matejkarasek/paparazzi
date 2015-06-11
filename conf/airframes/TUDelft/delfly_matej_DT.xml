@@ -38,12 +38,10 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
       </subsystem-->
       
       <subsystem name="radio_control" type="ppm">
-	<configure name="RADIO_CONTROL_PPM_PIN" value="SERVO6"/>
+	     <configure name="RADIO_CONTROL_PPM_PIN" value="SERVO6"/>
       </subsystem>
 
-      <!-- the  periodic frequency is 60 by default in fixed wing, 512 in rotorcraft -->
       <!-- AHRS_PROPAGATE_FREQUENCY mus be < PERIODIC_FREQUENCY -->
-
       <configure name="AHRS_PROPAGATE_FREQUENCY" value="512"/>
       <configure name="PERIODIC_FREQUENCY" value="512"/>  <!-- 120 seams to be the max of the barometer -->
       <define name="USE_PERSISTENT_SETTINGS" value="TRUE"/>
@@ -91,7 +89,10 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
     <!--
     <subsystem name="gps" type="datalink"/>
     -->
-    <subsystem name="rpm_sensor" type="eagletree"/>
+    
+    <subsystem name="rpm_sensor" type="eagletree">
+      <define name="PULSES_PER_ROTATION" value="5"/>
+    </subsystem>
     
     <subsystem name="actuators" type="pwm">
       <define name="SERVO_HZ" value="400"/>
@@ -106,13 +107,8 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
     
   </firmware>
 
-<section name="RPM_SENSOR" prefix="RPM_SENSOR_">
-  <define name="PULSES_PER_ROTATION" value="6"/>
-</section>
-
-  <modules main_freq="512"> <!-- NEW (512hz) -->
+  <modules main_freq="512">
     <load name="gps_ubx_ucenter.xml"/>
-    <!--load name="send_imu_mag_current.xml"/-->
     <load name="sd_logger_spi_direct.xml"/>
   </modules>
 
@@ -121,8 +117,7 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
     <servo name="MOTOR" no="4" min="1100" neutral="1100" max="1900"/>
     <servo name="ELEVATOR" no="5" min="1100" neutral="1500" max="1900"/>
     <servo name="RUDDER" no="0" min="1900" neutral="1500" max="1100"/>
-    <!--servo name="LED" no="1" min="0" neutral="1250" max="2500"/-->
-    <servo name="LED2" no="2" min="0" neutral="1250" max="2500"/>
+    <servo name="LED" no="1" min="0" neutral="1250" max="2500"/>
   </servos>
 
   <commands>
@@ -141,10 +136,9 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
     <let var="ledswitch" value="(2*recording_status-1)*MAX_PPRZ"/>
     <set servo="MOTOR" value="@THROTTLE"/>
     <set servo="RUDDER" value="@ROLL"/>
-    <!--set servo="ELEVATOR" value="@PITCH"/-->
-    <set servo="ELEVATOR" value="elevator_hack*MAX_PPRZ"/>
-    <!--set servo="LED" value="$ledswitch"/-->
-    <set servo="LED2" value="$ledswitch"/>
+    <set servo="ELEVATOR" value="@PITCH"/>
+    <!--set servo="ELEVATOR" value="elevator_hack*MAX_PPRZ"/-->
+    <set servo="LED" value="$ledswitch"/>
   </command_laws>
 
  <section name="AUTOPILOT">
@@ -261,8 +255,8 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
   <section name="FAILSAFE" prefix="FAILSAFE_">
     <define name="DELAY_WITHOUT_GPS" value="5" unit="s"/>
     <define name="DEFAULT_THROTTLE" value="0"/>
-    <define name="DEFAULT_ROLL" value="5000"/>
-    <define name="DEFAULT_PITCH" value="3000"/>
+    <define name="DEFAULT_ROLL" value="0"/>
+    <define name="DEFAULT_PITCH" value="0"/>
   </section>
 
 

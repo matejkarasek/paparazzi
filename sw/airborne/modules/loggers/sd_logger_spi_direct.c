@@ -35,11 +35,6 @@
 #include "peripherals/sdcard_spi.h"
 #include "subsystems/datalink/telemetry.h"
 
-#ifdef TEST
-/* The original messages.h uses inline functions, which are incompatible with cmock. TEST is defined by the unittest framework */
-#include "messages_testable.h"
-#endif // TEST
-
 #include "subsystems/imu.h"
 #include "subsystems/actuators/actuators_pwm_arch.h"
 #include "subsystems/sensors/rpm_sensor.h"
@@ -129,9 +124,6 @@ void sd_logger_periodic(void)
       }
       recording_status = 1;
 
-      float test_var=test_2var;
-
-
       sd_logger_uint32_to_buffer(sdlogger.packet_count, &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr]);
       sd_logger_int32_to_buffer(imu.accel_unscaled.x,
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 4]);
@@ -155,7 +147,7 @@ void sd_logger_periodic(void)
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 40]);
       sd_logger_int32_to_buffer(actuators_pwm_values[5],
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 44]);
-      sd_logger_int32_to_buffer(test_var,
+      sd_logger_int32_to_buffer(rpm_sensor.motor_frequency,
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 48]); // reserved for something
       sdlogger.buffer_addr += SD_LOGGER_PACKET_SIZE;
 

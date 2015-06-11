@@ -108,7 +108,7 @@ static void send_estimator(struct transport_tx *trans, struct link_device *dev)
 {
   float est = recording_status;
   pprz_msg_send_ESTIMATOR(trans, dev, AC_ID,
-                          &test_2var, &est);
+                          &rpm_sensor.motor_frequency, &est);
 }
 
 static void send_bat(struct transport_tx *trans, struct link_device *dev)

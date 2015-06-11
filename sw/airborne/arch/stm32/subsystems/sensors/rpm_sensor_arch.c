@@ -38,11 +38,6 @@
 // Telemetry to test values
 #include "subsystems/datalink/telemetry.h"
 
-#ifdef TEST
-/* The original messages.h uses inline functions, which are incompatible with cmock. TEST is defined by the unittest framework */
-#include "messages_testable.h"
-#endif // TEST
-
 #define ONE_MHZ_CLK 1000000
 #ifdef NVIC_TIM_IRQ_PRIO
 #define RPM_PPM_IRQ_PRIO  NVIC_TIM_IRQ_PRIO
@@ -55,7 +50,8 @@
 #define RPM_PPM_CHANNEL         TIM_IC1
 #define RPM_PPM_GPIO_PORT       GPIOC
 #define RPM_PPM_GPIO_PIN        GPIO6
-#define RPM_PPM_GPIO_AF         0
+//#define RPM_PPM_GPIO_AF         0
+#define RPM_PPM_GPIO_AF         AFIO_MAPR_TIM3_REMAP_FULL_REMAP  // IRQ pin remapping to TIM 3
 #define RPM_PPM_TICKS_PER_USEC  6
 #define RPM_PPM_TIMER_INPUT     TIM_IC_IN_TI1
 #define RPM_PPM_IRQ             NVIC_TIM3_IRQ
@@ -63,12 +59,6 @@
 #define RPM_PPM_CC_IF           TIM_SR_CC1IF
 
 static uint8_t rpm_sensor_arch_overflow_cnt;
-
-/*static void send_rpm(struct transport_tx *trans, struct link_device *dev)
-{
-  pprz_msg_send_ESTIMATOR(trans, dev, AC_ID, &rpm_sensor.motor_frequency, 0);
-}*/
-
 
 void rpm_sensor_arch_init(void)
 {
@@ -82,8 +72,9 @@ void rpm_sensor_arch_init(void)
    * Requires remapping to get timer 3 channel 1.
    */
   gpio_enable_clock(RPM_PPM_GPIO_PORT);
-  gpio_primary_remap(FALSE, AFIO_MAPR_TIM3_REMAP_FULL_REMAP);
-  gpio_set_mode(RPM_PPM_GPIO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, RPM_PPM_GPIO_PIN);
+  //gpio_primary_remap(FALSE, AFIO_MAPR_TIM3_REMAP_FULL_REMAP);
+  //gpio_set_mode(RPM_PPM_GPIO_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, RPM_PPM_GPIO_PIN);
+  gpio_setup_pin_af(RPM_PPM_GPIO_PORT, RPM_PPM_GPIO_PIN, RPM_PPM_GPIO_AF, FALSE);
 
   /* Time Base configuration */
   timer_reset(RPM_PPM_TIMER);

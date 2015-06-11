@@ -30,3 +30,4 @@
 
 #endif
 
+extern void rpm_sensor_arch_init(void);

@@ -24,26 +24,14 @@
  */
 
 // Telemetry to test values
-#include "subsystems/datalink/telemetry.h"
-
-#ifdef TEST
-/* The original messages.h uses inline functions, which are incompatible with cmock. TEST is defined by the unittest framework */
-#include "messages_testable.h"
-#endif // TEST
-
+//#include "subsystems/datalink/telemetry.h"
 #include "subsystems/sensors/rpm_sensor.h"
 
 struct RpmSensor rpm_sensor;
-volatile float test_2var = 234;
-
-/*static void send_rpm(struct transport_tx *trans, struct link_device *dev)
-{
-  pprz_msg_send_ESTIMATOR(trans, dev, AC_ID, &test_2var, (float *) (&recording_status));
-}*/
+uint8_t pulse_per_rot=PULSES_PER_ROTATION;
 
 void rpm_sensor_init(void)
 {
-  //register_periodic_telemetry(DefaultPeriodic, "ESTIMATOR", send_rpm);
   rpm_sensor_arch_init();
 }
 
@@ -55,10 +43,8 @@ void rpm_sensor_process_pulse(uint16_t cnt, uint8_t overflow_cnt)
   if ((cnt > rpm_sensor.previous_cnt && overflow_cnt > 0) || (overflow_cnt > 1)) {
     rpm_sensor.motor_frequency = 0.0f;
   } else {
-    rpm_sensor.motor_frequency = 281250.0/diff/10.0;
+    rpm_sensor.motor_frequency = 281250.0/diff/pulse_per_rot;
   }
-
-  test_2var = 666;
 
   /* Remember count */
   rpm_sensor.previous_cnt = cnt;
