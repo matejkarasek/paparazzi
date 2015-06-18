@@ -2,6 +2,11 @@
 
 <!-- Delfly (http://www.delfly.nl/home.html)
 Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
+DelTang Rx31 receiver (ppm single wire, soldered to servo channel 3 of Lisa/S)
+
+flightplan: fixedwing_basic.xml
+radio: DT_Rx31_Devo10.xml
+telemetry: default_fixedwing.xml
 -->
 
 <airframe name="Delfly Lisa/S 1.0 Indoor">
@@ -32,7 +37,7 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
 
       <!-- AHRS_PROPAGATE_FREQUENCY mus be < PERIODIC_FREQUENCY -->
       <configure name="AHRS_PROPAGATE_FREQUENCY" value="512"/>
-      <configure name="PERIODIC_FREQUENCY" value="512"/>  <!-- 120 seams to be the max of the barometer -->
+      <configure name="PERIODIC_FREQUENCY" value="1500"/>  <!-- 120 seams to be the max of the barometer -->
       <define name="USE_PERSISTENT_SETTINGS" value="TRUE"/>
 
     </target>
@@ -107,6 +112,7 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
     <servo name="ELEVATOR" no="5" min="1100" neutral="1500" max="1900"/>
     <servo name="RUDDER" no="0" min="1900" neutral="1500" max="1100"/>
     <servo name="LED" no="1" min="0" neutral="1250" max="2500"/>
+    <servo name="LEDS" no="2" min="0" neutral="1250" max="2500"/>
   </servos>
 
   <commands>
@@ -123,11 +129,13 @@ Lisa/S v1.0 board (http://wiki.paparazziuav.org/wiki/Lisa/S)
 
   <command_laws>
     <let var="ledswitch" value="(2*recording_status-1)*MAX_PPRZ"/>
+    <let var="ledscontrol" value="(2*LEDs_switch-1)*MAX_PPRZ"/>
     <set servo="MOTOR" value="@THROTTLE"/>
     <set servo="RUDDER" value="@ROLL"/>
-    <set servo="ELEVATOR" value="@PITCH"/>
-    <!--set servo="ELEVATOR" value="elevator_hack*MAX_PPRZ"/-->
+    <!--set servo="ELEVATOR" value="@PITCH"/-->
+    <set servo="ELEVATOR" value="(1-elevator_control)*@PITCH+elevator_control*elevator_hack*MAX_PPRZ"/>
     <set servo="LED" value="$ledswitch"/>
+    <set servo="LEDS" value="$ledscontrol"/>
   </command_laws>
 
  <section name="AUTOPILOT">

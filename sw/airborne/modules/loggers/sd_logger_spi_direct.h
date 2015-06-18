@@ -88,6 +88,12 @@ struct SdLogger {
 extern struct SdLogger sdlogger;
 extern uint8_t recording_status;
 extern uint8_t elevator_hack;
+extern uint8_t LEDs_switch;
+extern uint8_t elevator_repetitions;
+extern uint8_t elevator_control;
+extern uint16_t elev_on;
+extern uint16_t elev_off;
+
 
 /* Public functions */
 extern void sd_logger_start(void);
