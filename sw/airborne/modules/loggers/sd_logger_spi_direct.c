@@ -36,6 +36,7 @@
 #include "subsystems/datalink/telemetry.h"
 
 #include "subsystems/imu.h"
+#include "mcu_periph/sys_time.h"
 #include "subsystems/actuators/actuators_pwm_arch.h"
 #include "subsystems/sensors/rpm_sensor.h"
 #include "sd_logger_spi_direct.h"
@@ -129,6 +130,10 @@ void sd_logger_periodic(void)
       }
       recording_status = 1;
 
+      // float denominator= (float)sys_time.cpu_ticks_per_sec;
+      // float time_since_startup = (float)sys_time.nb_sec + (float)sys_time.nb_sec_rem/(float)sys_time.cpu_ticks_per_sec;
+      // float time_since_startup = 10000000*sys_time.nb_sec_rem/denominator;
+
       sd_logger_uint32_to_buffer(sdlogger.packet_count, &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr]);
       sd_logger_int32_to_buffer(imu.accel_unscaled.x,
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 4]);
@@ -150,7 +155,7 @@ void sd_logger_periodic(void)
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 36]);
       sd_logger_int32_to_buffer(actuators_pwm_values[1],
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 40]);
-      sd_logger_int32_to_buffer(actuators_pwm_values[2],
+      sd_logger_int32_to_buffer(sys_time.nb_sec_rem,
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 44]);
       sd_logger_int32_to_buffer(rpm_sensor.motor_frequency,
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 48]); // reserved for something
