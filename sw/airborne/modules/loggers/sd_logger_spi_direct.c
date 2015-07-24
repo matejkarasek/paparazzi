@@ -46,12 +46,12 @@
 /* Definition of the sdlogger */
 struct SdLogger sdlogger;
 uint8_t recording_status; // 1: recording, 0: not recording
-uint8_t LEDs_switch=1; // 1: tracking LEDs on, 0: tracking LEDs off
-uint8_t elevator_control=0; // 1: automatic elevator, 0: direct RC elevator
+uint8_t LEDs_switch=0; // 1: tracking LEDs on, 0: tracking LEDs off
+uint8_t elevator_control=1; // 1: automatic elevator, 0: direct RC elevator
 uint8_t elevator_hack; // elevator position 
-uint8_t elevator_repetitions=3; // number of elevator step repetitions
+uint8_t elevator_repetitions=1; // number of elevator step repetitions
 uint16_t elev_on=128; // step on time (in samples)
-uint16_t elev_off=128; // step off time (in samples)
+uint16_t elev_off=256; // step off time (in samples)
 int32_t iii;
 int8_t jj;
 
@@ -83,6 +83,7 @@ void sd_logger_periodic(void)
     sd_logger_previous_switch_state = TRUE;
     iii=0;
     jj=0;
+
   } else if (USEC_OF_RC_PPM_TICKS(ppm_pulses[4]) < 1300 && sd_logger_previous_switch_state == TRUE) {
     /* Stop logging */
     sdlogger.cmd = SdLoggerCmd_StopLogging;
@@ -109,26 +110,33 @@ void sd_logger_periodic(void)
     case SdLogger_Logging:
       sdlogger.packet_count++;
   
-      /* Automated elevator / rudder deflection hack */
-      
-      // int elev_on=128;
-      // int elev_off=128;
-      int repet=elevator_repetitions;
+      recording_status = 1; // sets the LED on
 
-      if (jj<repet)
+      /* Automated elevator deflection sequence */
+      if (USEC_OF_RC_PPM_TICKS(ppm_pulses[6]) > 1300)
       {
-        if (iii<elev_off)
-          { iii++; elevator_hack = 0; }
-        else if (iii<elev_off+elev_on)
-          { iii++; elevator_hack = 1; }
-        else
-          { 
-            jj++;
-            elevator_hack = 0; 
-            if (jj<repet) { iii=0; }
-          }
+        int repet=elevator_repetitions;
+
+        if (jj<repet)
+        {
+          if (iii<elev_off)
+            { iii++; elevator_hack = 0; }
+          else if (iii<elev_off+elev_on)
+            { iii++; elevator_hack = 1; }
+          else
+            { 
+              jj++;
+              elevator_hack = 0; 
+              if (jj<repet) { iii=0; }
+            }
+        }
       }
-      recording_status = 1;
+      else
+      {
+        iii=0;
+        jj=0;
+      }
+      
 
       // float denominator= (float)sys_time.cpu_ticks_per_sec;
       // float time_since_startup = (float)sys_time.nb_sec + (float)sys_time.nb_sec_rem/(float)sys_time.cpu_ticks_per_sec;
