@@ -113,7 +113,7 @@ void sd_logger_periodic(void)
       recording_status = 1; // sets the LED on
 
       /* Automated elevator deflection sequence */
-      if (USEC_OF_RC_PPM_TICKS(ppm_pulses[6]) > 1300)
+      if (USEC_OF_RC_PPM_TICKS(ppm_pulses[6]) > 1300) // if ELEV D/R switch is on, start the sequence
       {
         int repet=elevator_repetitions;
 
@@ -163,10 +163,10 @@ void sd_logger_periodic(void)
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 36]);
       sd_logger_int32_to_buffer(actuators_pwm_values[1],
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 40]);
-      sd_logger_int32_to_buffer(sys_time.nb_sec_rem,
+      sd_logger_int32_to_buffer(1000000*get_sys_time_float(),
                                 &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 44]);
-      sd_logger_int32_to_buffer(rpm_sensor.motor_frequency,
-                                &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 48]); // reserved for something
+      sd_logger_int32_to_buffer(1000*rpm_sensor.motor_frequency,
+                                &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr + 48]);
       sdlogger.buffer_addr += SD_LOGGER_PACKET_SIZE;
 
       /* Check if the buffer is now full. If so, write to SD card */

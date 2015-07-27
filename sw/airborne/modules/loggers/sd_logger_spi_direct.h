@@ -68,8 +68,8 @@ struct LogPacket {
   int32_t data_8;
   int32_t data_9;
   int32_t data_10;
-  float data_11;
-  float data_12;
+  int32_t data_11;
+  int32_t data_12;
 };
 
 struct SdLogger {
