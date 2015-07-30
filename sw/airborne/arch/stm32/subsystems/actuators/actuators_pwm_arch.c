@@ -37,6 +37,7 @@
 
 
 int32_t actuators_pwm_values[ACTUATORS_PWM_NB];
+//uint16_t aaa=1;
 
 
 /** PWM arch init called by generic pwm driver
@@ -163,7 +164,7 @@ void actuators_pwm_commit(void)
   timer_set_oc_value(PWM_SERVO_3_TIMER, PWM_SERVO_3_OC, actuators_pwm_values[PWM_SERVO_3]);
 #endif
 #ifdef PWM_SERVO_4
-  timer_set_oc_value(PWM_SERVO_4_TIMER, PWM_SERVO_4_OC, actuators_pwm_values[PWM_SERVO_4]);
+  //timer_set_oc_value(PWM_SERVO_4_TIMER, PWM_SERVO_4_OC, actuators_pwm_values[PWM_SERVO_4]);
 #endif
 #ifdef PWM_SERVO_5
   timer_set_oc_value(PWM_SERVO_5_TIMER, PWM_SERVO_5_OC, actuators_pwm_values[PWM_SERVO_5]);

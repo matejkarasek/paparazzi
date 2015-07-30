@@ -41,6 +41,8 @@
 #include "subsystems/sensors/rpm_sensor.h"
 #include "sd_logger_spi_direct.h"
 
+#include <libopencm3/stm32/timer.h>
+
 #include RADIO_CONTROL_TYPE_H
 
 /* Definition of the sdlogger */
@@ -48,12 +50,14 @@ struct SdLogger sdlogger;
 uint8_t recording_status; // 1: recording, 0: not recording
 uint8_t LEDs_switch=0; // 1: tracking LEDs on, 0: tracking LEDs off
 uint8_t elevator_control=1; // 1: automatic elevator, 0: direct RC elevator
-uint8_t elevator_hack; // elevator position 
-uint8_t elevator_repetitions=1; // number of elevator step repetitions
-uint16_t elev_on=128; // step on time (in samples)
-uint16_t elev_off=256; // step off time (in samples)
+int8_t elevator_hack; // elevator position 
+uint8_t elevator_repetitions=3; // number of elevator step repetitions
+uint16_t elev_on=300; // step on time (in samples)
+uint16_t elev_off=300; // step off time (in samples)
 int32_t iii;
 int8_t jj;
+//int32_t kk;
+//int32_t LED_command;
 
 /**
  * @brief Start function called during initialization of the autopilot.
@@ -67,6 +71,8 @@ void sd_logger_start(void)
   elevator_hack = 0;
   iii=0;
   jj=0;
+  //kk=0;
+  //LED_command=0;
 }
 
 /**
@@ -74,6 +80,22 @@ void sd_logger_start(void)
  */
 void sd_logger_periodic(void)
 {
+  // Tracking LEDs switch
+  if (USEC_OF_RC_PPM_TICKS(ppm_pulses[3]) > 1300) {LEDs_switch=1;}
+  else {LEDs_switch=0;} 
+
+  // PWM - LED speed test
+  /*kk=kk+1;
+  if (kk==4)
+    {
+      if (LED_command==0) {LED_command=2500;}
+      else {LED_command=0;}
+      kk=0;
+      timer_set_oc_value(PWM_SERVO_5_TIMER, PWM_SERVO_5_OC, LED_command); // sets LEDS pwm
+    }
+  */
+
+
   /* Check if the switch is flipped to start or stop logging */
   static bool_t sd_logger_previous_switch_state = FALSE;
   if (USEC_OF_RC_PPM_TICKS(ppm_pulses[4]) > 1300 && sd_logger_previous_switch_state == FALSE) {
@@ -110,31 +132,49 @@ void sd_logger_periodic(void)
     case SdLogger_Logging:
       sdlogger.packet_count++;
   
-      recording_status = 1; // sets the LED on
+      recording_status = 1;
+      timer_set_oc_value(PWM_SERVO_4_TIMER, PWM_SERVO_4_OC, 2500); // sets LED on
 
       /* Automated elevator deflection sequence */
       if (USEC_OF_RC_PPM_TICKS(ppm_pulses[6]) > 1300) // if ELEV D/R switch is on, start the sequence
       {
         int repet=elevator_repetitions;
-
+        
         if (jj<repet)
         {
           if (iii<elev_off)
-            { iii++; elevator_hack = 0; }
+            { 
+              iii++;
+              elevator_hack = -1;
+              //LEDs_switch = 1;
+            }
           else if (iii<elev_off+elev_on)
-            { iii++; elevator_hack = 1; }
+            { 
+              iii++;
+              elevator_hack = 1;
+              //LEDs_switch = 0;
+            }
           else
             { 
               jj++;
-              elevator_hack = 0; 
-              if (jj<repet) { iii=0; }
+              if (jj<repet)
+                { 
+                  iii=0;
+                  //elev_off=elev_off-15;
+                  //elev_on=elev_on-15;
+                }
             }
         }
+        else {elevator_hack = 0;} 
       }
       else
       {
+        //LEDs_switch = 0;
+        elevator_hack = 0; 
         iii=0;
         jj=0;
+        //elev_on=300;
+        //elev_off=300;
       }
       
 
@@ -279,6 +319,7 @@ void sd_logger_command(void)
       
       recording_status = 0;
       elevator_hack = 0;
+      timer_set_oc_value(PWM_SERVO_4_TIMER, PWM_SERVO_4_OC, 0); // sets LED off
 
       /* Cannot stop if not logging */
       if (sdlogger.status != SdLogger_Logging) {

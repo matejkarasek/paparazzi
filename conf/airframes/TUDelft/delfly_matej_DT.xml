@@ -104,14 +104,14 @@ telemetry: default_fixedwing.xml
   <modules main_freq="1500"> <!-- was 512-->
     <load name="gps_ubx_ucenter.xml"/>
     <load name="sd_logger_spi_direct.xml"/>
-    <load name="sys_mon.xml"/>
+    <!--load name="sys_mon.xml"/-->
   </modules>
 
 
   <servos driver="Pwm">
     <servo name="MOTOR" no="4" min="1100" neutral="1100" max="1900"/>
-    <!--servo name="ELEVATOR" no="5" min="1100" neutral="1500" max="1900"/-->
-    <servo name="ELEVATOR" no="5" min="1370" neutral="1635" max="1900"/> <!-- trimmed -->
+    <servo name="ELEVATOR" no="5" min="1100" neutral="1500" max="1900"/>
+    <!--servo name="ELEVATOR" no="5" min="1370" neutral="1635" max="1900"/--> <!-- trimmed -->
     <servo name="RUDDER" no="0" min="1900" neutral="1500" max="1100"/>
     <servo name="LED" no="1" min="0" neutral="1250" max="2500"/>
     <servo name="LEDS" no="2" min="0" neutral="1250" max="2500"/>
@@ -130,13 +130,12 @@ telemetry: default_fixedwing.xml
   </rc_commands>
 
   <command_laws>
-    <let var="ledswitch" value="(2*recording_status-1)*MAX_PPRZ"/>
+    <!--let var="ledswitch" value="(2*recording_status-1)*MAX_PPRZ"/-->
     <let var="ledscontrol" value="(2*LEDs_switch-1)*MAX_PPRZ"/>
     <set servo="MOTOR" value="@THROTTLE"/>
     <set servo="RUDDER" value="@ROLL"/>
-    <!--set servo="ELEVATOR" value="@PITCH"/-->
     <set servo="ELEVATOR" value="(1-elevator_control)*@PITCH+elevator_control*elevator_hack*MAX_PPRZ"/>
-    <set servo="LED" value="$ledswitch"/>
+    <!--set servo="LED" value="$ledswitch"/-->
     <set servo="LEDS" value="$ledscontrol"/>
   </command_laws>
 
