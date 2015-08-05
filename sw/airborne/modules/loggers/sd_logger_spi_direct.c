@@ -51,6 +51,8 @@ uint8_t recording_status; // 1: recording, 0: not recording
 uint8_t LEDs_switch=0; // 1: tracking LEDs on, 0: tracking LEDs off
 uint8_t elevator_control=1; // 1: automatic elevator, 0: direct RC elevator
 int8_t elevator_hack; // elevator position 
+int8_t elevator_min=0; // step on time (in samples)
+int8_t elevator_max=100; // step off time (in samples)
 uint8_t elevator_repetitions=3; // number of elevator step repetitions
 uint16_t elev_on=300; // step on time (in samples)
 uint16_t elev_off=300; // step off time (in samples)
@@ -145,13 +147,13 @@ void sd_logger_periodic(void)
           if (iii<elev_off)
             { 
               iii++;
-              elevator_hack = -1;
+              elevator_hack = elevator_min;
               //LEDs_switch = 1;
             }
           else if (iii<elev_off+elev_on)
             { 
               iii++;
-              elevator_hack = 1;
+              elevator_hack = elevator_max;
               //LEDs_switch = 0;
             }
           else

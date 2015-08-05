@@ -134,7 +134,7 @@ telemetry: default_fixedwing.xml
     <let var="ledscontrol" value="(2*LEDs_switch-1)*MAX_PPRZ"/>
     <set servo="MOTOR" value="@THROTTLE"/>
     <set servo="RUDDER" value="@ROLL"/>
-    <set servo="ELEVATOR" value="(1-elevator_control)*@PITCH+elevator_control*elevator_hack*MAX_PPRZ"/>
+    <set servo="ELEVATOR" value="(1-elevator_control)*@PITCH+elevator_control*elevator_hack*0.01*MAX_PPRZ"/>
     <!--set servo="LED" value="$ledswitch"/-->
     <set servo="LEDS" value="$ledscontrol"/>
   </command_laws>
