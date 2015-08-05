@@ -217,6 +217,13 @@
   <firmware name="rotorcraft">
     <target name="ap" board="lisa_s_1.0">
       <subsystem name="radio_control" type="superbitrf_rc">
+      
+        <!--TX 6 (DEVO-10) : 0xF724B7D7 -->
+        <!--
+        <define name="RADIO_TRANSMITTER_ID" value="4146378711"/> 
+        <define name="RADIO_TRANSMITTER_PROTOCOL" value="0x01"/>
+        <define name="RADIO_TRANSMITTER_CHAN" value="7"/>
+        -->
         <define name="RADIO_MODE" value="RADIO_GEAR"/>
         <!--<define name="RADIO_KILL_SWITCH" value="RADIO_GEAR"/>-->
         <define name="USE_PERSISTENT_SETTINGS" value="TRUE"/>
@@ -243,7 +250,13 @@
     <!--<subsystem name="telemetry" type="superbitrf"/>-->
     <!-- Comment the previous line and uncomment the following one if you need
          to use the debug serial interface for telemetry. -->
-    <subsystem name="telemetry" type="superbitrf"/>
+    <!--subsystem name="telemetry" type="superbitrf"/-->
+    
+    <subsystem name="telemetry" type="transparent">
+        <configure name="MODEM_BAUD" value="B115200"/>
+        <configure name="MODEM_PORT" value="UART1"/>
+    </subsystem>
+    
     <subsystem name="imu" type="lisa_s_v1.0">
       <define name="LISA_S_UPSIDE_DOWN"/> <!-- Upside down is a relative term. :) -->
     </subsystem>
