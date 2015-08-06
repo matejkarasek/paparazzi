@@ -34,7 +34,7 @@
 <airframe name="quadrotor_lisa_s">
 
   <servos driver="Pwm">
-    <servo name="MOTOR" no="0" min="1100" neutral="1100" max="2000"/>
+    <servo name="MOTOR" no="0" min="1100" neutral="1100" max="1900"/>
   </servos>
 
   <servos driver="Dualpwm">
@@ -53,7 +53,7 @@
     <axis name="THRUST" failsafe_value="0"/>
   </commands>
   <command_laws>
-    <call fun="motor_mixing_run(autopilot_motors_on,FALSE,values)"/>
+    <!--call fun="motor_mixing_run(autopilot_motors_on,FALSE,values)"/-->
     <set servo="TOUW1" value="+@ROLL-@PITCH+@YAW"/>
     <set servo="TOUW2" value="-@ROLL-@PITCH-@YAW"/>
     <set servo="TOUW3" value="@PITCH-@ROLL+@YAW"/>
@@ -70,7 +70,7 @@
     <set servo="MOTOR" value="@THRUST" />
   </command_laws>
 -->
-  <section name="MIXING" prefix="MOTOR_MIXING_">
+<!--section name="MIXING" prefix="MOTOR_MIXING_">
     <define name="TRIM_ROLL" value="0"/>
     <define name="TRIM_PITCH" value="0"/>
     <define name="TRIM_YAW" value="0"/>
@@ -80,7 +80,7 @@
     <define name="PITCH_COEF" value="{  256, -256, -256,  256 }"/>
     <define name="YAW_COEF" value="{    256, -256,  256, -256 }"/>
     <define name="THRUST_COEF" value="{ 256,  256,  256,  256 }"/>
-  </section>
+  </section-->
 
   <section name="IMU" prefix="IMU_">
     <define name="BODY_TO_IMU_PHI"   value="90." unit="deg"/>
@@ -116,13 +116,15 @@
   </section>
 
  <section name="AUTOPILOT">
-   <define name="MODE_STARTUP" value="AP_MODE_NAV"/>
+   <define name="MODE_STARTUP" value="AP_MODE_RC_DIRECT"/>
    <define name="MODE_MANUAL" value="AP_MODE_ATTITUDE_DIRECT"/>
    <define name="MODE_AUTO1" value="AP_MODE_RC_DIRECT"/>
    <define name="MODE_AUTO2" value="AP_MODE_NAV"/>
-
+    <!--
     <define name="USE_THROTTLE_FOR_MOTOR_ARMING" value="TRUE"/>
     <define name="NO_RC_THRUST_LIMIT" value="TRUE"/>
+     
+    -->
  </section>
 
  <section name="BAT">
@@ -229,7 +231,7 @@
 
  <modules main_freq="512">
    <load name="gps_ubx_ucenter.xml"/>
-   <load name="send_imu_mag_current.xml"/>
+   <!--load name="send_imu_mag_current.xml"/-->
  </modules>
 
   <firmware name="rotorcraft">
@@ -239,9 +241,9 @@
         <define name="RADIO_TRANSMITTER_PROTOCOL" value="0x01"/>
         <define name="RADIO_TRANSMITTER_CHAN" value="7"/>
         
-      <define name="RADIO_MODE" value="RADIO_FLAP"/>
-        <!--<define name="RADIO_KILL_SWITCH" value="RADIO_GEAR"/>-->
-        <!--define name="USE_PERSISTENT_SETTINGS" value="TRUE"/-->
+        <define name="RADIO_MODE" value="RADIO_FLAP"/>
+        <!--define name="RADIO_KILL_SWITCH" value="RADIO_GEAR"/-->
+       <define name="USE_PERSISTENT_SETTINGS" value="TRUE"/>
       </subsystem>
 
       <configure name="AHRS_PROPAGATE_FREQUENCY" value="500"/>
@@ -252,7 +254,7 @@
       <subsystem name="radio_control" type="ppm"/>
     </target>
 
-    <subsystem name="motor_mixing"/>
+    <!--subsystem name="motor_mixing"/-->
 
     <subsystem name="actuators" type="pwm">
       <define name="SERVO_HZ" value="50"/>
