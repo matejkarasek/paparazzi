@@ -47,15 +47,15 @@
 
 /* Definition of the sdlogger */
 struct SdLogger sdlogger;
-uint8_t recording_status; // 1: recording, 0: not recording
+//uint8_t recording_status; // 1: recording, 0: not recording
 uint8_t LEDs_switch=0; // 1: tracking LEDs on, 0: tracking LEDs off
 uint8_t elevator_control=1; // 1: automatic elevator, 0: direct RC elevator
 int8_t elevator_hack; // elevator position 
 int8_t elevator_min=0; // step on time (in samples)
 int8_t elevator_max=100; // step off time (in samples)
-uint8_t elevator_repetitions=3; // number of elevator step repetitions
-uint16_t elev_on=300; // step on time (in samples)
-uint16_t elev_off=300; // step off time (in samples)
+uint8_t elevator_repetitions=1; // number of elevator step repetitions
+uint16_t elev_on=128; // step on time (in samples)
+uint16_t elev_off=128; // step off time (in samples)
 int32_t iii;
 int8_t jj;
 //int32_t kk;
@@ -69,7 +69,7 @@ void sd_logger_start(void)
 {
   sdcard_spi_init(&sdcard1, &(SD_LOGGER_SPI_LINK_DEVICE), SD_LOGGER_SPI_LINK_SLAVE_NUMBER);
   sdlogger.status = SdLogger_Initializing;
-  recording_status = 0;
+  //recording_status = 0;
   elevator_hack = 0;
   iii=0;
   jj=0;
@@ -134,7 +134,7 @@ void sd_logger_periodic(void)
     case SdLogger_Logging:
       sdlogger.packet_count++;
   
-      recording_status = 1;
+      //recording_status = 1;
       timer_set_oc_value(PWM_SERVO_4_TIMER, PWM_SERVO_4_OC, 2500); // sets LED on
 
       /* Automated elevator deflection sequence */
@@ -179,10 +179,6 @@ void sd_logger_periodic(void)
         //elev_off=300;
       }
       
-
-      // float denominator= (float)sys_time.cpu_ticks_per_sec;
-      // float time_since_startup = (float)sys_time.nb_sec + (float)sys_time.nb_sec_rem/(float)sys_time.cpu_ticks_per_sec;
-      // float time_since_startup = 10000000*sys_time.nb_sec_rem/denominator;
 
       sd_logger_uint32_to_buffer(sdlogger.packet_count, &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + sdlogger.buffer_addr]);
       sd_logger_int32_to_buffer(imu.accel_unscaled.x,
@@ -319,7 +315,7 @@ void sd_logger_command(void)
       /* Stop logging command, write last block and fill with zeros if necessary */
     case SdLoggerCmd_StopLogging:
       
-      recording_status = 0;
+      //recording_status = 0;
       elevator_hack = 0;
       timer_set_oc_value(PWM_SERVO_4_TIMER, PWM_SERVO_4_OC, 0); // sets LED off
 

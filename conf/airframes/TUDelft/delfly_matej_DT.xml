@@ -37,7 +37,7 @@ telemetry: default_fixedwing.xml
 
       <!-- AHRS_PROPAGATE_FREQUENCY mus be < PERIODIC_FREQUENCY -->
       <configure name="AHRS_PROPAGATE_FREQUENCY" value="512"/>
-      <configure name="PERIODIC_FREQUENCY" value="1500"/>  <!-- was 512, 120 seams to be the max of the barometer -->
+      <configure name="PERIODIC_FREQUENCY" value="512"/>  <!-- was 512, 120 seams to be the max of the barometer -->
       <define name="USE_PERSISTENT_SETTINGS" value="TRUE"/>
 
     </target>
@@ -101,7 +101,7 @@ telemetry: default_fixedwing.xml
     
   </firmware>
 
-  <modules main_freq="1500"> <!-- was 512-->
+  <modules main_freq="512"> <!-- was 512-->
     <load name="gps_ubx_ucenter.xml"/>
     <load name="sd_logger_spi_direct.xml"/>
     <!--load name="sys_mon.xml"/-->
