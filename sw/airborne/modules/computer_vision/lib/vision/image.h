@@ -108,4 +108,26 @@ struct marker_deviation_t marker(struct image_t *input, struct image_t *output, 
 /////  Seong Addition ends..   //////
 /////                          //////
 /////////////////////////////////////
+
+/////////////////////////////////////
+/////                          //////
+/////  Matej's code starts..   //////
+/////                          //////
+/////////////////////////////////////
+
+struct centroid_vband_t
+{
+  float x;
+  float y;
+};
+
+struct centroid_vband_t image_vband_centroid(struct image_t *input, struct image_t *output, uint8_t y_m, uint8_t y_M, uint8_t u_m,
+                                            uint8_t u_M, uint8_t v_m, uint8_t v_M, uint16_t line_m, uint16_t line_M, uint8_t vband_id);
+
+/////////////////////////////////////
+/////                          //////
+/////  Matej's code ends..     //////
+/////                          //////
+/////////////////////////////////////
+
 #endif

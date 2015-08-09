@@ -42,7 +42,7 @@
         <define name="VISION_t" value="8"/>
         <define name="VISION_IN" value="3"/>
     </load>
-    <!--load name="video_rtp_stream_IMAV2015.xml">
+    <load name="video_rtp_stream_IMAV2015.xml">
     	<define name="VIEWVIDEO_DEVICE" value="/dev/video2" />
    	<define name="VIEWVIDEO_DEVICE_SIZE" value="320,240" />
     	<define name="VIEWVIDEO_DEVICE_BUFFERS" value="10" />
@@ -56,7 +56,7 @@
         <define name="VISION_m" value="5" />
         <define name="VISION_t" value="8"/>
         <define name="VISION_IN" value="3"/>
-    </load-->
+    </load>
   </modules>
 
   <commands>

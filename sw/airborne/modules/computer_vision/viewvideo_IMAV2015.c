@@ -137,12 +137,14 @@ PRINT_CONFIG_VAR(VIEWVIDEO_HOST)
 PRINT_CONFIG_VAR(VIEWVIDEO_PORT_OUT)
 
 /* Initialize the default settings for the vision algorithm */
+/*
 struct visionhover_param_t visionhover_param = {
   .M = VISION_M,
   .m = VISION_m,
   .t = VISION_t,
   .IN = VISION_IN,
 };
+*/
 
 // Main thread
 static void *viewvideo_thread(void *data);
@@ -221,9 +223,15 @@ static void *viewvideo_thread(void *data __attribute__((unused)))
 	
 	//printf("x_deviation and y_deviation is %.0f and %.0f\n", centroid_deviation.x, centroid_deviation.y);
 	
-	struct marker_deviation_t marker_deviation = marker(&img, &img, visionhover_param.M, visionhover_param.m, visionhover_param.t, visionhover_param.IN);
+	//struct marker_deviation_t marker_deviation = marker(&img, &img, visionhover_param.M, visionhover_param.m, visionhover_param.t, visionhover_param.IN);
 	
-	printf("Inliers = %i\n", marker_deviation.inlier);
+	//printf("Inliers = %i\n", marker_deviation.inlier);
+
+  struct centroid_vband_t centroid_vband1 = image_vband_centroid(&img, &img, 75, 255, 0, 255, 0, 255, 1, 20, 1); // y_m day 180, night 60 
+  struct centroid_vband_t centroid_vband2 = image_vband_centroid(&img, &img, 75, 255, 0, 255, 0, 255, 21, 120, 2);
+  struct centroid_vband_t centroid_vband3 = image_vband_centroid(&img, &img, 75, 255, 0, 255, 0, 255, 221, 240, 3);
+
+  // printf("x_deviation and y_deviation is %.0f and %.0f\n", centroid_vband.x, centroid_vband.y);
 	
 /////////////////////////////////////////////////////////////
 /////                                                   /////

@@ -858,3 +858,200 @@ struct marker_deviation_t marker(struct image_t *input, struct image_t *output, 
     return marker_deviation;
 
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+//////////                                                                         /////////
+//////////                           Matej's code below...                         /////////
+//////////                                                                         /////////
+////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+/**
+ * Create a binary map after filtering colors in a horizontal band of selected lines of an YUV422 image, then calculate the centroid location wrt center.
+ * @param[in] *input The input image to filter
+ * @param[out] *output The filtered output image
+ * @param[in] y_m The Y minimum value
+ * @param[in] y_M The Y maximum value
+ * @param[in] u_m The U minimum value
+ * @param[in] u_M The U maximum value
+ * @param[in] v_m The V minimum value
+ * @param[in] v_M The V maximum value
+ * @param[in] h   The number of lines to be considered at the top and bottom for line direction calculation 
+ * @return The location of the filtered image centroid.
+ */
+
+
+ struct centroid_vband_t image_vband_centroid(struct image_t *input, struct image_t *output, uint8_t y_m, uint8_t y_M, uint8_t u_m,
+                                uint8_t u_M, uint8_t v_m, uint8_t v_M, uint16_t line_m, uint16_t line_M, uint8_t vband_id)
+{
+  struct centroid_vband_t centroid_vband;
+  uint8_t *source = input->buf;
+  uint8_t *dest = output->buf;
+  uint16_t x, y;
+  int bin[input->h][input->w];
+  int sum_row, moment_row_sum, sum_col, moment_col_sum, image_total = 0;
+  int x_centroid, y_centroid;
+  int counter;
+  
+
+  // Copy the creation timestamp (stays the same)
+  memcpy(&output->ts, &input->ts, sizeof(struct timeval));
+
+  // TODO check if line_m and line_M are valid
+
+  // Go trough the selected lines of the image
+  counter = 0;
+  dest += (line_m-1)*2*output->w;
+  source += (line_m-1)*2*output->w;
+  for (y = 0; y < line_M-line_m; y++) 
+  {
+    for (x = 0; x < output->w; x+=2) 
+    {
+      // Check if the color is inside the specified values
+      if (
+        (dest[1] >= y_m)
+        && (dest[1] <= y_M)
+        && (dest[0] >= u_m)
+        && (dest[0] <= u_M)
+        && (dest[2] >= v_m)
+        && (dest[2] <= v_M)
+         )
+       {
+        // color the filtered pixels
+        switch(vband_id)
+        {
+          case 1 :
+            // top band coloured to green
+            dest[0] = 0;         // U 0
+            dest[1] = source[1];  // Y 255
+            dest[2] = 0;        // V 0
+            dest[3] = source[3];  // Y 255
+            bin[y][x] = 1;
+            bin[y][x+1] = 1;
+            break;
+
+          case 2 :
+            // middle band coloured to blue
+            dest[0] = 255;         // U 0
+            dest[1] = source[1];  // Y 255
+            dest[2] = 0;        // V 0
+            dest[3] = source[3];  // Y 255
+            bin[y][x] = 1;
+            bin[y][x+1] = 1;
+            break;
+
+          case 3 :
+            // bottom band coloured to pink
+            dest[0] = 255;         // U 0
+            dest[1] = source[1];  // Y 255
+            dest[2] = 255;        // V 0
+            dest[3] = source[3];  // Y 255
+            bin[y][x] = 1;
+            bin[y][x+1] = 1;
+            break;
+        }
+
+        // to green
+        // dest[0] = 0;         // U 0
+        // dest[1] = source[1];  // Y 255
+        // dest[2] = 0;        // V 0
+        // dest[3] = source[3];  // Y 255
+        // bin[y][x] = 1;
+        // bin[y][x+1] = 1;
+       } 
+      else {
+        // UYVY
+        //dest[0] = source[0];  // U 
+        //dest[1] = source[1];  // Y 
+        //dest[2] = source[2];  // V 
+        //dest[3] = source[3];  // Y 
+        bin[y][x] = 0;
+        bin[y][x+1] = 0;
+      }
+
+      // Go to the next 2 pixels
+      dest+=4;
+      source+=4;
+      counter+=1;
+    }
+  }
+    
+    // Calculate the y-position of the centroid.
+    moment_row_sum = 0;
+    for (y = 0; y < line_M-line_m; y++) 
+    {
+      sum_row = 0;
+      for (x = 0; x < input->w; x++) 
+      {
+       sum_row = sum_row + bin[y][x];
+      }
+      image_total = image_total + sum_row;
+      moment_row_sum = moment_row_sum + sum_row * y;
+    }
+
+    
+    if (image_total == 0) {y_centroid = (line_m+line_M)/2 -1;}
+    else { y_centroid = moment_row_sum/image_total + line_m - 1;}
+        
+    // Calculate the x-position of the centroid.
+    moment_col_sum = 0;
+    for (x = 0; x < input->w; x++) 
+    {
+          sum_col = 0;
+      for (y = 0; y < line_M-line_m; y++) 
+      {
+       sum_col = sum_col + bin[y][x];
+      }
+      moment_col_sum = moment_col_sum + sum_col * x;
+    }
+    
+    if (image_total == 0) {x_centroid = (input->w)/2;}
+    else { x_centroid = moment_col_sum/image_total;}
+    
+   
+    centroid_vband.x = x_centroid - (output->w)/2;
+    centroid_vband.y = -y_centroid + (output->h)/2;
+
+    // display two crosses marking the image center and the filtered blob centroid
+    dest-=4*counter+(line_m-1)*2*output->w;
+    source-=4*counter+(line_m-1)*2*output->w;
+
+    for (y = 0; y < output->h; y++) 
+    {
+      for (x = 0; x < output->w; x+=2) 
+      {
+        dest[1] = source[1]; //Y
+        dest[3] = source[3]; //Y
+        
+        static uint8_t th= 2; // making the cross thicker by adding 'th' lines on each side
+
+        // image center - blue
+        if ( ((y >= (output->h)/2 - th) && (y <= (output->h)/2 + th) ) || ((x >= (output->w)/2 - th) && (x <= (output->w)/2 + th)) )
+        {
+          dest[0] = 200;       // U
+          dest[2] = 60;        // V
+        }
+        // blob centroid - red
+        if ( ((y >= y_centroid - th) && (y <= y_centroid + th)) || ((x >= x_centroid - th) && (x <= x_centroid + th)) )
+        {
+          dest[0] = 60;       // U
+          dest[2] = 200;        // V
+        }
+        else
+        {
+          dest[0] = source[0];    // U
+          dest[2] = source[2];    // V
+        }
+          
+        dest+=4;
+        source+=4;
+      }
+    }
+    
+    return centroid_vband;
+
+}
+
+ 
