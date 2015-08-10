@@ -42,12 +42,13 @@
 #include "sd_logger_spi_direct.h"
 
 #include <libopencm3/stm32/timer.h>
+#include "led.h"
 
 #include RADIO_CONTROL_TYPE_H
 
 /* Definition of the sdlogger */
 struct SdLogger sdlogger;
-//uint8_t recording_status; // 1: recording, 0: not recording
+uint8_t recording_status; // 1: recording, 0: not recording
 uint8_t LEDs_switch=0; // 1: tracking LEDs on, 0: tracking LEDs off
 uint8_t elevator_control=1; // 1: automatic elevator, 0: direct RC elevator
 int8_t elevator_hack; // elevator position 
@@ -69,8 +70,9 @@ void sd_logger_start(void)
 {
   sdcard_spi_init(&sdcard1, &(SD_LOGGER_SPI_LINK_DEVICE), SD_LOGGER_SPI_LINK_SLAVE_NUMBER);
   sdlogger.status = SdLogger_Initializing;
-  //recording_status = 0;
+  recording_status = 0;
   elevator_hack = 0;
+  LED_OFF(1); // sets the system time LED off
   iii=0;
   jj=0;
   //kk=0;
@@ -124,6 +126,7 @@ void sd_logger_periodic(void)
     case SdLogger_Initializing:
       if (sdcard1.status == SDCard_Error) {
         sdlogger.status = SdLogger_Error;
+        LED_TOGGLE(1); // makes the system time LED blink
       } else if (sdcard1.status == SDCard_Idle) {
         sdlogger.status = SdLogger_Idle;
       }
@@ -134,8 +137,9 @@ void sd_logger_periodic(void)
     case SdLogger_Logging:
       sdlogger.packet_count++;
   
-      //recording_status = 1;
+      recording_status = 1;
       timer_set_oc_value(PWM_SERVO_4_TIMER, PWM_SERVO_4_OC, 2500); // sets LED on
+      LED_ON(1); // sets the system time LED on
 
       /* Automated elevator deflection sequence */
       if (USEC_OF_RC_PPM_TICKS(ppm_pulses[6]) > 1300) // if ELEV D/R switch is on, start the sequence
@@ -212,6 +216,7 @@ void sd_logger_periodic(void)
         /* If the card is not idle, we cannot write the buffered data and it will be lost */
         if (sdcard1.status != SDCard_MultiWriteIdle) {
           sdlogger.error_count++;
+          LED_TOGGLE(1); // makes the system time LED blink
         }
         /* Write the unique ID at the beginning of the block, to identify later if the block belongs to the dataset */
         sd_logger_uint32_to_buffer(sdlogger.unique_id, &sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET]);
@@ -296,13 +301,37 @@ void sd_logger_command(void)
 
   switch (sdlogger.cmd) {
 
-      /* Start logging command*/
+    //   /* Start logging command*/
+    // case SdLoggerCmd_StartLogging:
+    //   if (sdcard1.status != SDCard_Idle) {
+    //     break;
+    //   }
+    //   /* Start at address 1 since 0 is used for the status block/packet */
+    //   sdcard_spi_multiwrite_start(&sdcard1, 0x00000001);
+    //   sdlogger.status = SdLogger_BeforeLogging;
+    //   /* Reserved for unique_id which is set just before writing the block */
+    //   sdlogger.buffer_addr = SD_LOGGER_BLOCK_PREAMBLE_SIZE;
+    //   /* Reset counters since a new log is started */
+    //   sdlogger.packet_count = 0;
+    //   sdlogger.error_count = 0;
+    //   break;
+
+
+          /* Start logging command*/
     case SdLoggerCmd_StartLogging:
       if (sdcard1.status != SDCard_Idle) {
         break;
       }
-      /* Start at address 1 since 0 is used for the status block/packet */
-      sdcard_spi_multiwrite_start(&sdcard1, 0x00000001);
+      
+      /* Fill the first block with zeros */
+      sdcard_spi_multiwrite_start(&sdcard1, 0x00000000);
+      for (uint16_t i = sdlogger.buffer_addr; i < (SD_LOGGER_BUFFER_OFFSET + SD_BLOCK_SIZE); i++) {
+        sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + i] = 0x00;
+      }
+      /* Write the first block */
+      sdcard_spi_multiwrite_next(&sdcard1);
+
+
       sdlogger.status = SdLogger_BeforeLogging;
       /* Reserved for unique_id which is set just before writing the block */
       sdlogger.buffer_addr = SD_LOGGER_BLOCK_PREAMBLE_SIZE;
@@ -312,12 +341,14 @@ void sd_logger_command(void)
       break;
 
 
+
       /* Stop logging command, write last block and fill with zeros if necessary */
     case SdLoggerCmd_StopLogging:
       
-      //recording_status = 0;
+      recording_status = 0;
       elevator_hack = 0;
       timer_set_oc_value(PWM_SERVO_4_TIMER, PWM_SERVO_4_OC, 0); // sets LED off
+      LED_OFF(1); // sets the system time LED off
 
       /* Cannot stop if not logging */
       if (sdlogger.status != SdLogger_Logging) {

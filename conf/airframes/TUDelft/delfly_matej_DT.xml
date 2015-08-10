@@ -39,7 +39,7 @@ telemetry: default_fixedwing.xml
       <configure name="AHRS_PROPAGATE_FREQUENCY" value="512"/>
       <configure name="PERIODIC_FREQUENCY" value="512"/>  <!-- was 512, 120 seams to be the max of the barometer -->
       <define name="USE_PERSISTENT_SETTINGS" value="TRUE"/>
-
+      <configure name="SYS_TIME_LED" value="none"/> <!-- Red LED no longer used a System Alive LED-->
     </target>
     
     
@@ -98,7 +98,9 @@ telemetry: default_fixedwing.xml
     <subsystem name="control"/>
     <subsystem name="navigation"/>
     <subsystem name="ins" type="alt_float"/>
-    
+
+    <define name="USE_LED_1" value="1"/> <!--red LED will be used for logging status -->
+        
   </firmware>
 
   <modules main_freq="512"> <!-- was 512-->
@@ -133,7 +135,7 @@ telemetry: default_fixedwing.xml
     <!--let var="ledswitch" value="(2*recording_status-1)*MAX_PPRZ"/-->
     <let var="ledscontrol" value="(2*LEDs_switch-1)*MAX_PPRZ"/>
     <set servo="MOTOR" value="@THROTTLE"/>
-    <set servo="RUDDER" value="@ROLL"/>
+    <set servo="RUDDER" value="LEDs_switch*@ROLL"/>
     <set servo="ELEVATOR" value="(1-elevator_control)*@PITCH+elevator_control*elevator_hack*0.01*MAX_PPRZ"/>
     <!--set servo="LED" value="$ledswitch"/-->
     <set servo="LEDS" value="$ledscontrol"/>

@@ -86,7 +86,7 @@ struct SdLogger {
 };
 
 extern struct SdLogger sdlogger;
-//extern uint8_t recording_status;
+extern uint8_t recording_status;
 extern int8_t elevator_hack;
 extern int8_t elevator_min;
 extern int8_t elevator_max;
