@@ -301,37 +301,13 @@ void sd_logger_command(void)
 
   switch (sdlogger.cmd) {
 
-    //   /* Start logging command*/
-    // case SdLoggerCmd_StartLogging:
-    //   if (sdcard1.status != SDCard_Idle) {
-    //     break;
-    //   }
-    //   /* Start at address 1 since 0 is used for the status block/packet */
-    //   sdcard_spi_multiwrite_start(&sdcard1, 0x00000001);
-    //   sdlogger.status = SdLogger_BeforeLogging;
-    //   /* Reserved for unique_id which is set just before writing the block */
-    //   sdlogger.buffer_addr = SD_LOGGER_BLOCK_PREAMBLE_SIZE;
-    //   /* Reset counters since a new log is started */
-    //   sdlogger.packet_count = 0;
-    //   sdlogger.error_count = 0;
-    //   break;
-
-
-          /* Start logging command*/
+      /* Start logging command*/
     case SdLoggerCmd_StartLogging:
       if (sdcard1.status != SDCard_Idle) {
         break;
       }
-      
-      /* Fill the first block with zeros */
-      sdcard_spi_multiwrite_start(&sdcard1, 0x00000000);
-      for (uint16_t i = sdlogger.buffer_addr; i < (SD_LOGGER_BUFFER_OFFSET + SD_BLOCK_SIZE); i++) {
-        sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + i] = 0x00;
-      }
-      /* Write the first block */
-      sdcard_spi_multiwrite_next(&sdcard1);
-
-
+      /* Start at address 1 since 0 is used for the status block/packet */
+      sdcard_spi_multiwrite_start(&sdcard1, 0x00000001);
       sdlogger.status = SdLogger_BeforeLogging;
       /* Reserved for unique_id which is set just before writing the block */
       sdlogger.buffer_addr = SD_LOGGER_BLOCK_PREAMBLE_SIZE;
@@ -339,6 +315,30 @@ void sd_logger_command(void)
       sdlogger.packet_count = 0;
       sdlogger.error_count = 0;
       break;
+
+
+    //       /* Start logging command*/
+    // case SdLoggerCmd_StartLogging:
+    //   if (sdcard1.status != SDCard_Idle) {
+    //     break;
+    //   }
+      
+    //   /* Fill the first block with zeros */
+    //   sdcard_spi_multiwrite_start(&sdcard1, 0x00000000);
+    //   for (uint16_t i = sdlogger.buffer_addr; i < (SD_LOGGER_BUFFER_OFFSET + SD_BLOCK_SIZE); i++) {
+    //     sdcard1.output_buf[SD_LOGGER_BUFFER_OFFSET + i] = 0x00;
+    //   }
+    //   /* Write the first block */
+    //   sdcard_spi_multiwrite_next(&sdcard1);
+
+
+    //   sdlogger.status = SdLogger_BeforeLogging;
+    //   /* Reserved for unique_id which is set just before writing the block */
+    //   sdlogger.buffer_addr = SD_LOGGER_BLOCK_PREAMBLE_SIZE;
+    //   /* Reset counters since a new log is started */
+    //   sdlogger.packet_count = 0;
+    //   sdlogger.error_count = 0;
+    //   break;
 
 
 
