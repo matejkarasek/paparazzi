@@ -227,15 +227,40 @@ static void *viewvideo_thread(void *data __attribute__((unused)))
 	
 	//printf("Inliers = %i\n", marker_deviation.inlier);
 
-  struct centroid_vband_t centroid_vband1 = image_vband_centroid(&img, &img, 75, 255, 0, 255, 0, 255, 1, 20, 1); // y_m day 180, night 60 
-  struct centroid_vband_t centroid_vband2 = image_vband_centroid(&img, &img, 75, 255, 0, 255, 0, 255, 21, 120, 2);
-  struct centroid_vband_t centroid_vband3 = image_vband_centroid(&img, &img, 75, 255, 0, 255, 0, 255, 221, 240, 3);
-
-  // printf("x_deviation and y_deviation is %.0f and %.0f\n", centroid_vband.x, centroid_vband.y);
-	
 /////////////////////////////////////////////////////////////
 /////                                                   /////
 /////   TEST by Seong - IMAV2015    ends here..         /////
+/////                                                   /////
+/////////////////////////////////////////////////////////////
+
+  
+/////////////////////////////////////////////////////////////
+/////                                                   /////
+/////   CODE by Matej start                             /////
+/////                                                   /////
+/////////////////////////////////////////////////////////////
+
+// filter settings - intenity limits
+  int y_min=150;
+  int y_max=255;
+
+// detect the line
+  struct centroid_vband_t centroid_vband1 = image_vband_centroid(&img, &img, y_min, y_max, 0, 255, 0, 255, 1, 20, 1); // top band 
+  // struct centroid_vband_t centroid_vband2 = image_vband_centroid(&img, &img, y_min, y_max, 0, 255, 0, 255, 21, 120, 2); // top half band
+  struct centroid_vband_t centroid_vband3 = image_vband_centroid(&img, &img, y_min, y_max, 0, 255, 0, 255, 221, 240, 3); // bottom band
+
+// calculate line orientation
+  float yaw_line=atan((centroid_vband1.x-centroid_vband3.x)/img.h);
+  printf("line orientation = %.0f deg \n", yaw_line/3.14*180);
+  
+
+
+
+
+
+/////////////////////////////////////////////////////////////
+/////                                                   /////
+/////   CODE by Matej end                               /////
 /////                                                   /////
 /////////////////////////////////////////////////////////////
 
