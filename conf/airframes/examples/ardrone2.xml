@@ -18,7 +18,7 @@
     <subsystem name="actuators" type="ardrone2"/>
     <subsystem name="imu" type="ardrone2"/>
     <!-- gps: "ublox" or change to "sirf" for usage with parrot flight recorder -->
-    <subsystem name="gps" type="ublox"/>
+    <subsystem name="gps" type="datalink"/>
     <subsystem name="stabilization" type="int_quat"/>
     <subsystem name="ahrs" type="int_cmpl_quat"/>
     <subsystem name="ins" type="extended"/>
@@ -27,7 +27,7 @@
   <modules main_freq="512">
     <load name="bat_voltage_ardrone2.xml"/>
     <!-- remove the gps_ubx_ucenter module if you use the sirf gps (flight recorder) -->
-    <load name="gps_ubx_ucenter.xml"/>
+    <!--load name="gps_ubx_ucenter.xml"/-->
     <load name="send_imu_mag_current.xml"/>
     <load name="air_data.xml"/>
     <load name="geo_mag.xml"/>
@@ -203,10 +203,10 @@
   </section>
 
   <section name="AUTOPILOT">
-    <define name="MODE_STARTUP" value="AP_MODE_NAV"/>
+    <define name="MODE_STARTUP" value="AP_MODE_ATTITUDE_DIRECT"/>
     <define name="MODE_MANUAL" value="AP_MODE_ATTITUDE_DIRECT"/>
     <define name="MODE_AUTO1" value="AP_MODE_ATTITUDE_Z_HOLD"/>
-    <define name="MODE_AUTO2" value="AP_MODE_NAV"/>
+    <define name="MODE_AUTO2" value="AP_MODE_ATTITUDE_DIRECT"/>
   </section>
 
   <section name="BAT">

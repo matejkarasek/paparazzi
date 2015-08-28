@@ -33,6 +33,7 @@
 #include "math/pprz_isa.h"
 #include "state.h"
 #include "generated/airframe.h"
+#include "stdio.h"
 
 /** global AirData state
  */
@@ -86,6 +87,19 @@ static abi_event temperature_ev;
 PRINT_CONFIG_MSG("USE_AIRSPEED_AIR_DATA automatically set to TRUE")
 #endif
 #endif
+
+
+
+
+// Start of release mechanism test hack
+#include "subsystems/radio_control/rc_datalink.h"
+#include "subsystems/radio_control.h"
+
+int release_package=0;
+int previous_switch=0;
+
+// End of release mechanism hack
+
 
 /*
  * Internal variable to keep track of validity.
@@ -176,6 +190,9 @@ static void send_amsl(struct transport_tx *trans, struct link_device *dev)
  */
 void air_data_init(void)
 {
+  release_package=0;
+  previous_switch=0;
+
   air_data.calc_airspeed = AIR_DATA_CALC_AIRSPEED;
   air_data.calc_tas_factor = AIR_DATA_CALC_TAS_FACTOR;
   air_data.calc_amsl_baro = AIR_DATA_CALC_AMSL_BARO;
@@ -225,6 +242,33 @@ float air_data_get_amsl(void)
 
 void air_data_periodic(void)
 {
+  
+  // Start of release mechanism test hack
+  if (radio_control.values[4] > 0 && previous_switch==0)
+    {
+      printf("<Drop_Paintball_Now> \n");
+      previous_switch=1;
+    }
+  else if (radio_control.values[4] <= 0)
+    {
+      previous_switch=0;
+    }
+
+
+  if (release_package==1) 
+    {
+      printf("<Drop_Paintball_Now> \n");
+      release_package=0;
+    }
+  else
+
+    {
+      //printf("Drop_Paintball_Later\n");
+    }
+
+  // End of release mechanism hack
+
+
   // Watchdog on baro
   if (baro_health_counter > 0) {
     baro_health_counter--;

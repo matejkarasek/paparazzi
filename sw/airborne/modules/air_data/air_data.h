@@ -73,6 +73,12 @@ extern void air_data_periodic(void);
  */
 extern float air_data_get_amsl(void);
 
+
+// Start of release mechanism test hack
+extern int release_package;
+
+// End of release mechanism hack
+
 /**
  * Calculate equivalent airspeed from dynamic pressure.
  * Dynamic pressure @f$q@f$ (also called impact pressure) is the
