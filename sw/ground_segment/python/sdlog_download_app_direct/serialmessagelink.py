@@ -211,5 +211,7 @@ class SerialMessageLink():
         buf.append(crc_a % 256)
         """CRC_B"""
         buf.append(crc_b % 256)
-
-        self.serial.write(buf)
+    
+        print self.serial.write(buf)
+        
+        self.serial.flush()

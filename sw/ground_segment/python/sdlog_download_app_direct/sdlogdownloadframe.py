@@ -166,7 +166,7 @@ class SDLogDownloadFrame(wx.Frame):
                 # continue with logging command
                 self.msglink.sendMessage('datalink', 'SETTING', (cmd_idx, self.ac_id, 1))
                 self.startButton.Disable()
-                self.request_timer = threading.Timer(0.5, self.startButton.Enable)
+                self.request_timer = threading.Timer(3, self.startButton.Enable)
                 self.request_timer.start()
             # If set for download request
             if self.last_command == 3:
@@ -174,6 +174,7 @@ class SDLogDownloadFrame(wx.Frame):
                 self.RequestNextPacket()
 
     def RequestNextPacket(self):
+        print self.download_counter
         if (self.download_counter <= self.download_available):
             #self.timeout_time = self.timeout_time * 2
             self.last_command = 57
