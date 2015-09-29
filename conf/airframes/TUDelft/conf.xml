@@ -1,5 +1,16 @@
 <conf>
   <aircraft
+   name="DelFly"
+   ac_id="111"
+   airframe="airframes/TUDelft/delfly_matej_DT.xml"
+   radio="radios/DT_Rx31_Devo10.xml"
+   telemetry="telemetry/default_fixedwing.xml"
+   flight_plan="flight_plans/basic.xml"
+   settings="settings/fixedwing_basic.xml"
+   settings_modules="modules/gps_ubx_ucenter.xml modules/sd_logger_spi_direct.xml"
+   gui_color="blue"
+  />
+  <aircraft
    name="MentorEnergy"
    ac_id="8"
    airframe="airframes/examples/MentorEnergy.xml"
