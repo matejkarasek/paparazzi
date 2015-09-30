@@ -174,7 +174,7 @@ class SDLogDownloadFrame(wx.Frame):
                 self.RequestNextPacket()
 
     def RequestNextPacket(self):
-        print self.download_counter
+        #print self.download_counter
         if (self.download_counter <= self.download_available):
             #self.timeout_time = self.timeout_time * 2
             self.last_command = 57

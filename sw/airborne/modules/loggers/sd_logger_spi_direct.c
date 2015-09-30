@@ -101,22 +101,44 @@ void sd_logger_periodic(void)
 
 
   /* Check if the switch is flipped to start or stop logging */
-  static bool_t sd_logger_previous_switch_state = FALSE;
-  if (USEC_OF_RC_PPM_TICKS(ppm_pulses[4]) > 1300 && sd_logger_previous_switch_state == FALSE) {
+  /* Using counters of ON and OFF states to suppres false trigger when radio connection is lost*/
+  
+  static bool_t sd_logger_current_switch_state = FALSE;
+  static uint32_t switch_ON_cnt = 0;
+  static uint32_t switch_OFF_cnt = 1000;
+  
+  if (USEC_OF_RC_PPM_TICKS(ppm_pulses[4]) > 1300) {
+    sd_logger_current_switch_state = TRUE;
+    switch_ON_cnt++;
+  }
+  else {
+    sd_logger_current_switch_state = FALSE;
+    switch_OFF_cnt++;
+  }
+  /* the above counters are reset when the logging starts and the ON counter also when the logging ends */
+  
+  if (sd_logger_current_switch_state == TRUE && switch_OFF_cnt > 500) {
+    /* Switch is on and there have already been at least 500 samples with switch off */
     /* Start logging */
     sdlogger.cmd = SdLoggerCmd_StartLogging;
     sd_logger_command();
-    sd_logger_previous_switch_state = TRUE;
+    /* Reset counters */
+    switch_ON_cnt = 0;
+    switch_OFF_cnt = 0;
     iii=0;
     jj=0;
-
-  } else if (USEC_OF_RC_PPM_TICKS(ppm_pulses[4]) < 1300 && sd_logger_previous_switch_state == TRUE) {
+  } else if (sd_logger_current_switch_state == FALSE && switch_ON_cnt > 50 && switch_OFF_cnt > 200) {
+    /* Switch is off and there have already been at least 50 samples with switch on (logging was on) and at least 200 sample with switch off (we want to stop logging)*/
     /* Stop logging */
     sdlogger.cmd = SdLoggerCmd_StopLogging;
     sd_logger_command();
-    sd_logger_previous_switch_state = FALSE;
+    /* Reset ON counter */
+    switch_ON_cnt = 0;
+  } else if (sd_logger_current_switch_state == TRUE && switch_ON_cnt > 50) {
+    /* Reset OFF counter after a lost connection*/
+    switch_OFF_cnt = 0;
   }
-
+  
   /* Keep the SDCard running at the same rate */
   sdcard_spi_periodic(&sdcard1);
 
