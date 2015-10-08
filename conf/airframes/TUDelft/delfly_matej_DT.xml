@@ -49,16 +49,9 @@ telemetry: default_fixedwing.xml
       <subsystem name="radio_control" type="ppm"/>
     </target>
 
-    <define name="LOITER_TRIM"/>
-    <define name="STRONG_WIND"/>
-
-    <!--<define name="LISA_S_SIDEWAY"/>-->
-
     <define name="USE_BAROMETER" value="TRUE"/>
 
     <!-- Communication -->
-    
-    <!--define name="AUTOPILOT_DISABLE_AHRS_KILL"/-->  <!-- NEW -->
     
     <subsystem name="telemetry" type="transparent">
         <configure name="MODEM_BAUD" value="B230400"/>
@@ -80,9 +73,6 @@ telemetry: default_fixedwing.xml
       <configure name="GPS_PORT" value="UART3"/>
       <configure name="GPS_BAUD" value="B38400"/>
     </subsystem>
-    <!--
-    <subsystem name="gps" type="datalink"/>
-    -->
     
     <subsystem name="rpm_sensor" type="eagletree">
       <define name="PULSES_PER_ROTATION" value="5"/>
@@ -92,8 +82,6 @@ telemetry: default_fixedwing.xml
       <define name="SERVO_HZ" value="400"/>
       <define name="USE_SERVOS_1AND2"/>
     </subsystem>
-
-    <!--<subsystem name="stabilization" type="int_quat"/>-->
 
     <subsystem name="control"/>
     <subsystem name="navigation"/>
@@ -113,7 +101,6 @@ telemetry: default_fixedwing.xml
   <servos driver="Pwm">
     <servo name="MOTOR" no="4" min="1100" neutral="1100" max="1900"/>
     <servo name="ELEVATOR" no="5" min="1100" neutral="1500" max="1900"/>
-    <!--servo name="ELEVATOR" no="5" min="1370" neutral="1635" max="1900"/--> <!-- trimmed -->
     <servo name="RUDDER" no="0" min="1900" neutral="1500" max="1100"/>
     <servo name="LED" no="1" min="0" neutral="1250" max="2500"/>
     <servo name="LEDS" no="2" min="0" neutral="1250" max="2500"/>
@@ -134,9 +121,10 @@ telemetry: default_fixedwing.xml
   <command_laws>
     <!--let var="ledswitch" value="(2*recording_status-1)*MAX_PPRZ"/-->
     <let var="ledscontrol" value="(2*LEDs_switch-1)*MAX_PPRZ"/>
-    <set servo="MOTOR" value="@THROTTLE"/>
-    <set servo="RUDDER" value="LEDs_switch*@ROLL"/>
-    <set servo="ELEVATOR" value="(1-elevator_control)*@PITCH+elevator_control*elevator_hack*0.01*MAX_PPRZ"/>
+    <set servo="MOTOR" value="(1+throttle_control*sequence_command*0.001)*@THROTTLE"/>
+    <!--set servo="RUDDER" value="LEDs_switch*@ROLL"/-->
+    <set servo="RUDDER" value="LEDs_switch*(rudder_direct*@ROLL+rudder_control*sequence_command*0.01*MAX_PPRZ)"/>
+    <set servo="ELEVATOR" value="LEDs_switch*(elevator_direct*@PITCH+elevator_control*sequence_command*0.01*MAX_PPRZ)"/>
     <!--set servo="LED" value="$ledswitch"/-->
     <set servo="LEDS" value="$ledscontrol"/>
   </command_laws>

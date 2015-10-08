@@ -51,12 +51,17 @@ struct SdLogger sdlogger;
 uint8_t recording_status; // 1: recording, 0: not recording
 uint8_t LEDs_switch=0; // 1: tracking LEDs on, 0: tracking LEDs off
 uint8_t elevator_control=1; // 1: automatic elevator, 0: direct RC elevator
-int8_t elevator_hack; // elevator position 
-int8_t elevator_min=0; // step on time (in samples)
-int8_t elevator_max=100; // step off time (in samples)
-uint8_t elevator_repetitions=1; // number of elevator step repetitions
-uint16_t elev_on=128; // step on time (in samples)
-uint16_t elev_off=128; // step off time (in samples)
+uint8_t rudder_control=0; // 1: automatic rudder, 0: direct RC rudder
+uint8_t throttle_control=0; // 1: automatic throttle, 0: direct RC throttle
+uint8_t elevator_direct=1; // 1: elevator follows RC command, 0: elevator in neutral position
+uint8_t rudder_direct=1; // 1: rudder follows RC command, 0: rudder in neutral position
+uint8_t throttle_direct=1; // 1: throttle follows RC command, 0: throttle in neutral position
+int8_t sequence_command; // elevator position 
+int8_t sequence_min=0; // step on time (in samples)
+int8_t sequence_max=100; // step off time (in samples)
+uint8_t sequence_repetitions=1; // number of elevator step repetitions
+uint16_t sequence_on=128; // step on time (in samples)
+uint16_t sequence_off=128; // step off time (in samples)
 int32_t iii;
 int8_t jj;
 //int32_t kk;
@@ -71,7 +76,7 @@ void sd_logger_start(void)
   sdcard_spi_init(&sdcard1, &(SD_LOGGER_SPI_LINK_DEVICE), SD_LOGGER_SPI_LINK_SLAVE_NUMBER);
   sdlogger.status = SdLogger_Initializing;
   recording_status = 0;
-  elevator_hack = 0;
+  sequence_command = 0;
   LED_OFF(1); // sets the system time LED off
   iii=0;
   jj=0;
@@ -166,20 +171,23 @@ void sd_logger_periodic(void)
       /* Automated elevator deflection sequence */
       if (USEC_OF_RC_PPM_TICKS(ppm_pulses[6]) > 1300) // if ELEV D/R switch is on, start the sequence
       {
-        int repet=elevator_repetitions;
-        
+        int repet=sequence_repetitions;
+        elevator_direct=0;
+        rudder_direct=0;
+	throttle_direct=0;
+	
         if (jj<repet)
         {
-          if (iii<elev_off)
+          if (iii<sequence_off)
             { 
               iii++;
-              elevator_hack = elevator_min;
+              sequence_command = sequence_min;
               //LEDs_switch = 1;
             }
-          else if (iii<elev_off+elev_on)
+          else if (iii<sequence_off+sequence_on)
             { 
               iii++;
-              elevator_hack = elevator_max;
+              sequence_command = sequence_max;
               //LEDs_switch = 0;
             }
           else
@@ -188,21 +196,24 @@ void sd_logger_periodic(void)
               if (jj<repet)
                 { 
                   iii=0;
-                  //elev_off=elev_off-15;
-                  //elev_on=elev_on-15;
+                  //sequence_off=sequence_off-15;
+                  //sequence_on=sequence_on-15;
                 }
             }
         }
-        else {elevator_hack = 0;} 
+        else {sequence_command = 0;} 
       }
       else
       {
         //LEDs_switch = 0;
-        elevator_hack = 0; 
+        sequence_command = 0; 
         iii=0;
         jj=0;
-        //elev_on=300;
-        //elev_off=300;
+        //sequence_on=300;
+        //sequence_off=300;
+	elevator_direct=1;
+	rudder_direct=1;
+	throttle_direct=1;
       }
       
 
@@ -368,7 +379,7 @@ void sd_logger_command(void)
     case SdLoggerCmd_StopLogging:
       
       recording_status = 0;
-      elevator_hack = 0;
+      sequence_command = 0;
       timer_set_oc_value(PWM_SERVO_4_TIMER, PWM_SERVO_4_OC, 0); // sets LED off
       LED_OFF(1); // sets the system time LED off
 
