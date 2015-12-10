@@ -14,19 +14,7 @@ telemetry: default_fixedwing.xml
   <firmware name="fixedwing">
     <target name="ap" board="lisa_s_1.0">
 
-      <!--subsystem name="radio_control" type="superbitrf_rc"-->
-        <!--TX 6 (DEVO-10) : 0xF724B7D7 -->
-        <!--
-        <define name="RADIO_TRANSMITTER_ID" value="4146378711"/> 
-        <define name="RADIO_TRANSMITTER_PROTOCOL" value="0x01"/>
-        <define name="RADIO_TRANSMITTER_CHAN" value="7"/>
-        -->
-        <!--TX 8 (DEVO-10) : 0xF7249ED7 -->
-        <!-- 
-        <define name="RADIO_TRANSMITTER_ID" value="4146372311"/> 
-        <define name="RADIO_TRANSMITTER_PROTOCOL" value="0x01"/>
-        <define name="RADIO_TRANSMITTER_CHAN" value="7"/>
-        
+      <!--subsystem name="radio_control" type="superbitrf_rc">
         <define name="RADIO_MODE" value="RADIO_FLAP"/>
         <define name="RADIO_KILL_SWITCH" value="RADIO_GEAR"/>
       </subsystem-->
