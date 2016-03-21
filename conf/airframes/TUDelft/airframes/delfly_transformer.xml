@@ -20,7 +20,8 @@
   <servos driver="Pwm">
     <servo name="MOTOR_LEFT" no="5" min="1100" neutral="1100" max="1900"/>
     <servo name="MOTOR_RIGHT" no="4" min="1100" neutral="1100" max="1900"/>
-    <servo name="DIHEDRAL" no="0" min="1100" neutral="1420" max="1740"/>
+    <!--servo name="DIHEDRAL" no="0" min="1100" neutral="1420" max="1740"/-->
+    <servo name="DIHEDRAL" no="0" min="1300" neutral="1500" max="1700"/>
     <servo name="WING_DEF" no="1" min="900" neutral="1500" max="2100"/>
   </servos>
 
