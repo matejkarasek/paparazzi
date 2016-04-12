@@ -121,6 +121,17 @@
    gui_color="#ffffcccaccca"
   />
   <aircraft
+   name="LisaSUART"
+   ac_id="6"
+   airframe="airframes/TUDELFT/tudelft_lisa_s_uart.xml"
+   radio="radios/cockpitSX.xml"
+   telemetry="telemetry/default_rotorcraft.xml"
+   flight_plan="flight_plans/rotorcraft_basic.xml"
+   settings=""
+   settings_modules="modules/gps_ubx_ucenter.xml"
+   gui_color="blue"
+  />
+  <aircraft
    name="Logo600"
    ac_id="111"
    airframe="airframes/TUDELFT/tudelft_logo600.xml"
