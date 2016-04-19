@@ -38,12 +38,12 @@ void logger_uart_periodic(void)
   logger_uart_data.start = 0x99;
   logger_uart_data.length = 14; // 14 bytes
 
-  logger_uart_data.gyro_p     = 1;//imu.gyro_unscaled.p;
-  logger_uart_data.gyro_q     = 2;//imu.gyro_unscaled.q;
-  logger_uart_data.gyro_r     = 3;//imu.gyro_unscaled.r;
-  logger_uart_data.acc_x      = 4;//imu.accel_unscaled.x;
-  logger_uart_data.acc_y      = 5;//imu.accel_unscaled.y;
-  logger_uart_data.acc_z      = 6;//imu.accel_unscaled.z;
+  logger_uart_data.gyro_p     = imu.gyro_unscaled.p;
+  logger_uart_data.gyro_q     = imu.gyro_unscaled.q;
+  logger_uart_data.gyro_r     = imu.gyro_unscaled.r;
+  logger_uart_data.acc_x      = imu.accel_unscaled.x;
+  logger_uart_data.acc_y      = imu.accel_unscaled.y;
+  logger_uart_data.acc_z      = imu.accel_unscaled.z;
 
   uint8_t crc = 0;
   uint8_t *p = (uint8_t*) &logger_uart_data;
