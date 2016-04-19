@@ -57,11 +57,11 @@ uint8_t elevator_direct=1; // 1: elevator follows RC command, 0: elevator in neu
 uint8_t rudder_direct=1; // 1: rudder follows RC command, 0: rudder in neutral position
 uint8_t throttle_direct=1; // 1: throttle follows RC command, 0: throttle in neutral position
 int8_t sequence_command; // elevator position 
-int8_t sequence_min=0; // step on time (in samples)
-int8_t sequence_max=100; // step off time (in samples)
+int8_t sequence_min=70; // min command
+int8_t sequence_max=-70; // max command
 uint8_t sequence_repetitions=1; // number of elevator step repetitions
-uint16_t sequence_on=128; // step on time (in samples)
-uint16_t sequence_off=128; // step off time (in samples)
+uint16_t sequence_on=150; // step on time (in samples)
+uint16_t sequence_off=150; // step off time (in samples)
 int32_t iii;
 int8_t jj;
 //int32_t kk;
