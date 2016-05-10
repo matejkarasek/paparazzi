@@ -62,6 +62,8 @@ int8_t sequence_max=-70; // max command
 uint8_t sequence_repetitions=1; // number of elevator step repetitions
 uint16_t sequence_on=150; // step on time (in samples)
 uint16_t sequence_off=150; // step off time (in samples)
+uint16_t pitch_ppm; // pitch command at the beginning of automated sequence
+int8_t pitch_offset; // elevator offset
 int32_t iii;
 int8_t jj;
 //int32_t kk;
@@ -106,7 +108,7 @@ void sd_logger_periodic(void)
 
 
   /* Check if the switch is flipped to start or stop logging */
-  /* Using counters of ON and OFF states to suppres false trigger when radio connection is lost*/
+  /* Using counters of ON and OFF states to suppress false trigger when radio connection is lost*/
   
   static bool_t sd_logger_current_switch_state = FALSE;
   static uint32_t switch_ON_cnt = 0;
@@ -171,25 +173,37 @@ void sd_logger_periodic(void)
       /* Automated elevator deflection sequence */
       if (USEC_OF_RC_PPM_TICKS(ppm_pulses[6]) > 1300) // if ELEV D/R switch is on, start the sequence
       {
-        int repet=sequence_repetitions;
+    	/* 1) entering the sequence */
+
+    	/* store the RC pitch value when entering the sequence */
+    	if (iii == 0 && jj==0)
+    	{
+    	  pitch_ppm=USEC_OF_RC_PPM_TICKS(ppm_pulses[2]);
+    	  pitch_offset=(pitch_ppm-1500)/4; // pitch command in percent
+    	}
+
+    	int repet=sequence_repetitions;
         elevator_direct=0;
         rudder_direct=0;
-	throttle_direct=0;
-	
+	    throttle_direct=0;
+
         if (jj<repet)
         {
+        /* 2) Minimal position */
           if (iii<sequence_off)
             { 
               iii++;
               sequence_command = sequence_min;
               //LEDs_switch = 1;
             }
+        /* 3) Maximal position */
           else if (iii<sequence_off+sequence_on)
             { 
               iii++;
               sequence_command = sequence_max;
               //LEDs_switch = 0;
             }
+        /* 4) Repeat */
           else
             { 
               jj++;
@@ -201,12 +215,15 @@ void sd_logger_periodic(void)
                 }
             }
         }
-        else {sequence_command = 0;} 
+        /* 5) Fly straight until the switch is flipped back */
+        else {sequence_command = 0;}
       }
+      /* 6) Restore default values */
       else
       {
         //LEDs_switch = 0;
-        sequence_command = 0; 
+        sequence_command = 0;
+        pitch_offset = 0;
         iii=0;
         jj=0;
         //sequence_on=300;

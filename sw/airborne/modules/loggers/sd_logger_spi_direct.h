@@ -100,6 +100,8 @@ extern uint8_t throttle_control;
 extern uint8_t rudder_direct;
 extern uint8_t elevator_direct;
 extern uint8_t throttle_direct;
+extern int8_t pitch_offset;
+
 
 /* Public functions */
 extern void sd_logger_start(void);
