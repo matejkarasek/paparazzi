@@ -16,8 +16,9 @@
         <dl_setting module="loggers/sd_logger_spi_direct" var="sequence_repetitions" min="0" max="3" step="1"/>
         <dl_setting module="loggers/sd_logger_spi_direct" var="sequence_min" min="-100" max="100" step="1"/>
         <dl_setting module="loggers/sd_logger_spi_direct" var="sequence_max" min="-100" max="100" step="1"/>
-        <dl_setting module="loggers/sd_logger_spi_direct" var="sequence_on" min="0" max="1024" step="1"/>
-        <dl_setting module="loggers/sd_logger_spi_direct" var="sequence_off" min="0" max="1024" step="1"/>
+        <dl_setting module="loggers/sd_logger_spi_direct" var="time_min" min="0" max="1024" step="1"/>
+        <dl_setting module="loggers/sd_logger_spi_direct" var="time_max" min="0" max="1024" step="1"/>
+        <dl_setting module="loggers/sd_logger_spi_direct" var="time_neutr" min="0" max="1024" step="1"/>
         <dl_setting module="loggers/sd_logger_spi_direct" var="elevator_control" min="0" max="1" step="1"/>
 	<dl_setting module="loggers/sd_logger_spi_direct" var="rudder_control" min="0" max="1" step="1"/>
 	<dl_setting module="loggers/sd_logger_spi_direct" var="throttle_control" min="0" max="1" step="1"/>

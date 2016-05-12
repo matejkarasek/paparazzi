@@ -60,8 +60,9 @@ int8_t sequence_command; // elevator position
 int8_t sequence_min=70; // min command
 int8_t sequence_max=-70; // max command
 uint8_t sequence_repetitions=1; // number of elevator step repetitions
-uint16_t sequence_on=150; // step on time (in samples)
-uint16_t sequence_off=150; // step off time (in samples)
+uint16_t time_min=150; // max command time (in samples)
+uint16_t time_max=150; // min command time (in samples)
+uint16_t time_neutr=0; // neutral command time (in samples)
 uint16_t pitch_ppm; // pitch command at the beginning of automated sequence
 int8_t pitch_offset; // elevator offset
 int32_t iii;
@@ -189,21 +190,51 @@ void sd_logger_periodic(void)
 
         if (jj<repet)
         {
+
+        switch (jj){
+
+        // first repetition
+        case 0  :
+        	elevator_control=1;
+        	rudder_control=0;
+        	throttle_control=0;
+            break;
+
+        // second repetition
+        case 1  :
+            elevator_control=0;
+            rudder_control=0;
+            throttle_control=1;
+            break;
+
+        // furher repetitions
+        default :
+        	elevator_control=0;
+        	rudder_control=0;
+        	throttle_control=0;
+        	break;
+        }
         /* 2) Minimal position */
-          if (iii<sequence_off)
+          if (iii<time_min)
             { 
               iii++;
               sequence_command = sequence_min;
               //LEDs_switch = 1;
             }
         /* 3) Maximal position */
-          else if (iii<sequence_off+sequence_on)
+          else if (iii<time_min+time_max)
             { 
               iii++;
               sequence_command = sequence_max;
               //LEDs_switch = 0;
             }
-        /* 4) Repeat */
+        /* 4) Neutral position */
+          else if (iii<time_min+time_max+time_neutr)
+            {
+              iii++;
+              sequence_command = 0;
+            }
+        /* 5) Repeat */
           else
             { 
               jj++;
