@@ -102,6 +102,7 @@ extern uint8_t rudder_direct;
 extern uint8_t elevator_direct;
 extern uint8_t throttle_direct;
 extern int8_t pitch_offset;
+extern int8_t roll_offset;
 
 
 /* Public functions */

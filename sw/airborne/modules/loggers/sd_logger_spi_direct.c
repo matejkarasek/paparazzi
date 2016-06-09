@@ -52,19 +52,21 @@ uint8_t recording_status; // 1: recording, 0: not recording
 uint8_t LEDs_switch=0; // 1: tracking LEDs on, 0: tracking LEDs off
 uint8_t elevator_control=1; // 1: automatic elevator, 0: direct RC elevator
 uint8_t rudder_control=0; // 1: automatic rudder, 0: direct RC rudder
-uint8_t throttle_control=0; // 1: automatic throttle, 0: direct RC throttle
-uint8_t elevator_direct=1; // 1: elevator follows RC command, 0: elevator in neutral position
+uint8_t throttle_control=1; // 1: automatic throttle, 0: direct RC throttle
+uint8_t elevator_direct=0; // 1: elevator follows RC command, 0: elevator in neutral position
 uint8_t rudder_direct=1; // 1: rudder follows RC command, 0: rudder in neutral position
 uint8_t throttle_direct=1; // 1: throttle follows RC command, 0: throttle in neutral position
 int8_t sequence_command; // elevator position 
-int8_t sequence_min=70; // min command
-int8_t sequence_max=-70; // max command
-uint8_t sequence_repetitions=1; // number of elevator step repetitions
+int8_t sequence_min=30; // min command
+int8_t sequence_max=-30; // max command
+uint8_t sequence_repetitions=2; // number of elevator step repetitions
 uint16_t time_min=150; // max command time (in samples)
 uint16_t time_max=150; // min command time (in samples)
-uint16_t time_neutr=0; // neutral command time (in samples)
+uint16_t time_neutr=1000; // neutral command time (in samples)
 uint16_t pitch_ppm; // pitch command at the beginning of automated sequence
 int8_t pitch_offset; // elevator offset
+uint16_t roll_ppm; // roll command at the beginning of automated sequence
+int8_t roll_offset; // rudder offset
 int32_t iii;
 int8_t jj;
 //int32_t kk;
@@ -181,6 +183,8 @@ void sd_logger_periodic(void)
     	{
     	  pitch_ppm=USEC_OF_RC_PPM_TICKS(ppm_pulses[2]);
     	  pitch_offset=(pitch_ppm-1500)/4; // pitch command in percent
+		  roll_ppm=USEC_OF_RC_PPM_TICKS(ppm_pulses[1]);
+    	  roll_offset=(roll_ppm-1500)/4; // roll command in percent
     	}
 
     	int repet=sequence_repetitions;
@@ -195,19 +199,19 @@ void sd_logger_periodic(void)
 
         // first repetition
         case 0  :
-        	elevator_control=1;
+        	elevator_control=0;
         	rudder_control=0;
-        	throttle_control=0;
+        	throttle_control=1;
             break;
 
         // second repetition
         case 1  :
-            elevator_control=0;
+            elevator_control=1;
             rudder_control=0;
-            throttle_control=1;
+            throttle_control=0;
             break;
 
-        // furher repetitions
+        // further repetitions
         default :
         	elevator_control=0;
         	rudder_control=0;
