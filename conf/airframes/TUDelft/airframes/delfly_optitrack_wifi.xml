@@ -85,6 +85,7 @@
     <servo name="ELEVATOR" no="5" min="1100" neutral="1500" max="1900"/>
     <servo name="RUDDER" no="0" min="1100" neutral="1500" max="1900"/>
     <servo name="LEDS" no="2" min="0" neutral="0" max="2500"/>
+    <servo name="LEDS2" no="1" min="0" neutral="0" max="2500"/>
   </servos>
 
   <commands>
@@ -96,10 +97,12 @@
 
   <command_laws>
     <let var="ledscontrol" value="(2*LEDS_switch-1)*MAX_PPRZ"/>
+    <let var="logcontrol" value="(2*LOG_switch-1)*MAX_PPRZ"/>
     <set servo="MOTOR" value="(1-SRVO_kill)*@THRUST"/>
     <set servo="ELEVATOR" value="(1-SRVO_kill)*@PITCH"/>
     <set servo="RUDDER" value="(1-SRVO_kill)*@YAW"/>
     <set servo="LEDS" value="$ledscontrol"/>
+    <set servo="LEDS2" value="$logcontrol"/>
   </command_laws>
 
 
@@ -178,6 +181,7 @@
  
   <section name="DELFLY_UTILS" prefix="DELFLY_UTILS_">
     <define name="LEDS_SWITCH" value="1"/>
+    <define name="LOG_SWITCH" value="0"/>
     <define name="SRVO_KILL" value="0"/>
   </section><!--DELFLY_UTILS-->
 
