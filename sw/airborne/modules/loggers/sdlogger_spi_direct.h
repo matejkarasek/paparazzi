@@ -78,5 +78,7 @@ extern void sdlogger_spi_direct_send_message(void *p);
 extern int sdlogger_spi_direct_char_available(void *p);
 extern uint8_t sdlogger_spi_direct_get_byte(void *p);
 
+extern uint8_t LOG_switch;
+
 #endif
 

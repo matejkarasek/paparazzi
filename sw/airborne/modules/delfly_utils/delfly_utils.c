@@ -30,7 +30,6 @@
 
 
 uint8_t LEDS_switch = DELFLY_UTILS_LEDS_SWITCH;
-uint8_t LOG_switch = DELFLY_UTILS_LOG_SWITCH;
 uint8_t SRVO_kill = DELFLY_UTILS_SRVO_KILL;
 
 extern void util_init(void) {
@@ -39,5 +38,4 @@ extern void util_init(void) {
 extern void util_run_periodic(void) {
   // refer values greater than -1000 to be non-negative
   LEDS_switch = ( radio_control.values[RADIO_MIX] > -1000 );
-  LOG_switch = ( radio_control.values[RADIO_MIX] > 0 );
 }

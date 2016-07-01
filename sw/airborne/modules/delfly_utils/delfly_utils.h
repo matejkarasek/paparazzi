@@ -29,7 +29,6 @@
 #include "std.h"
 
 extern uint8_t LEDS_switch;
-extern uint8_t LOG_switch;
 extern uint8_t SRVO_kill;
 
 

@@ -59,6 +59,7 @@ b * Copyright (C) Bart Slinger
 #endif
 
 struct sdlogger_spi_periph sdlogger_spi;
+uint8_t LOG_switch = 0;
 
 /**
  * @brief sdlogger_spi_direct_init
@@ -109,7 +110,7 @@ void sdlogger_spi_direct_periodic(void)
 
   static uint8_t sdlogger_control_switch = 0;
   if (radio_control.values[SDLOGGER_CONTROL_SWITCH] > 0) {
-    if (sdlogger_control_switch < 10)
+    if (sdlogger_control_switch < 100)
       sdlogger_control_switch++;
   } else {
     if (sdlogger_control_switch > 0)
@@ -128,6 +129,7 @@ void sdlogger_spi_direct_periodic(void)
       if (sdlogger_control_switch > 0 && //radio_control.values[SDLOGGER_CONTROL_SWITCH] > 0 &&
           sdcard1.status == SDCard_Idle) {
         LOGGER_LED_ON;
+		LOG_switch=1;
         sdcard_spi_multiwrite_start(&sdcard1, sdlogger_spi.next_available_address);
         sdlogger_spi.status = SDLogger_Logging;
       }
@@ -146,8 +148,9 @@ void sdlogger_spi_direct_periodic(void)
         sdcard_spi_multiwrite_next(&sdcard1, &sdlogger_spi_direct_multiwrite_written);
       }
       /* Check if switch is flipped to stop logging */
-      if (radio_control.values[SDLOGGER_CONTROL_SWITCH] < 0) {
-        sdlogger_spi.status = SDLogger_LoggingFinalBlock;
+      if (sdlogger_control_switch == 0) { //radio_control.values[SDLOGGER_CONTROL_SWITCH] < 0) {
+		LOG_switch=0;        
+		sdlogger_spi.status = SDLogger_LoggingFinalBlock;
       }
       break;
 
