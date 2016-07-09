@@ -27,7 +27,7 @@
 
 
 #include "delfly_algebra_int.h"
-
+#include "generated/airframe.h"
 
 #define DELFLY_GUIDANCE_MODE_OFF			  0
 #define DELFLY_GUIDANCE_MODE_MODULE			1
@@ -40,6 +40,17 @@
 #define DELFLY_GUIDANCE_USE_SPEED_REF   FALSE
 #endif
 
+#ifndef DELFLY_GUIDANCE_LATERAL_PGAIN
+#define DELFLY_GUIDANCE_LATERAL_PGAIN   0
+#endif
+
+#ifndef DELFLY_GUIDANCE_LATERAL_DGAIN
+#define DELFLY_GUIDANCE_LATERAL_DGAIN   0
+#endif
+
+#ifndef DELFLY_GUIDANCE_LATERAL_IGAIN
+#define DELFLY_GUIDANCE_LATERAL_IGAIN   0
+#endif
 
 struct DelflyGuidanceCommand {
   /* horizontal acceleration command

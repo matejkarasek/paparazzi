@@ -85,6 +85,7 @@ static void delfly_telemetry_send_guidance (struct transport_tx* trans, struct l
 		&delfly_guidance.err.lat.states.pos,
 		&delfly_guidance.err.fwd.states.vel,
 		&delfly_guidance.err.lat.states.vel,
+		&delfly_guidance.err.lat_pos_int,
 		&delfly_guidance.cmd.h_acc,
 		&delfly_guidance.cmd.v_acc,
 		&delfly_guidance.cmd.pseudo_heading,

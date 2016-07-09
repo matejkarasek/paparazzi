@@ -71,8 +71,10 @@ void guidance_h_module_init() {
   VECT2_ASSIGN(delfly_guidance.gains.fwd.xy, 1, 2);
 
 //  VECT2_COPY(delfly_guidance.gains.lat.xy, matlab_guidance_gain_fwd);
-  VECT2_ASSIGN(delfly_guidance.gains.lat.xy, 1, 2);
+//  VECT2_ASSIGN(delfly_guidance.gains.lat.xy, 1, 2);
 
+  delfly_guidance.gains.lat.states.pos = DELFLY_GUIDANCE_LATERAL_PGAIN;
+  delfly_guidance.gains.lat.states.vel = DELFLY_GUIDANCE_LATERAL_DGAIN;
   delfly_guidance.gains.lat_i = DELFLY_GUIDANCE_LATERAL_IGAIN;
 
 
@@ -180,7 +182,11 @@ void guidance_h_module_run_traj( bool_t in_flight ) {
       delfly_guidance.err.lat.states.pos = VECT2_GET_LAT(delfly_guidance.err.pos, delfly_guidance.sp.heading);
       delfly_guidance.err.lat.states.vel = VECT2_GET_LAT(delfly_guidance.err.vel, delfly_guidance.sp.heading);
 
-      delfly_guidance.err.lat_pos_int += delfly_guidance.err.lat.states.pos*(1.0/PERIODIC_FREQUENCY)*(1<<(INT32_SPEED_FRAC-INT32_POS_FRAC));
+      if ( delfly_guidance.gains.lat_i > 0 ) {
+    	  delfly_guidance.err.lat_pos_int += delfly_guidance.err.lat.states.pos*(1.0/PERIODIC_FREQUENCY)*(1<<(INT32_SPEED_FRAC-INT32_POS_FRAC));
+      } else {
+    	  delfly_guidance.err.lat_pos_int = 0;
+      }
 
       int32_t pseudo_heading_d;
 
@@ -195,27 +201,29 @@ void guidance_h_module_run_traj( bool_t in_flight ) {
 
       /* lateral guidance pseudo acceleration command
        * in m/s2, with #INT32_ACCEL_FRAC                  */
-      int64_t pseudo_cmd_lat_acc = delfly_guidance.err.lat.states.pos   * delfly_guidance.gains.lat.states.pos / (1<<(/*INT32_MATLAB_FRAC+*/INT32_POS_FRAC-INT32_ACCEL_FRAC))
-                                   + delfly_guidance.err.lat.states.vel * delfly_guidance.gains.lat.states.vel / (1<<(/*INT32_MATLAB_FRAC+*/INT32_SPEED_FRAC-INT32_ACCEL_FRAC))
-                                   + delfly_guidance.err.lat_pos_int    * delfly_guidance.gains.lat_i          / (100*(1<<(INT32_SPEED_FRAC-INT32_ACCEL_FRAC)));
+      int64_t pseudo_cmd_lat_acc = ( delfly_guidance.err.lat.states.pos   * delfly_guidance.gains.lat.states.pos / (1<<(INT32_POS_FRAC-INT32_ACCEL_FRAC))
+                                   	 + delfly_guidance.err.lat.states.vel * delfly_guidance.gains.lat.states.vel / (1<<(INT32_SPEED_FRAC-INT32_ACCEL_FRAC))
+                                     + delfly_guidance.err.lat_pos_int    * delfly_guidance.gains.lat_i          / (1<<(INT32_SPEED_FRAC-INT32_ACCEL_FRAC))
+								   )/100;
       /* lateral guidance pseudo heading difference
        * i.e. additional heading to set-point
        * in [-MAX_HEADING_DELTA, +MAX_HEADING_DELTA]
        * in rad, with #INT32_ANGLE_FRAC                   */
-//      pseudo_heading_d   = delfly_guidance.gains.h.lateral_ratio*pseudo_cmd_lat_acc*INT32_ANGLE_PI_4/(100*(1<<INT32_ACCEL_FRAC));
-//      INT32_STRIM(pseudo_heading_d, MAX_HEADING_DELTA);
+      pseudo_heading_d   = delfly_guidance.gains.h.lateral_ratio*pseudo_cmd_lat_acc*INT32_ANGLE_PI_4*(1<<(INT32_SPEED_FRAC-INT32_ACCEL_FRAC))/(delfly_state.h.speed_wind*100);
+      INT32_STRIM(pseudo_heading_d, MAX_HEADING_DELTA);
       }
 
       /* lateral guidance pseudo heading command
        * i.e. desired heading set-point to attitude control
        * in rad, with #INT32_ANGLE_FRAC                   */
       delfly_guidance.cmd.pseudo_heading = delfly_guidance.sp.heading + pseudo_heading_d;
-      /* lateral guidance complementary heading command
-       * i.e. heading reference to attitude control
-       * in rad, with #INT32_ANGLE_FRAC                   */
-      delfly_guidance.cmd.heading = (delfly_guidance.gains.h.complementary_gain*delfly_guidance.cmd.pseudo_heading
-                                     + (100 - delfly_guidance.gains.h.complementary_gain)*delfly_state.h.heading)
-                                    /100;
+//      /* lateral guidance complementary heading command
+//       * i.e. heading reference to attitude control
+//       * in rad, with #INT32_ANGLE_FRAC                   */
+//      delfly_guidance.cmd.heading = (delfly_guidance.gains.h.complementary_gain*delfly_guidance.cmd.pseudo_heading
+//                                     + (100 - delfly_guidance.gains.h.complementary_gain)*delfly_state.h.heading)
+//                                    /100;
+	  delfly_guidance.cmd.heading = delfly_guidance.cmd.pseudo_heading;
 
     }
     break;

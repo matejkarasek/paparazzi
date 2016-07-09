@@ -1020,6 +1020,7 @@
       <field name="err_lat"  type="int32" alt_unit=" m"    alt_unit_coef="0.00012207">Lateral position error in xy-plane (geographic frame)</field>
       <field name="err_dfwd" type="int32" alt_unit=" m/s"  alt_unit_coef="0.00000191">Forward velocity error in xy-plane (geographic frame)</field>
       <field name="err_dlat" type="int32" alt_unit=" m/s"  alt_unit_coef="0.00000191">Lateral velocity error in xy-plane (geographic frame)</field>
+      <field name="err_lat_i" type="int32" alt_unit=" m*s" alt_unit_coef="0.00000191">Integrated lateral position error</field>
       <field name="cmd_h"    type="int32" alt_unit=" m/s2" alt_unit_coef="0.00097656">Horizontal acceleration command (in xy-plane, geographic frame)</field>
       <field name="cmd_v"    type="int32" alt_unit=" m/s2" alt_unit_coef="0.00097656">Vertical acceleration command (in z-axis, geographic frame)</field>
       <field name="cmd_psi"  type="int32" alt_unit=" deg"  alt_unit_coef="0.01398823">Heading pseudo command</field>

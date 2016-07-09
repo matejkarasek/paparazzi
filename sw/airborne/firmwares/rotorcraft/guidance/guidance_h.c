@@ -463,6 +463,8 @@ void guidance_h_run(bool_t  in_flight)
 
 #if GUIDANCE_H_MODE_MODULE_SETTING == GUIDANCE_H_MODE_MODULE
     case GUIDANCE_H_MODE_MODULE:
+	  // for telemetry
+	  guidance_h.sp.heading = nav_heading;
       guidance_h_module_run(in_flight);
       break;
 #endif

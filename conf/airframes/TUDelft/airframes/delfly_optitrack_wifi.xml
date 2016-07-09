@@ -150,6 +150,7 @@
   	<define name="FLAP_CONTROL_ADAPT" value="150"/>
   </section><!--DELFLY_COMMON-->
   
+  <!-- All gains in percent !!!-->
   <section name="DELFLY_CONTROL" prefix="SPEED_CONTROL_">
     <define name="FB_FWD_PGAIN" value="0"/>
     <define name="FB_VER_PGAIN" value="0"/>
@@ -167,7 +168,9 @@
   <section name="DELFLY_GUIDANCE" prefix="DELFLY_GUIDANCE_">
   	<define name="COMPLEMENTARY_HEADING_GAIN" value="100"/>
   	<define name="LATERAL_RATIO" value="75"/>
-  	<define name="LATERAL_IGAIN" value="0"/>
+  	<define name="LATERAL_PGAIN" value="80"/>
+  	<define name="LATERAL_DGAIN" value="0"/>
+  	<define name="LATERAL_IGAIN" value="10"/>
   	<define name="VERTICAL_POLE" value="-1"/>
   	<define name="USE_SPEED_REF" value="FALSE"/>
   </section><!--DELFLY_GUIDANCE-->
