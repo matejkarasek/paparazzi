@@ -190,10 +190,14 @@ void ahrs_icq_propagate(struct Int32Rates *gyro, float dt)
   RATES_DIFF(omega, *gyro, ahrs_icq.gyro_bias);
 
   /* low pass rate */
-#ifdef AHRS_PROPAGATE_LOW_PASS_RATES
-  RATES_SMUL(ahrs_icq.imu_rate, ahrs_icq.imu_rate, 2);
+#ifndef AHRS_PROPAGATE_LOW_PASS_RATES
+#define AHRS_PROPAGATE_LOW_PASS_RATES 0
+#endif
+
+#if AHRS_PROPAGATE_LOW_PASS_RATES
+  RATES_SMUL(ahrs_icq.imu_rate, ahrs_icq.imu_rate, AHRS_PROPAGATE_LOW_PASS_RATES-1);
   RATES_ADD(ahrs_icq.imu_rate, omega);
-  RATES_SDIV(ahrs_icq.imu_rate, ahrs_icq.imu_rate, 3);
+  RATES_SDIV(ahrs_icq.imu_rate, ahrs_icq.imu_rate, AHRS_PROPAGATE_LOW_PASS_RATES);
 #else
   RATES_COPY(ahrs_icq.imu_rate, omega);
 #endif

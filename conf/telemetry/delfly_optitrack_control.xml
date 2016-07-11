@@ -26,7 +26,8 @@
       <message name="STAB_ATTITUDE_INT"      period="0.5"   />
       <message name="UART_ERRORS"            period="3."    phase="0."/>  <!-- 7 bytes -->
       <message name="WP_MOVED"               period="1.5"/>
-    </mode><!--Main-->
+      <message name="ROTORCRAFT_TUNE_HOVER"  period=".1"/>
+          </mode><!--Main-->
     
     <mode name="diagnostics" key_press="d">
       <message name="ALIVE"                  period="1.5"   phase="0."/>  <!-- n bytes -->
