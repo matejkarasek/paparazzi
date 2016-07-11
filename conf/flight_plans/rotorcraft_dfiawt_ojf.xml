@@ -11,6 +11,7 @@
     <waypoint name="TD" x="0.8" y="-1.7" alt="2"/>
     <waypoint name="TD2" x="0.0" y="0.5" alt="2.5"/>
     <waypoint x="0.0" y="0.5" alt="2" name="TARGET"/>
+    <waypoint x="0.5" y="0.5" alt="2" name="TARGET2"/><!-- waypoint lateral step -->
     <waypoint lat="51.9906308" lon="4.3767945" alt="2" name="p1"/>
     <waypoint lat="51.9906420" lon="4.3768256" alt="2" name="p2"/>
     <waypoint lat="51.9906316" lon="4.3768384" name="_FA1"/>
@@ -43,7 +44,7 @@
       <!--call fun="NavSetGroundReferenceHere()"/-->
     </block>
     <block name="Holding point">
-        <deroute block="Goto Tulip"/>
+        <deroute block="Go to orange Tulip"/>
     	<!--call fun="NavKillThrottle()"/-->
       <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
     </block>
@@ -60,24 +61,28 @@
       <!--call fun="{ nav_StopPosControl(); windtunnel_set_periodic( FALSE ); FALSE; }"/-->
       <stay wp="STDBY"/>
     </block>
-    <block name="Goto Tulip">
+    <block name="Go to orange Tulip">
       <call fun="nav_set_heading_deg(0)"/>
       <stay wp="TARGET"/>
+    </block>
+    <block name="Go to red Tulip">
+      <call fun="nav_set_heading_deg(0)"/>
+      <stay wp="TARGET2"/>
     </block>
     <block name="Step up">
       <call fun="NavSetWaypointPos(WP_TD2, 0.0, 0.5)"/>
       <stay wp="TD2" until="stage_time > 30"/>
-      <deroute block="Goto Tulip"/>
+      <deroute block="Go to orange Tulip"/>
     </block>
     <block name="Step forward">
       <call fun="NavSetWaypointPos(WP_TD, 0.0, 1.0)"/>
       <stay wp="TD" until="stage_time > 30"/>
-      <deroute block="Goto Tulip"/>
+      <deroute block="Go to orange Tulip"/>
     </block>
     <block name="Step right">
       <call fun="NavSetWaypointPos(WP_TD, 0.5, 0.5)"/>
       <stay wp="TD" until="stage_time > 30"/>
-      <deroute block="Goto Tulip"/>
+      <deroute block="Go to orange Tulip"/>
     </block>
     
     <block name="stay_p1" strip_button="Encircle P1" strip_icon="flat_theme/circle-right.png">
