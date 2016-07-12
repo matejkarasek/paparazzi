@@ -7,14 +7,15 @@
       <message name="AUTOPILOT_VERSION"      period="6."    phase="3."/>  <!-- 1 + n bytes -->
       <message name="DATALINK_REPORT"        period="6."    phase="0."/>  <!-- 9 bytes -->
       <!--message name="DELFLY_FLAPCONTROL"     period="0.25"  /-->
-      <message name="DELFLY_GUIDANCE"        period="0.25"   phase="0."/>
+      <message name="DELFLY_GUIDANCE"        period="0.25" />
       <message name="DELFLY_STATE"           period="0.25"  /><!-- 68 bytes -->
-      <message name="DELFLY_SPEEDCTRL"       period="0.5"  />
+      <!--message name="DELFLY_SPEEDCTRL"       period="0.5"  />
       <message name="DELFLY_SPEEDCTRL_GAINS" period="1."  />      
-      <message name="DELFLY_STATEESTIMATION" period="1."    phase="0.5"/>
+      <message name="DELFLY_STATEESTIMATION" period="1."    phase="0.5"/-->
       <message name="DL_VALUE"               period="1.5"   phase="0.75"/><!-- 2n bytes -->
       <message name="ENERGY"                 period="3."    phase="1.5"/> <!-- 14 bytes -->
-      <!--message name="GPS_DIAGNOSTICS"        period=".25"   phase="0."/--><!-- 14 bytes -->
+      <!--message name="GPS_DIAGNOSTICS"        period="1"   phase="0."/--><!-- 14 bytes -->
+      <message name="GPS"					 period=".25"   />
       <message name="GPS_INT"                period="0.5"   />
       <message name="INS"                    period="0.25"  />
       <message name="INS_REF"                period="6."    />
@@ -27,7 +28,26 @@
       <message name="UART_ERRORS"            period="3."    phase="0."/>  <!-- 7 bytes -->
       <message name="WP_MOVED"               period="1.5"/>
       <message name="ROTORCRAFT_TUNE_HOVER"  period=".1"/>
-          </mode><!--Main-->
+    </mode><!--default-->
+    
+    <mode name="default_small">
+	  <message name="ALIVE"                  period="1.5"   phase="0."/>  <!-- n bytes -->
+      <message name="AUTOPILOT_VERSION"      period="6."    phase="3."/>  <!-- 1 + n bytes -->
+      <message name="DATALINK_REPORT"        period="6."    phase="0."/>  <!-- 9 bytes -->
+      <message name="DELFLY_STATE"           period="0.25"  /><!-- 68 bytes -->
+      <message name="DL_VALUE"               period="1.5"   phase="0.75"/><!-- 2n bytes -->
+      <message name="ENERGY"                 period="3."    phase="1.5"/> <!-- 14 bytes -->
+      <message name="GPS_INT"                period="0.5"   />
+      <message name="INS"                    period="0.25"  />
+      <message name="INS_REF"                period="6."    />
+      <message name="ROTORCRAFT_FP"          period="0.5"   phase="0.25"/><!-- 58 bytes -->
+      <message name="ROTORCRAFT_NAV_STATUS"  period="0.5"   />            <!-- 15 bytes -->
+      <message name="ROTORCRAFT_STATUS"      period="1.5"   phase="0.75"/><!-- 17 bytes -->
+      <message name="STAB_ATTITUDE_INT"      period="0.5"   />
+      <message name="UART_ERRORS"            period="3."    phase="0."/>  <!-- 7 bytes -->
+      <message name="WP_MOVED"               period="1.5"/>
+      <message name="ROTORCRAFT_TUNE_HOVER"  period=".1"/>
+    </mode>
     
     <mode name="diagnostics" key_press="d">
       <message name="ALIVE"                  period="1.5"   phase="0."/>  <!-- n bytes -->
