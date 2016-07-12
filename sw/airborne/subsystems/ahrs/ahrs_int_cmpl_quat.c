@@ -33,6 +33,9 @@
 #include "subsystems/ahrs/ahrs_int_cmpl_quat.h"
 #include "subsystems/ahrs/ahrs_int_utils.h"
 
+#include "state.h"
+#include "filters/low_pass_filter.h"
+
 #if USE_GPS
 #include "subsystems/gps.h"
 #endif
@@ -104,10 +107,25 @@ PRINT_CONFIG_VAR(AHRS_MAG_ZETA)
 #define AHRS_USE_GPS_HEADING_ONLY   FALSE
 #endif
 
+#ifndef AHRS_GPS_LOW_PASS_HEADING
+#define AHRS_GPS_LOW_PASS_HEADING	FALSE
+#endif
+
+#ifndef AHRS_PROPAGATE_LOW_PASS_RATES
+#define AHRS_PROPAGATE_LOW_PASS_RATES 0
+#endif
+
+#ifndef AHRS_USE_HEADING_RATE
+#define AHRS_USE_HEADING_RATE		FALSE
+#endif
+
 struct AhrsIntCmplQuat ahrs_icq;
 
 static inline void UNUSED ahrs_icq_update_mag_full(struct Int32Vect3 *mag, float dt);
 static inline void ahrs_icq_update_mag_2d(struct Int32Vect3 *mag, float dt);
+
+Butterworth2LowPass_int course_filter;
+bool_t course_filter_initialized;
 
 void ahrs_icq_init(void)
 {
@@ -169,6 +187,8 @@ bool_t ahrs_icq_align(struct Int32Rates *lp_gyro, struct Int32Vect3 *lp_accel,
   lp_mag = lp_mag;
 #endif
 
+  course_filter_initialized = FALSE;
+
   /* Use low passed gyro value as initial bias */
   RATES_COPY(ahrs_icq.gyro_bias, *lp_gyro);
   RATES_COPY(ahrs_icq.high_rez_bias, *lp_gyro);
@@ -190,16 +210,20 @@ void ahrs_icq_propagate(struct Int32Rates *gyro, float dt)
   RATES_DIFF(omega, *gyro, ahrs_icq.gyro_bias);
 
   /* low pass rate */
-#ifndef AHRS_PROPAGATE_LOW_PASS_RATES
-#define AHRS_PROPAGATE_LOW_PASS_RATES 0
-#endif
-
 #if AHRS_PROPAGATE_LOW_PASS_RATES
   RATES_SMUL(ahrs_icq.imu_rate, ahrs_icq.imu_rate, AHRS_PROPAGATE_LOW_PASS_RATES-1);
   RATES_ADD(ahrs_icq.imu_rate, omega);
   RATES_SDIV(ahrs_icq.imu_rate, ahrs_icq.imu_rate, AHRS_PROPAGATE_LOW_PASS_RATES);
 #else
   RATES_COPY(ahrs_icq.imu_rate, omega);
+#endif
+
+#if AHRS_USE_HEADING_RATE
+  struct Int32Eulers ed;
+  struct Int32Eulers* att_eulers = stateGetNedToBodyEulers_i();
+  int32_eulers_dot_of_rates(&ed, att_eulers, &omega);
+
+  omega.r = ed.psi*(1<<(INT32_RATE_FRAC-INT32_ANGLE_FRAC));
 #endif
 
   /* add correction */
@@ -541,6 +565,17 @@ void ahrs_icq_update_gps(struct GpsState *gps_s __attribute__((unused)))
 
     // gps_s->course is in rad * 1e7, we need it in rad * 2^INT32_ANGLE_FRAC
     int32_t course = gps_s->course * ((1 << INT32_ANGLE_FRAC) / 1e7);
+
+#if AHRS_GPS_LOW_PASS_HEADING
+    if ( !course_filter_initialized ) {
+      init_butterworth_2_low_pass_int(&course_filter, 1.0/STATE_ESTIMATION_GPS_FREQ, STATE_ESTIMATION_FILTER_CUTOFF, course);
+      course_filter_initialized = TRUE;
+    } else {
+      update_butterworth_2_low_pass_int(&course_filter, course);
+    }
+
+    course = get_butterworth_2_low_pass_int(&course_filter);
+#endif
 
     /* the assumption here is that there is no side-slip, so heading=course */
 
