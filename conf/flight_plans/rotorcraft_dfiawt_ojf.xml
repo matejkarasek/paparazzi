@@ -48,44 +48,44 @@
     	<!--call fun="NavKillThrottle()"/-->
       <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
     </block>
-    <block name="Start Engine" strip_button="Start Engine" strip_icon="flat_theme/on.png">
+    <block name="Start Engine">
       <call fun="NavResurrect()"/>
       <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
     </block>
-    <block name="Takeoff" strip_button="Takeoff" strip_icon="flat_theme/launch.png">
+    <block name="Takeoff">
       <exception cond="stateGetPositionEnu_f()->z > 1.5" deroute="Standby"/>
       <call fun="NavSetWaypointHere(WP_CLIMB)"/>
       <stay climb="nav_climb_vspeed" vmode="climb" wp="CLIMB"/>
     </block>
-    <block key="1" name="Standby" strip_button="Standby" strip_icon="flat_theme/home.png">
+    <block key="1" name="Standby">
       <!--call fun="{ nav_StopPosControl(); windtunnel_set_periodic( FALSE ); FALSE; }"/-->
       <stay wp="STDBY"/>
     </block>
-    <block name="Go to orange Tulip">
+    <block name="Go to orange Tulip" strip_button="orange tulip (target)" strip_icon="target.png">
       <call fun="nav_set_heading_deg(0)"/>
       <stay wp="TARGET"/>
     </block>
-    <block name="Go to red Tulip">
+    <block name="Go to red Tulip" strip_button="red tulip" strip_icon="tulip.png">
       <call fun="nav_set_heading_deg(0)"/>
       <stay wp="TARGET2"/>
     </block>
-    <block name="Step up">
+    <block name="Step up" strip_button="step up" strip_icon="upup.png">
       <call fun="NavSetWaypointPos(WP_TD2, 0.0, 0.5)"/>
       <stay wp="TD2" until="stage_time > 30"/>
       <deroute block="Go to orange Tulip"/>
     </block>
-    <block name="Step forward">
+    <block name="Step forward" strip_button="step forward" strip_icon="up.png">
       <call fun="NavSetWaypointPos(WP_TD, 0.0, 1.0)"/>
       <stay wp="TD" until="stage_time > 30"/>
       <deroute block="Go to orange Tulip"/>
     </block>
-    <block name="Step right">
+    <block name="Step right" strip_button="step right" strip_icon="right.png">
       <call fun="NavSetWaypointPos(WP_TD, 0.5, 0.5)"/>
       <stay wp="TD" until="stage_time > 30"/>
       <deroute block="Go to orange Tulip"/>
     </block>
     
-    <block name="stay_p1" strip_button="Encircle P1" strip_icon="flat_theme/circle-right.png">
+    <block name="stay_p1">
       <circle wp="p1" radius="1.5"/>
     </block>
     <block name="Decrease Altitude">
@@ -97,10 +97,10 @@
       <call fun="NavSetWaypointHere(WP_TD)"/>
       <stay climb="-0.1" vmode="climb" wp="TD"/>
     </block>
-    <block key="0" name="land_stdby" strip_button="Land home" group="land" strip_icon="flat_theme/land.png">
+    <block key="0" name="land_stdby">
       <go wp="STDBY"/>
     </block>
-    <block key="l" name="land here" strip_button="Land here" group="land" strip_icon="flat_theme/land-left.png">
+    <block key="l" name="land here">
       <call fun="NavSetWaypointHere(WP_TD)"/>
     </block>
     <block name="land">
@@ -112,7 +112,7 @@
       <call fun="NavStartDetectGround()"/>
       <stay climb="nav_descend_vspeed" vmode="climb" wp="TD"/>
     </block>
-    <block name="landed">
+    <block name="landed" strip_button="kill" strip_icon="kill.png">
       <call fun="NavKillThrottle()"/>
       <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
     </block>
