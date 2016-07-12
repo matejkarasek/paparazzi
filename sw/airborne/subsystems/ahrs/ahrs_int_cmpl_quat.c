@@ -672,9 +672,14 @@ void ahrs_icq_realign_heading(int32_t heading)
   /* quaternion representing current heading only */
   struct Int32Quat q_h;
   QUAT_COPY(q_h, ltp_to_body_quat);
-  q_h.qx = 0;
-  q_h.qy = 0;
-  int32_quat_normalize(&q_h);
+  struct Int32Eulers e_h;
+  int32_eulers_of_quat(&e_h, &q_h);
+  e_h.phi = 0;
+  e_h.theta = 0;
+  int32_quat_of_eulers(&q_h, &e_h);
+//  q_h.qx = 0;
+//  q_h.qy = 0;
+//  int32_quat_normalize(&q_h);
 
   /* quaternion representing rotation from current to new heading */
   struct Int32Quat q_c;
