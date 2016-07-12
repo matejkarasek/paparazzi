@@ -172,9 +172,9 @@
   
   <section name="DELFLY_GUIDANCE" prefix="DELFLY_GUIDANCE_">
   	<define name="COMPLEMENTARY_HEADING_GAIN" value="100"/>
-  	<define name="LATERAL_RATIO" value="75"/>
+  	<define name="LATERAL_RATIO" value="75"/><!-- LS: 75, MS: 60 -->
   	<define name="LATERAL_PGAIN" value="80"/>
-  	<define name="LATERAL_DGAIN" value="0"/>
+  	<define name="LATERAL_DGAIN" value="10"/><!-- LS: 10, MS: 20 -->
   	<define name="LATERAL_IGAIN" value="10"/>
   	<define name="VERTICAL_POLE" value="-1"/>
   	<define name="USE_SPEED_REF" value="FALSE"/>
@@ -286,9 +286,9 @@
     <define name="THETA_PGAIN" value="2024"/>
     <define name="THETA_DGAIN" value="200"/>
     <define name="THETA_IGAIN" value="800"/>
-    <define name="PSI_PGAIN" value="850"/>
-    <define name="PSI_DGAIN" value="0"/>
-    <define name="PSI_IGAIN" value="225"/>
+    <define name="PSI_PGAIN" value="1300"/>
+    <define name="PSI_DGAIN" value="300"/>
+    <define name="PSI_IGAIN" value="60"/>
     <!-- feedforward -->
     <define name="PHI_DDGAIN" value="0"/>
     <define name="THETA_DDGAIN" value="0"/>
