@@ -27,13 +27,41 @@
 #define DELFLY_UTILS_H
 
 #include "std.h"
+#include "subsystems/navigation/waypoints.h"
 
 extern uint8_t LEDS_switch;
 extern uint8_t SRVO_kill;
 
+#define WP_PIV		piv_wp
+
+#define DELFLY_WP_PIV1		1
+#define DELFLY_WP_PIV2		2
+#define DELFLY_WP_PIV3		3
+
+/* target waypoint for PIV    		*/
+extern uint8_t delfly_wp_piv;
+extern uint8_t piv_wp;
+/* height of *all* piv waypoints
+ * in m								*/
+extern double piv_height;
+/* lateral (east) position of *all* piv waypoints
+ * in m 							*/
+extern double piv_east;
+/* forward (north) position of *current* piv waypoint
+ * in m								*/
+extern double piv_wp_north;
+
 
 extern void util_init(void);
+extern void util_piv_init(void);
+
 extern void util_run_periodic(void);
+
+extern void delfly_utils_piv_select_wp(uint8_t wp);
+extern void delfly_utils_piv_set_height(double height);
+extern void delfly_utils_piv_set_wp_north(double wp_north);
+extern void delfly_utils_piv_set_east(double east);
+
 
 
 #endif

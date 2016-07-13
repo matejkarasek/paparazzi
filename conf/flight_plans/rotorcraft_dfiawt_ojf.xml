@@ -1,17 +1,21 @@
 <!DOCTYPE flight_plan SYSTEM "flight_plan.dtd">
 
-<flight_plan alt="2" ground_alt="0" lat0="51.990634" lon0="4.376789" max_dist_from_home="20" name="Rotorcraft Open Jet Facility of the Delft University of Technology" security_height="0.3">
+<flight_plan alt="1.75" ground_alt="0" lat0="51.990634" lon0="4.376789" max_dist_from_home="60" name="Rotorcraft Open Jet Facility of the Delft University of Technology" security_height="0.3">
   <header>
 #include "autopilot.h"
+#include "modules/delfly_utils/delfly_utils.h"
 </header>
   <waypoints>
     <waypoint name="HOME" x="0.0" y="0.0"/>
     <waypoint name="CLIMB" x="1.2" y="-0.6"/>
     <waypoint name="STDBY" x="-0.7" y="-0.8"/>
-    <waypoint name="TD" x="0.8" y="-1.7" alt="2"/>
-    <waypoint name="TD2" x="0.0" y="0.5" alt="2.5"/>
-    <waypoint x="0.0" y="0.5" alt="2" name="TARGET"/>
-    <waypoint x="0.5" y="0.5" alt="2" name="TARGET2"/><!-- waypoint lateral step -->
+    <waypoint name="TD" x="0.8" y="-1.7" alt="1.75"/>
+    <waypoint name="TD2" x="0.0" y="0.5" alt="2.25"/>
+    <waypoint x="0.0" y="0.5" alt="1.75" name="TARGET"/>
+    <waypoint x="0.5" y="0.5" alt="1.75" name="TARGET2"/><!-- waypoint lateral step -->
+    <waypoint x="-0.125" y="-0.10" alt="1.2" name="PIV1"/>
+    <waypoint x="-0.125" y="-0.15" alt="1.2" name="PIV2"/>
+    <waypoint x="-0.125" y="-0.20" alt="1.2" name="PIV3"/>    
     <waypoint lat="51.9906308" lon="4.3767945" alt="2" name="p1"/>
     <waypoint lat="51.9906420" lon="4.3768256" alt="2" name="p2"/>
     <waypoint lat="51.9906316" lon="4.3768384" name="_FA1"/>
@@ -44,7 +48,7 @@
       <!--call fun="NavSetGroundReferenceHere()"/-->
     </block>
     <block name="Holding point">
-        <deroute block="Go to orange Tulip"/>
+        <deroute block="Go to target"/>
     	<!--call fun="NavKillThrottle()"/-->
       <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
     </block>
@@ -61,28 +65,29 @@
       <!--call fun="{ nav_StopPosControl(); windtunnel_set_periodic( FALSE ); FALSE; }"/-->
       <stay wp="STDBY"/>
     </block>
-    <block name="Go to orange Tulip" strip_button="orange tulip (target)" strip_icon="target.png">
+    <block name="Go to target" strip_button="orange tulip (target)" strip_icon="target.png">
       <call fun="nav_set_heading_deg(0)"/>
       <stay wp="TARGET"/>
     </block>
-    <block name="Go to red Tulip" strip_button="red tulip" strip_icon="tulip.png">
+    <block name="Go to Tulip" strip_button="red tulip" strip_icon="tulip.png">
       <call fun="nav_set_heading_deg(0)"/>
-      <stay wp="TARGET2"/>
+      <!--stay wp="TARGET2"/-->
+      <call fun="{NavGotoWaypoint(WP_PIV); NavVerticalAutoThrottleMode(RadOfDeg(0.000000)); NavVerticalAltitudeMode(WaypointAlt(WP_PIV), 0.); TRUE;}"/>
     </block>
     <block name="Step up" strip_button="step up" strip_icon="upup.png">
       <call fun="NavSetWaypointPos(WP_TD2, 0.0, 0.5)"/>
       <stay wp="TD2" until="stage_time > 30"/>
-      <deroute block="Go to orange Tulip"/>
+      <deroute block="Go to target"/>
     </block>
     <block name="Step forward" strip_button="step forward" strip_icon="up.png">
       <call fun="NavSetWaypointPos(WP_TD, 0.0, 1.0)"/>
-      <stay wp="TD" until="stage_time > 30"/>
-      <deroute block="Go to orange Tulip"/>
+      <stay wp="TD" until="stage_time > 45"/>
+      <deroute block="Go to target"/>
     </block>
     <block name="Step right" strip_button="step right" strip_icon="right.png">
       <call fun="NavSetWaypointPos(WP_TD, 0.5, 0.5)"/>
       <stay wp="TD" until="stage_time > 30"/>
-      <deroute block="Go to orange Tulip"/>
+      <deroute block="Go to target"/>
     </block>
     
     <block name="stay_p1">
