@@ -9,8 +9,8 @@
       <!--message name="DELFLY_FLAPCONTROL"     period="0.25"  /-->
       <message name="DELFLY_GUIDANCE"        period="0.25" />
       <message name="DELFLY_STATE"           period="0.25"  /><!-- 68 bytes -->
-      <!--message name="DELFLY_SPEEDCTRL"       period="0.5"  />
-      <message name="DELFLY_SPEEDCTRL_GAINS" period="1."  />      
+      <message name="DELFLY_SPEEDCTRL"       period="0.5"  />
+      <!--message name="DELFLY_SPEEDCTRL_GAINS" period="1."  />      
       <message name="DELFLY_STATEESTIMATION" period="1."    phase="0.5"/-->
       <message name="DL_VALUE"               period="1.5"   phase="0.75"/><!-- 2n bytes -->
       <message name="ENERGY"                 period="3."    phase="1.5"/> <!-- 14 bytes -->
