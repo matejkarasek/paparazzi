@@ -151,6 +151,15 @@ void stabilization_attitude_init(void)
   register_periodic_telemetry(DefaultPeriodic, PPRZ_MSG_ID_STAB_ATTITUDE_INT, send_att);
   register_periodic_telemetry(DefaultPeriodic, PPRZ_MSG_ID_STAB_ATTITUDE_REF_INT, send_att_ref);
 #endif
+<<<<<<< HEAD
+=======
+
+  // Initialize filters
+  // void init_second_order_low_pass_int(struct SecondOrderLowPass_int *filter, float cut_off, float Q, float sample_time, int32_t value)
+  init_second_order_low_pass_int(&filter_roll, 20.0, 0.7071, 1.0/PERIODIC_FREQUENCY, 0.0);
+  init_second_order_low_pass_int(&filter_pitch, 20.0, 0.7071, 1.0/PERIODIC_FREQUENCY, 0.0);
+
+>>>>>>> 456e7d0... Flying well!
 }
 
 void stabilization_attitude_read_rc(bool in_flight, bool in_carefree, bool coordinated_turn)
