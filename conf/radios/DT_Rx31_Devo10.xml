@@ -4,8 +4,8 @@
  <channel ctl="A" function="THROTTLE" min="1110" neutral="1110" max="1900" average="0"/>
  <channel ctl="D" function="ROLL"     max="1110" neutral="1500" min="1900" average="0"/>
  <channel ctl="C" function="PITCH"    max="1110" neutral="1500" min="1900" average="0"/>
- <channel ctl="B" function="GEAR"     max="1110" neutral="1500" min="1900" average="0"/>
- <channel ctl="G" function="FLAP"     min="1110" neutral="1500" max="1900" average="1"/>
- <channel ctl="E" function="MODE"     min="1110" neutral="1500" max="1900" average="1"/>
- <channel ctl="F" function="ELEV_DR"  min="1110" neutral="1500" max="1900" average="1"/>
+ <channel ctl="B" function="YAW"     max="1110" neutral="1500" min="1900" average="0"/>
+ <channel ctl="G" function="MODE"     min="1110" neutral="1500" max="1900" average="1"/>
+ <channel ctl="E" function="FLAP"     min="1110" neutral="1500" max="1900" average="1"/>
+ <channel ctl="F" function="GEAR"  min="1110" neutral="1500" max="1900" average="1"/>
 </radio>

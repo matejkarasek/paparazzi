@@ -1951,7 +1951,13 @@
     <field name="g2_r" type="float"/>
   </message>
 
-  <!--217 is free -->
+  <message name="ROTORCRAFT_FP_MIN" id="217">
+    <description>Minimalistic message to track Rotorcraft over very low bandwidth links</description>
+    <field name="east"     type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+    <field name="north"    type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+    <field name="up"       type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+    <field name="gspeed"   type="uint16" unit="cm/s" alt_unit="m/s"/>
+  </message>
 
   <message name="BEBOP_ACTUATORS" id="218">
     <field name="cmd_thrust" type="int32"/>
