@@ -297,7 +297,7 @@ void stabilization_attitude_run(bool  in_flight)
    // int32_t update_second_order_low_pass_int(struct SecondOrderLowPass_int *filter, int32_t value)
   stabilization_cmd[COMMAND_ROLL]=update_second_order_low_pass_int(&filter_roll, stabilization_cmd[COMMAND_ROLL]);
   stabilization_cmd[COMMAND_PITCH]=update_second_order_low_pass_int(&filter_pitch, stabilization_cmd[COMMAND_PITCH]);
-  stabilization_cmd[COMMAND_YAW]=update_second_order_low_pass_int(&filter_pitch, stabilization_cmd[COMMAND_YAW]);
+  stabilization_cmd[COMMAND_YAW]=update_second_order_low_pass_int(&filter_yaw, stabilization_cmd[COMMAND_YAW]);
 
   /* bound the result */
   BoundAbs(stabilization_cmd[COMMAND_ROLL], MAX_PPRZ);
