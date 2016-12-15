@@ -74,8 +74,8 @@
 		<load name="gps_ubx_ucenter.xml"/>
    
    		<module name="logger_sd_spi_direct.xml">
-      		<define name="SDLOGGER_ON_ARM" value="TRUE"/>
-      		<!--define name="SDLOGGER_CONTROL_SWITCH" value="RADIO_GEAR"/-->
+      		<!--define name="SDLOGGER_ON_ARM" value="TRUE"/-->
+      		<define name="SDLOGGER_CONTROL_SWITCH" value="RADIO_GEAR"/>
 	  		<define name="LOGGER_LED" value="2"/> <!-- Other LED numbers get overwritten by the respective default LED functions-->
 		</module>	
 	</modules>

@@ -37,7 +37,13 @@
 
 #if SDLOGGER_ON_ARM
 #include "autopilot.h"
+#else
+#include "subsystems/radio_control.h"
+#ifndef SDLOGGER_CONTROL_SWITCH
+	#define SDLOGGER_CONTROL_SWITCH RADIO_GEAR
 #endif
+#endif
+
 
 #ifdef LOGGER_LED
 #define LOGGER_LED_ON LED_ON(LOGGER_LED);
@@ -111,13 +117,30 @@ void sdlogger_spi_direct_periodic(void)
 {
   sdcard_spi_periodic(&sdcard1);
 
-#if SDLOGGER_ON_ARM
-  if(autopilot_motors_on) {
-    sdlogger_spi.do_log = 1;
-  } else {
-    sdlogger_spi.do_log = 0;
-  }
-#endif
+  #if SDLOGGER_ON_ARM
+  	  if(autopilot_motors_on) {
+  		  sdlogger_spi.do_log = 1;
+  	  } else {
+  		  sdlogger_spi.do_log = 0;
+  	  }
+  #else
+
+  	  static uint8_t sdlogger_control_switch = 0;
+  	  // if (radio_control.values[SDLOGGER_CONTROL_SWITCH] > 1000) {
+      if (radio_control.values[SDLOGGER_CONTROL_SWITCH] < 0) {
+      	  if (sdlogger_control_switch < 100)
+      		  sdlogger_control_switch++;
+      } else {
+      	  if (sdlogger_control_switch > 0)
+      		  sdlogger_control_switch--;
+      	  }
+      if (sdlogger_control_switch>50) {
+    	  sdlogger_spi.do_log = 1;
+      }
+      else if(sdlogger_control_switch<20) {
+    	  sdlogger_spi.do_log = 0;
+      }
+  #endif
 
   switch (sdlogger_spi.status) {
     case SDLogger_Initializing:
