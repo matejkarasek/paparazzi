@@ -38,6 +38,13 @@
 		<!-- Necessary to build succesfully, but not used -->
 		<module name="motor_mixing"/>
 		
+		<!-- Rpm sensing settings start - cannot be pushed to master -->
+		<subsystem name="rpm_sensor" type="eagletree">
+ 			<define name="PULSES_PER_ROTATION" value="5"/>
+ 		</subsystem>	
+		<!-- Rpm sensing settings end -->
+		
+					
 		<module name="actuators" type="pwm">
 			<define name="SERVO_HZ" value="200"/>
 			<define name="USE_SERVOS_1AND2"/>
@@ -67,7 +74,7 @@
 		<load name="gps_ubx_ucenter.xml"/>
    
    		<module name="logger_sd_spi_direct.xml">
-      		<!--define name="SDLOGGER_ON_ARM" value="TRUE"/-->
+      		<define name="SDLOGGER_ON_ARM" value="TRUE"/>
       		<!--define name="SDLOGGER_CONTROL_SWITCH" value="RADIO_GEAR"/-->
 	  		<define name="LOGGER_LED" value="2"/> <!-- Other LED numbers get overwritten by the respective default LED functions-->
 		</module>	

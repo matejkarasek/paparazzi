@@ -153,9 +153,10 @@
       <message name="DL_VALUE"               period="0.5"/>
       <message name="ALIVE"                  period="2.1"/>
       <message name="RPM"        			 period=".002"/>
-      <message name="IMU_GYRO_SCALED"        period=".002"/>
-      <message name="IMU_ACCEL_SCALED"       period=".002"/>
-      <message name="IMU_MAG_SCALED"         period=".1"/>
+      <message name="ROTORCRAFT_TUNE_HOVER"    period=".002"/>
+<!--      <message name="IMU_GYRO_SCALED"        period=".002"/-->
+<!--      <message name="IMU_ACCEL_SCALED"       period=".002"/-->
+<!--      <message name="IMU_MAG_SCALED"         period=".1"/-->
     </mode>
   </process>
 
