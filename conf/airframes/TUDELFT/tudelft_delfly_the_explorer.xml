@@ -159,7 +159,7 @@
 		<define name="SP_MAX_PHI" value="45." unit="deg"/>
 		<define name="SP_MAX_THETA" value="30." unit="deg"/>
 		<define name="SP_MAX_PSI" value="45." unit="deg"/>
-		<define name="SP_MAX_R" value="90." unit="deg/s"/>
+		<define name="SP_MAX_R" value="180." unit="deg/s"/>
 		<define name="SP_MAX_P" value="90." unit="deg/s"/>
 		<define name="DEADBAND_R" value="250"/>
 		<define name="DEADBAND_A" value="250"/>
@@ -175,10 +175,10 @@
 		<define name="REF_MAX_Q" value="400." unit="deg/s"/>
 		<define name="REF_MAX_QDOT" value="RadOfDeg(8000.)"/>
 		
-		<define name="REF_OMEGA_R" value="500" unit="deg/s"/>
+		<define name="REF_OMEGA_R" value="1000" unit="deg/s"/>
 		<define name="REF_ZETA_R" value="0.85"/>
-		<define name="REF_MAX_R" value="90." unit="deg/s"/>
-		<define name="REF_MAX_RDOT" value="RadOfDeg(900.)"/>
+		<define name="REF_MAX_R" value="180." unit="deg/s"/>
+		<define name="REF_MAX_RDOT" value="RadOfDeg(4000.)"/>
 		
 		<!-- feedback -->
 		<define name="PHI_PGAIN" value="1"/>
