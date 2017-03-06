@@ -36,14 +36,20 @@
 #include "stabilization/stabilization_attitude_rc_setpoint.h"
 #include "stabilization/stabilization_attitude.h"
 
-#ifndef STOP_ROLL_CMD_ANGLE
-#define STOP_ROLL_CMD_ANGLE 25.0
+#ifndef STOP_FLIP_CMD_ANGLE
+#define STOP_FLIP_CMD_ANGLE 70.0
 #endif
 #ifndef FIRST_THRUST_DURATION
 #define FIRST_THRUST_DURATION 0.3
 #endif
 #ifndef FINAL_THRUST_LEVEL
-#define FINAL_THRUST_LEVEL 6000
+#define FINAL_THRUST_LEVEL 8000
+#endif
+#ifndef FLIP_PITCH
+#define FLIP_PITCH 0
+#endif
+#ifndef FLIP_ROLL
+#define FLIP_ROLL 1
 #endif
 
 uint32_t flip_counter;
@@ -65,11 +71,12 @@ void guidance_flip_enter(void)
 void guidance_flip_run(void)
 {
   uint32_t timer;
-  int32_t phi;
+  int32_t phi, theta;
   static uint32_t timer_save = 0;
 
   timer = (flip_counter++ << 12) / PERIODIC_FREQUENCY;
   phi = stateGetNedToBodyEulers_i()->phi;
+  theta = stateGetNedToBodyEulers_i()->theta;
 
   switch (flip_state) {
     case 0:
@@ -78,11 +85,14 @@ void guidance_flip_run(void)
       stabilization_attitude_set_earth_cmd_i(&flip_cmd_earth,
                                              heading_save);
       stabilization_attitude_run(autopilot_in_flight);
-      stabilization_cmd[COMMAND_THRUST] = 8000; //Thrust to go up first
+      stabilization_cmd[COMMAND_THRUST] = 9000; //Thrust to go up first
       timer_save = 0;
 
       if (timer > BFP_OF_REAL(FIRST_THRUST_DURATION, 12)) {
-        flip_state++;
+        if (FLIP_ROLL && ~FLIP_PITCH) flip_state=1;
+        else if (FLIP_PITCH && ~FLIP_ROLL) flip_state=3;
+        else flip_state=100; // return to attitude mode
+        // TODO: Add a combined pitch and roll flip
       }
       break;
 
@@ -90,9 +100,10 @@ void guidance_flip_run(void)
       stabilization_cmd[COMMAND_ROLL]   = 9000; // Rolling command
       stabilization_cmd[COMMAND_PITCH]  = 0;
       stabilization_cmd[COMMAND_YAW]    = 0;
-      stabilization_cmd[COMMAND_THRUST] = 1000; //Min thrust?
+      stabilization_cmd[COMMAND_THRUST] = 8000; //Min thrust?
 
-      if (phi > ANGLE_BFP_OF_REAL(RadOfDeg(STOP_ROLL_CMD_ANGLE))) {
+
+      if (phi > ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
         flip_state++;
       }
       break;
@@ -103,13 +114,37 @@ void guidance_flip_run(void)
       stabilization_cmd[COMMAND_YAW]    = 0;
       stabilization_cmd[COMMAND_THRUST] = 1000; //Min thrust?
 
-      if (phi > ANGLE_BFP_OF_REAL(RadOfDeg(-110.0)) && phi < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_ROLL_CMD_ANGLE))) {
+      if (phi > ANGLE_BFP_OF_REAL(RadOfDeg(-110.0)) && phi < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
         timer_save = timer;
-        flip_state++;
+        flip_state = 5;
       }
       break;
 
     case 3:
+          stabilization_cmd[COMMAND_ROLL]   = 0; // Rolling command
+          stabilization_cmd[COMMAND_PITCH]  = 9000;
+          stabilization_cmd[COMMAND_YAW]    = 0;
+          stabilization_cmd[COMMAND_THRUST] = 4000; //Min thrust?
+
+
+          if (theta > ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
+            flip_state++;
+          }
+          break;
+
+    case 4:
+          stabilization_cmd[COMMAND_ROLL]   = 0;
+          stabilization_cmd[COMMAND_PITCH]  = 0;
+          stabilization_cmd[COMMAND_YAW]    = 0;
+          stabilization_cmd[COMMAND_THRUST] = 1000; //Min thrust?
+
+          if (theta > ANGLE_BFP_OF_REAL(RadOfDeg(-110.0)) && theta < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
+            timer_save = timer;
+            flip_state = 5;
+          }
+          break;
+
+    case 5:
       flip_cmd_earth.x = 0;
       flip_cmd_earth.y = 0;
       stabilization_attitude_set_earth_cmd_i(&flip_cmd_earth,
