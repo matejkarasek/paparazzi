@@ -106,9 +106,9 @@
 	<!-- FLIP SETTINGS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 	
 	<section name="MISC">
-    	<define name="STOP_FLIP_CMD_ANGLE" value="70.0"/>
-    	<define name="FIRST_THRUST_DURATION" value="0.5"/>
-    	<define name="FINAL_THRUST_LEVEL" value="8000"/>
+<!--    	<define name="STOP_FLIP_CMD_ANGLE" value="70.0"/>-->
+<!--    	<define name="FIRST_THRUST_DURATION" value="0.5"/>-->
+<!--    	<define name="FINAL_THRUST_LEVEL" value="9000"/>-->
   	</section>	
   	
 	<!-- SETTINGS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->

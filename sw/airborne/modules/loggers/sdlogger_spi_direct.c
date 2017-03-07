@@ -271,11 +271,11 @@ void sdlogger_spi_direct_index_received(void)
       sdlogger_spi.last_completed = sdcard1.input_buf[4];
 
       /* the following lines are necessary not to overwrite the logs from before restart */
-      if(~SDLOGGER_ERASE_AFTER_RESTART) {
-    	  if(sdlogger_spi.next_available_address < 0x00004000) {
-    		  sdlogger_spi.next_available_address = 0x00004000;
-    	  }
-      }
+//      if(~SDLOGGER_ERASE_AFTER_RESTART) {
+//    	  if(sdlogger_spi.next_available_address < 0x00004000) {
+//    		  sdlogger_spi.next_available_address = 0x00004000;
+//    	  }
+//      }
 
       /* Ready to start logging */
       sdlogger_spi.status = SDLogger_Ready;

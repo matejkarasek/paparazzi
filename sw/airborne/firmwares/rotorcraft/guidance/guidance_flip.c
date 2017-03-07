@@ -37,19 +37,31 @@
 #include "stabilization/stabilization_attitude.h"
 
 #ifndef STOP_FLIP_CMD_ANGLE
-#define STOP_FLIP_CMD_ANGLE 70.0
+#define STOP_FLIP_CMD_ANGLE 90.0
+#endif
+
+#ifndef START_RECOVER_CMD_ANGLE
+#define START_RECOVER_CMD_ANGLE -115.0
+#endif
+
+#ifndef FIRST_THRUST_LEVEL
+#define FIRST_THRUST_LEVEL 2000 //9000
 #endif
 #ifndef FIRST_THRUST_DURATION
-#define FIRST_THRUST_DURATION 0.3
+#define FIRST_THRUST_DURATION 0.6
 #endif
 #ifndef FINAL_THRUST_LEVEL
-#define FINAL_THRUST_LEVEL 8000
+#define FINAL_THRUST_LEVEL 2000 //9000
 #endif
+#ifndef FINAL_THRUST_DURATION
+#define FINAL_THRUST_DURATION 0.8
+#endif
+
 #ifndef FLIP_PITCH
-#define FLIP_PITCH 0
+#define FLIP_PITCH 1
 #endif
 #ifndef FLIP_ROLL
-#define FLIP_ROLL 1
+#define FLIP_ROLL 0
 #endif
 
 uint32_t flip_counter;
@@ -71,12 +83,25 @@ void guidance_flip_enter(void)
 void guidance_flip_run(void)
 {
   uint32_t timer;
-  int32_t phi, theta;
+  int32_t phi, theta, phiq, thetaq, qi, qx, qy, qz;
   static uint32_t timer_save = 0;
+//  struct Int32Quat q, qg, qprod;
 
   timer = (flip_counter++ << 12) / PERIODIC_FREQUENCY;
   phi = stateGetNedToBodyEulers_i()->phi;
   theta = stateGetNedToBodyEulers_i()->theta;
+//  qi = stateGetNedToBodyQuat_i()->qi;
+//  qx = stateGetNedToBodyQuat_i()->qx;
+//  qy = stateGetNedToBodyQuat_i()->qy;
+  //qz = stateGetNedToBodyQuat_i()->qz;
+//  q = stateGetNedToBodyQuat_i();
+
+// quaternion multiplication
+// int32_quat_comp(struct Int32Quat *a2c, struct Int32Quat *a2b, struct Int32Quat *b2c)
+
+  phiq = 2*int32_atan2(stateGetNedToBodyQuat_i()->qx, stateGetNedToBodyQuat_i()->qi);
+  thetaq=2*int32_atan2(stateGetNedToBodyQuat_i()->qy, stateGetNedToBodyQuat_i()->qi);
+
 
   switch (flip_state) {
     case 0:
@@ -85,7 +110,7 @@ void guidance_flip_run(void)
       stabilization_attitude_set_earth_cmd_i(&flip_cmd_earth,
                                              heading_save);
       stabilization_attitude_run(autopilot_in_flight);
-      stabilization_cmd[COMMAND_THRUST] = 9000; //Thrust to go up first
+      stabilization_cmd[COMMAND_THRUST] = FIRST_THRUST_LEVEL; //Thrust to go up first
       timer_save = 0;
 
       if (timer > BFP_OF_REAL(FIRST_THRUST_DURATION, 12)) {
@@ -100,7 +125,7 @@ void guidance_flip_run(void)
       stabilization_cmd[COMMAND_ROLL]   = 9000; // Rolling command
       stabilization_cmd[COMMAND_PITCH]  = 0;
       stabilization_cmd[COMMAND_YAW]    = 0;
-      stabilization_cmd[COMMAND_THRUST] = 8000; //Min thrust?
+      stabilization_cmd[COMMAND_THRUST] = 4000; //Min thrust?
 
 
       if (phi > ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
@@ -114,7 +139,7 @@ void guidance_flip_run(void)
       stabilization_cmd[COMMAND_YAW]    = 0;
       stabilization_cmd[COMMAND_THRUST] = 1000; //Min thrust?
 
-      if (phi > ANGLE_BFP_OF_REAL(RadOfDeg(-110.0)) && phi < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
+      if (phi > ANGLE_BFP_OF_REAL(RadOfDeg(START_RECOVER_CMD_ANGLE)) && phi < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
         timer_save = timer;
         flip_state = 5;
       }
@@ -138,7 +163,7 @@ void guidance_flip_run(void)
           stabilization_cmd[COMMAND_YAW]    = 0;
           stabilization_cmd[COMMAND_THRUST] = 1000; //Min thrust?
 
-          if (theta > ANGLE_BFP_OF_REAL(RadOfDeg(-110.0)) && theta < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
+          if (theta > ANGLE_BFP_OF_REAL(RadOfDeg(START_RECOVER_CMD_ANGLE)) && theta < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
             timer_save = timer;
             flip_state = 5;
           }
@@ -153,7 +178,7 @@ void guidance_flip_run(void)
 
       stabilization_cmd[COMMAND_THRUST] = FINAL_THRUST_LEVEL; //Thrust to stop falling
 
-      if ((timer - timer_save) > BFP_OF_REAL(0.5, 12)) {
+      if ((timer - timer_save) > BFP_OF_REAL(FINAL_THRUST_DURATION, 12)) {
         flip_state++;
       }
       break;
@@ -170,7 +195,7 @@ void guidance_flip_run(void)
       stabilization_cmd[COMMAND_ROLL]   = 0;
       stabilization_cmd[COMMAND_PITCH]  = 0;
       stabilization_cmd[COMMAND_YAW]    = 0;
-      stabilization_cmd[COMMAND_THRUST] = 8000; //Some thrust to come out of the roll?
+      stabilization_cmd[COMMAND_THRUST] = 9000; //Some thrust to come out of the roll?
       break;
   }
 }
