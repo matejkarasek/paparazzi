@@ -64,10 +64,7 @@
 		<module name="ahrs" type="int_cmpl_quat">
 			<define name="AHRS_PROPAGATE_LOW_PASS_RATES" value="FALSE"/>
 		</module>
-		<module name="ins">
-			<!-- Check what is this setting? -->
-<!--			<define name="INS_INT_GPS_ID" value="ABI_DISABLE"/-->
-		</module>
+		<module name="ins"/>
 	</firmware>
 	
 	<!-- MODULES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
@@ -77,6 +74,7 @@
    
    		<module name="logger_sd_spi_direct.xml">
       		<!--define name="SDLOGGER_ON_ARM" value="TRUE"/-->
+      		<define name="SDLOGGER_ERASE_AFTER_RESTART" value="TRUE"/>
       		<define name="SDLOGGER_CONTROL_SWITCH" value="RADIO_GEAR"/>
 	  		<define name="LOGGER_LED" value="2"/> <!-- Other LED numbers get overwritten by the respective default LED functions-->
 		</module>	

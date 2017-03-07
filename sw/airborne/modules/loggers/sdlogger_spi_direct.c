@@ -44,6 +44,10 @@
 #endif
 #endif
 
+#ifndef SDLOGGER_ERASE_AFTER_RESTART
+	#define SDLOGGER_ERASE_AFTER_RESTART FALSE
+#endif
+
 
 #ifdef LOGGER_LED
 #define LOGGER_LED_ON LED_ON(LOGGER_LED);
@@ -266,8 +270,11 @@ void sdlogger_spi_direct_index_received(void)
                                             (sdcard1.input_buf[3]);
       sdlogger_spi.last_completed = sdcard1.input_buf[4];
 
-      if(sdlogger_spi.next_available_address < 0x00004000) {
-        sdlogger_spi.next_available_address = 0x00004000;
+      /* the following lines are necessary not to overwrite the logs from before restart */
+      if(~SDLOGGER_ERASE_AFTER_RESTART) {
+    	  if(sdlogger_spi.next_available_address < 0x00004000) {
+    		  sdlogger_spi.next_available_address = 0x00004000;
+    	  }
       }
 
       /* Ready to start logging */
