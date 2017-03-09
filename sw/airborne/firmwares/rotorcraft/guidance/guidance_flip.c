@@ -58,10 +58,10 @@
 #endif
 
 #ifndef FLIP_PITCH
-#define FLIP_PITCH 0
+#define FLIP_PITCH 1
 #endif
 #ifndef FLIP_ROLL
-#define FLIP_ROLL 1
+#define FLIP_ROLL 0
 #endif
 
 uint32_t flip_counter;
