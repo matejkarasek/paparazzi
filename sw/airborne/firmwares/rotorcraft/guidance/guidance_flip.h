@@ -28,6 +28,9 @@
  * the previous mode after finishing the flip.
  * Use it with caution!
  */
+#include "std.h"
+
+// extern int32_t phi_gyr, theta_gyr;
 
 #ifndef GUIDANCE_FLIP_H
 #define GUIDANCE_FLIP_H

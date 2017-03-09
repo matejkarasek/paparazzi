@@ -41,27 +41,27 @@
 #endif
 
 #ifndef START_RECOVER_CMD_ANGLE
-#define START_RECOVER_CMD_ANGLE 255.0 //-115.0
+#define START_RECOVER_CMD_ANGLE 255.0 // 615 //-115.0
 #endif
 
 #ifndef FIRST_THRUST_LEVEL
-#define FIRST_THRUST_LEVEL 2000 //9000
+#define FIRST_THRUST_LEVEL 9000
 #endif
 #ifndef FIRST_THRUST_DURATION
 #define FIRST_THRUST_DURATION 0.6
 #endif
 #ifndef FINAL_THRUST_LEVEL
-#define FINAL_THRUST_LEVEL 2000 //9000
+#define FINAL_THRUST_LEVEL 9000
 #endif
 #ifndef FINAL_THRUST_DURATION
 #define FINAL_THRUST_DURATION 0.8
 #endif
 
 #ifndef FLIP_PITCH
-#define FLIP_PITCH 1
+#define FLIP_PITCH 0
 #endif
 #ifndef FLIP_ROLL
-#define FLIP_ROLL 0
+#define FLIP_ROLL 1
 #endif
 
 uint32_t flip_counter;
@@ -71,6 +71,8 @@ int32_t heading_save;
 uint8_t autopilot_mode_old;
 struct Int32Vect2 flip_cmd_earth;
 
+int32_t phi_gyr, theta_gyr;
+
 void guidance_flip_enter(void)
 {
   flip_counter = 0;
@@ -78,12 +80,14 @@ void guidance_flip_enter(void)
   flip_rollout = false;
   heading_save = stabilization_attitude_get_heading_i();
   autopilot_mode_old = autopilot_mode;
+  phi_gyr=0;
+  theta_gyr=0;
 }
 
 void guidance_flip_run(void)
 {
   uint32_t timer;
-  int32_t phi, theta, phi_gyr, theta_gyr, p, q; //phiq, thetaq, qi, qx, qy, qz;
+  int32_t phi, theta, p, q; //phiq, thetaq, qi, qx, qy, qz;
   static uint32_t timer_save = 0;
   //  struct Int32Quat q, qg, qprod;
 
