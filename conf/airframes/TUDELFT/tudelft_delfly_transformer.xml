@@ -59,7 +59,7 @@
 		<module name="imu" type="lisa_s_v1.0"/>
 		<module name="gps" type="ublox"/>
 		<module name="stabilization" type="int_euler">
-	  		<define name="STABILIZATION_ATTITUDE_SP_PSI_DELTA_LIMIT" value="1.57"/>
+	  		<define name="STABILIZATION_ATTITUDE_SP_PSI_DELTA_LIMIT" value="0.5"/>
 	  	</module>
 		<module name="ahrs" type="int_cmpl_quat">
 			<define name="AHRS_PROPAGATE_LOW_PASS_RATES" value="FALSE"/>
@@ -84,7 +84,7 @@
 	<servos driver="Pwm">
 		<servo name="MOTOR_LEFT" no="5" min="1100" neutral="1100" max="1900"/> 
     	<servo name="MOTOR_RIGHT" no="4" min="1100" neutral="1100" max="1900"/> <!-- maximum corrected to compensate for the motor differences -->
-    	<servo name="DIHEDRAL" no="0" min="1110" neutral="1400" max="1690"/> <!--Trimmed for moment equilibrium with WiFi module-->
+    	<servo name="DIHEDRAL" no="0" min="1300" neutral="1550" max="1800"/> <!--Trimmed for moment equilibrium with WiFi module-->
 		<servo name="WING_DEF" no="1" min="955" neutral="1555" max="2155"/>
 	</servos>
 	
@@ -97,8 +97,8 @@
 	
 	<command_laws>
 		<call fun="motor_mixing_run(autopilot_motors_on,FALSE,values)"/>
-		<set servo="MOTOR_LEFT" value="@THRUST+0.5*@ROLL"/>
-    	<set servo="MOTOR_RIGHT" value="@THRUST-0.5*@ROLL"/>
+		<set servo="MOTOR_LEFT" value="@THRUST+0.5*@ROLL+0.1*ABS(@ROLL)"/>
+    	<set servo="MOTOR_RIGHT" value="@THRUST-0.5*@ROLL+0.1*ABS(@ROLL)"/>
     	<set servo="DIHEDRAL" value="@PITCH"/>
 		<set servo="WING_DEF" value="@YAW"/>
 	</command_laws>
@@ -182,17 +182,17 @@
 		<define name="REF_MAX_RDOT" value="RadOfDeg(900.)"/>
 		
 		<!-- feedback -->
-		<define name="PHI_PGAIN" value="2000"/>
-		<define name="PHI_DGAIN" value="800"/>
+		<define name="PHI_PGAIN" value="3000"/>
+		<define name="PHI_DGAIN" value="750"/>
 		<define name="PHI_IGAIN" value="0"/>
 		
 		<define name="THETA_PGAIN" value="7800"/>
-		<define name="THETA_DGAIN" value="800"/>
+		<define name="THETA_DGAIN" value="1000"/>
 		<define name="THETA_IGAIN" value="0"/>
 		
-		<define name="PSI_PGAIN" value="1000"/>
-		<define name="PSI_DGAIN" value="4000"/>
-		<define name="PSI_IGAIN" value="125"/>
+		<define name="PSI_PGAIN" value="4000"/>
+		<define name="PSI_DGAIN" value="0"/>
+		<define name="PSI_IGAIN" value="0"/>
 		
 		<!-- feedforward -->
 		<define name="PHI_DDGAIN" value="0"/>

@@ -41,7 +41,7 @@
 #endif
 
 #ifndef START_RECOVER_CMD_ANGLE
-#define START_RECOVER_CMD_ANGLE 255.0 // 615 //-115.0
+#define START_RECOVER_CMD_ANGLE 255.0 //255.0 // 615 //-115.0
 #endif
 
 #ifndef FIRST_THRUST_LEVEL
@@ -58,10 +58,10 @@
 #endif
 
 #ifndef FLIP_PITCH
-#define FLIP_PITCH 1
+#define FLIP_PITCH 0
 #endif
 #ifndef FLIP_ROLL
-#define FLIP_ROLL 0
+#define FLIP_ROLL 1
 #endif
 
 uint32_t flip_counter;

@@ -297,28 +297,28 @@ void stabilization_attitude_run(bool  in_flight)
   stabilization_cmd[COMMAND_PITCH] =
     OFFSET_AND_ROUND((stabilization_att_fb_cmd[COMMAND_PITCH] + stabilization_att_ff_cmd[COMMAND_PITCH]), CMD_SHIFT);
 
-//  stabilization_cmd[COMMAND_YAW] =
-//		  OFFSET_AND_ROUND((stabilization_att_fb_cmd[COMMAND_YAW] + stabilization_att_ff_cmd[COMMAND_YAW]), CMD_SHIFT);
-  stabilization_cmd[COMMAND_YAW] = radio_control.values[RADIO_YAW];
-
-  /* Filtering the commands */
-
-  /* Second order Butterworth */
-   // int32_t update_second_order_low_pass_int(struct SecondOrderLowPass_int *filter, int32_t value)
-  stabilization_cmd[COMMAND_ROLL]=update_second_order_low_pass_int(&filter_roll, stabilization_cmd[COMMAND_ROLL]);
-  stabilization_cmd[COMMAND_PITCH]=update_second_order_low_pass_int(&filter_pitch, stabilization_cmd[COMMAND_PITCH]);
-  //stabilization_cmd[COMMAND_YAW]=update_second_order_low_pass_int(&filter_yaw, stabilization_cmd[COMMAND_YAW]);
-
-  /* Fourth order Butterworth - may be too much for Lisa/S */
-  // update_butterworth_4_low_pass_int(Butterworth4LowPass_int *filter, int32_t value)
-//  stabilization_cmd[COMMAND_ROLL]=update_butterworth_4_low_pass_int(&filter_roll, stabilization_cmd[COMMAND_ROLL]);
-//  stabilization_cmd[COMMAND_PITCH]=update_butterworth_4_low_pass_int(&filter_pitch, stabilization_cmd[COMMAND_PITCH]);
-//  stabilization_cmd[COMMAND_YAW]=update_butterworth_4_low_pass_int(&filter_yaw, stabilization_cmd[COMMAND_YAW]);
-
+  stabilization_cmd[COMMAND_YAW] =
+		  OFFSET_AND_ROUND((stabilization_att_fb_cmd[COMMAND_YAW] + stabilization_att_ff_cmd[COMMAND_YAW]), CMD_SHIFT) + radio_control.values[RADIO_YAW];
+//stabilization_cmd[COMMAND_YAW] = radio_control.values[RADIO_YAW];
 
   /* bound the result */
   BoundAbs(stabilization_cmd[COMMAND_ROLL], MAX_PPRZ);
   BoundAbs(stabilization_cmd[COMMAND_PITCH], MAX_PPRZ);
   BoundAbs(stabilization_cmd[COMMAND_YAW], MAX_PPRZ);
+
+  /* Filtering the commands */
+
+  /* Second order Butterworth */
+  // int32_t update_second_order_low_pass_int(struct SecondOrderLowPass_int *filter, int32_t value)
+  stabilization_cmd[COMMAND_ROLL]=update_second_order_low_pass_int(&filter_roll, stabilization_cmd[COMMAND_ROLL]);
+  stabilization_cmd[COMMAND_PITCH]=update_second_order_low_pass_int(&filter_pitch, stabilization_cmd[COMMAND_PITCH]);
+  stabilization_cmd[COMMAND_YAW]=update_second_order_low_pass_int(&filter_yaw, stabilization_cmd[COMMAND_YAW]);
+
+  /* Fourth order Butterworth - may be too much for Lisa/S */
+  // update_butterworth_4_low_pass_int(Butterworth4LowPass_int *filter, int32_t value)
+  //  stabilization_cmd[COMMAND_ROLL]=update_butterworth_4_low_pass_int(&filter_roll, stabilization_cmd[COMMAND_ROLL]);
+  //  stabilization_cmd[COMMAND_PITCH]=update_butterworth_4_low_pass_int(&filter_pitch, stabilization_cmd[COMMAND_PITCH]);
+  //  stabilization_cmd[COMMAND_YAW]=update_butterworth_4_low_pass_int(&filter_yaw, stabilization_cmd[COMMAND_YAW]);
+
 
 }
