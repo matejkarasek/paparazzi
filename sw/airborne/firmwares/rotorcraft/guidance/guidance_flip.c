@@ -36,12 +36,16 @@
 #include "stabilization/stabilization_attitude_rc_setpoint.h"
 #include "stabilization/stabilization_attitude.h"
 
-#ifndef STOP_FLIP_CMD_ANGLE
-#define STOP_FLIP_CMD_ANGLE 90.0
+#ifndef STOP_ACCELERATE_CMD_ANGLE
+#define STOP_ACCELERATE_CMD_ANGLE 170.0
+#endif
+
+#ifndef START_DECELERATE_CMD_ANGLE
+#define START_DECELERATE_CMD_ANGLE 190.0 //255.0 // 615 //-115.0
 #endif
 
 #ifndef START_RECOVER_CMD_ANGLE
-#define START_RECOVER_CMD_ANGLE 255.0 //255.0 // 615 //-115.0
+#define START_RECOVER_CMD_ANGLE 270.0 //255.0 // 615 //-115.0
 #endif
 
 #ifndef FIRST_THRUST_LEVEL
@@ -133,7 +137,7 @@ void guidance_flip_run(void)
         }
         else if (FLIP_PITCH && ~FLIP_ROLL) {
         	theta_gyr = theta; // initialize the theta estimate with the current theta
-        	flip_state = 3;
+        	flip_state = 11;
         }
         else flip_state = 100; // return to attitude mode
         // TODO: Add a combined pitch and roll flip
@@ -149,7 +153,7 @@ void guidance_flip_run(void)
       // Integrate gyros for angle estimates
       phi_gyr += p/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
 
-      if (phi_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
+      if (phi_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(STOP_ACCELERATE_CMD_ANGLE))) {
         flip_state++;
       }
       break;
@@ -163,13 +167,28 @@ void guidance_flip_run(void)
       // Integrate gyros for angle estimates
       phi_gyr += p/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
 
-      if (phi_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(START_RECOVER_CMD_ANGLE))) { // && phi < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
+      if (phi_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(START_DECELERATE_CMD_ANGLE))) { // && phi < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_ACCELERATE_CMD_ANGLE))) {
         timer_save = timer;
-        flip_state = 5;
+        flip_state = 3;
       }
       break;
 
     case 3:
+      stabilization_cmd[COMMAND_ROLL]   = -7100;
+      stabilization_cmd[COMMAND_PITCH]  = 0;
+      stabilization_cmd[COMMAND_YAW]    = 0;
+      stabilization_cmd[COMMAND_THRUST] = 6050; // 5600 // --> Left (5600-8000/2) = 1600, right --> (5600+8000/2) = 9600
+
+      // Integrate gyros for angle estimates
+      phi_gyr += p/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
+
+      if (phi_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(START_RECOVER_CMD_ANGLE))) { // && phi < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_ACCELERATE_CMD_ANGLE))) {
+        timer_save = timer;
+        flip_state = 20;
+      }
+      break;
+
+    case 11:
       stabilization_cmd[COMMAND_ROLL]   = 0;
       stabilization_cmd[COMMAND_PITCH]  = -9600; // Pitching command
       stabilization_cmd[COMMAND_YAW]    = 0;
@@ -178,12 +197,12 @@ void guidance_flip_run(void)
       // Integrate gyro for pitch estimate
       theta_gyr += -q/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
 
-      if (theta_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
+      if (theta_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(STOP_ACCELERATE_CMD_ANGLE))) {
     	  flip_state++;
       }
       break;
 
-    case 4:
+    case 12:
       stabilization_cmd[COMMAND_ROLL]   = 0;
       stabilization_cmd[COMMAND_PITCH]  = 0;
       stabilization_cmd[COMMAND_YAW]    = 0;
@@ -192,13 +211,13 @@ void guidance_flip_run(void)
       // Integrate gyro for pitch estimate
       theta_gyr += -q/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
 
-      if (theta_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(START_RECOVER_CMD_ANGLE))) { // && theta < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
+      if (theta_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(START_RECOVER_CMD_ANGLE))) { // && theta < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_ACCELERATE_CMD_ANGLE))) {
         timer_save = timer;
-        flip_state = 5;
+        flip_state = 20;
       }
       break;
 
-    case 5:
+    case 20: // recovery with stabilization
       flip_cmd_earth.x = 0;
       flip_cmd_earth.y = 0;
       stabilization_attitude_set_earth_cmd_i(&flip_cmd_earth,

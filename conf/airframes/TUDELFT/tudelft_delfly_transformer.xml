@@ -85,7 +85,7 @@
 	<servos driver="Pwm">
 		<servo name="MOTOR_LEFT" no="5" min="1100" neutral="1100" max="1900"/> 
     	<servo name="MOTOR_RIGHT" no="4" min="1100" neutral="1100" max="1900"/> <!-- maximum corrected to compensate for the motor differences -->
-    	<servo name="DIHEDRAL" no="0" min="1300" neutral="1550" max="1800"/> <!--Trimmed for moment equilibrium with WiFi module-->
+    	<servo name="DIHEDRAL" no="0" min="1250" neutral="1500" max="1750"/> <!--Trimmed for moment equilibrium with WiFi module-->
 		<servo name="WING_DEF" no="1" min="955" neutral="1555" max="2155"/>
 	</servos>
 	
