@@ -64,6 +64,8 @@
 #define FLIP_ROLL 1
 #endif
 
+uint8_t in_flip;
+
 uint32_t flip_counter;
 uint8_t flip_state;
 bool flip_rollout;
@@ -80,8 +82,9 @@ void guidance_flip_enter(void)
   flip_rollout = false;
   heading_save = stabilization_attitude_get_heading_i();
   autopilot_mode_old = autopilot_mode;
-  phi_gyr=0;
-  theta_gyr=0;
+  phi_gyr = 0;
+  theta_gyr = 0;
+  in_flip = 0;
 }
 
 void guidance_flip_run(void)
@@ -113,6 +116,8 @@ void guidance_flip_run(void)
 
   switch (flip_state) {
     case 0:
+      in_flip =1;
+
       flip_cmd_earth.x = 0;
       flip_cmd_earth.y = 0;
       stabilization_attitude_set_earth_cmd_i(&flip_cmd_earth,
@@ -136,10 +141,10 @@ void guidance_flip_run(void)
       break;
 
     case 1:
-      stabilization_cmd[COMMAND_ROLL]   = 8000; // Rolling command
+      stabilization_cmd[COMMAND_ROLL]   = 7100; // Rolling command
       stabilization_cmd[COMMAND_PITCH]  = 0;
       stabilization_cmd[COMMAND_YAW]    = 0;
-      stabilization_cmd[COMMAND_THRUST] = 5600; // --> Left (5600-8000/2) = 1600, right --> (5600+8000/2) = 9600
+      stabilization_cmd[COMMAND_THRUST] = 6050; // 5600 // --> Left (5600-8000/2) = 1600, right --> (5600+8000/2) = 9600
 
       // Integrate gyros for angle estimates
       phi_gyr += p/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
@@ -153,7 +158,7 @@ void guidance_flip_run(void)
       stabilization_cmd[COMMAND_ROLL]   = 0;
       stabilization_cmd[COMMAND_PITCH]  = 0;
       stabilization_cmd[COMMAND_YAW]    = 0;
-      stabilization_cmd[COMMAND_THRUST] = 1600; // Min. thrust, so that none of the wings stops flapping
+      stabilization_cmd[COMMAND_THRUST] = 2500; //1600; // Min. thrust, so that none of the wings stops flapping
 
       // Integrate gyros for angle estimates
       phi_gyr += p/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
@@ -166,12 +171,12 @@ void guidance_flip_run(void)
 
     case 3:
       stabilization_cmd[COMMAND_ROLL]   = 0;
-      stabilization_cmd[COMMAND_PITCH]  = 9600; // Pitching command
+      stabilization_cmd[COMMAND_PITCH]  = -9600; // Pitching command
       stabilization_cmd[COMMAND_YAW]    = 0;
       stabilization_cmd[COMMAND_THRUST] = 9000; // Max. thrust
 
       // Integrate gyro for pitch estimate
-      theta_gyr += q/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
+      theta_gyr += -q/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
 
       if (theta_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
     	  flip_state++;
@@ -182,10 +187,10 @@ void guidance_flip_run(void)
       stabilization_cmd[COMMAND_ROLL]   = 0;
       stabilization_cmd[COMMAND_PITCH]  = 0;
       stabilization_cmd[COMMAND_YAW]    = 0;
-      stabilization_cmd[COMMAND_THRUST] = 1600; //Min thrust?
+      stabilization_cmd[COMMAND_THRUST] = 2500; //1600 //Min thrust?
 
       // Integrate gyro for pitch estimate
-      theta_gyr += q/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
+      theta_gyr += -q/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
 
       if (theta_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(START_RECOVER_CMD_ANGLE))) { // && theta < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_FLIP_CMD_ANGLE))) {
         timer_save = timer;
@@ -208,8 +213,15 @@ void guidance_flip_run(void)
       break;
 
     default:
-      autopilot_mode_auto2 = autopilot_mode_old;
-      autopilot_set_mode(autopilot_mode_old);
+
+//      autopilot_mode_auto2 = autopilot_mode_old;
+//      autopilot_set_mode(autopilot_mode_old);
+
+      autopilot_mode_auto2 = AP_MODE_ATTITUDE_DIRECT;
+      autopilot_set_mode(AP_MODE_ATTITUDE_DIRECT);
+
+      in_flip = 0;
+
       stab_att_sp_euler.psi = heading_save;
       flip_rollout = false;
       flip_counter = 0;
@@ -219,7 +231,7 @@ void guidance_flip_run(void)
       stabilization_cmd[COMMAND_ROLL]   = 0;
       stabilization_cmd[COMMAND_PITCH]  = 0;
       stabilization_cmd[COMMAND_YAW]    = 0;
-      stabilization_cmd[COMMAND_THRUST] = 9000; //Some thrust to come out of the roll?
+      stabilization_cmd[COMMAND_THRUST] = 9000; //Some thrust to come out of the flip
       break;
   }
 }

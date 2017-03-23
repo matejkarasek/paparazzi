@@ -39,6 +39,10 @@
 #include "math/pprz_algebra_int.h"
 #include "state.h"
 
+#include "autopilot.h"
+
+#include "firmwares/rotorcraft/guidance/guidance_flip.h"
+
 /** explicitly define to zero to disable attitude reference generation */
 #ifndef USE_ATTITUDE_REF
 #define USE_ATTITUDE_REF 1
@@ -70,6 +74,8 @@ int32_t stabilization_att_ff_cmd[COMMANDS_NB];
 
 struct Int32Eulers stab_att_sp_euler;
 struct AttRefEulerInt att_ref_euler_i;
+
+uint8_t switch_prev_state;
 
 static inline void reset_psi_ref_from_body(void)
 {
@@ -173,6 +179,8 @@ void stabilization_attitude_init(void)
 //    init_butterworth_4_low_pass_int(&filter_roll, 15.0, 1.0/PERIODIC_FREQUENCY, 0.0);
 //    init_butterworth_4_low_pass_int(&filter_pitch, 15.0, 1.0/PERIODIC_FREQUENCY, 0.0);
 //    init_butterworth_4_low_pass_int(&filter_yaw, 10, 1.0/PERIODIC_FREQUENCY, 0.0);
+
+    switch_prev_state = 0;
 
 }
 
@@ -319,6 +327,24 @@ void stabilization_attitude_run(bool  in_flight)
   //  stabilization_cmd[COMMAND_ROLL]=update_butterworth_4_low_pass_int(&filter_roll, stabilization_cmd[COMMAND_ROLL]);
   //  stabilization_cmd[COMMAND_PITCH]=update_butterworth_4_low_pass_int(&filter_pitch, stabilization_cmd[COMMAND_PITCH]);
   //  stabilization_cmd[COMMAND_YAW]=update_butterworth_4_low_pass_int(&filter_yaw, stabilization_cmd[COMMAND_YAW]);
+
+  // If switch is flipped, set mode2 to FLIP
+  if (radio_control.values[RADIO_FLAP] > 5000 && switch_prev_state == 0) {
+    autopilot_mode_auto2 = AP_MODE_FLIP;
+    autopilot_set_mode(AP_MODE_FLIP);
+    switch_prev_state = 1;
+  }
+  else if (in_flip == 0) {
+    // reset if flip was incomplete
+    autopilot_mode_auto2 = AP_MODE_ATTITUDE_DIRECT;
+  }
+
+  if (radio_control.values[RADIO_FLAP] < 5000) {
+      switch_prev_state = 0;
+  }
+
+
+
 
 
 }

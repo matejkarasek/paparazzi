@@ -148,7 +148,8 @@
 		<define name="MODE_STARTUP" value="AP_MODE_RC_DIRECT"/>
    		<define name="MODE_MANUAL" value="AP_MODE_RC_DIRECT"/>
 		<define name="MODE_AUTO1" value="AP_MODE_ATTITUDE_DIRECT"/>
-		<define name="MODE_AUTO2" value="AP_MODE_FLIP"/>
+		<define name="MODE_AUTO2" value="AP_MODE_ATTITUDE_DIRECT"/>
+<!--		<define name="MODE_AUTO2" value="AP_MODE_FLIP"/-->
 				
 		<define name="USE_THROTTLE_FOR_MOTOR_ARMING" value="TRUE"/>
 <!--		<define name="USE_KILL_SWITCH_FOR_MOTOR_ARMING" value="TRUE"/-->

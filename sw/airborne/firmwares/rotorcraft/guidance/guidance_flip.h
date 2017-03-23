@@ -30,7 +30,7 @@
  */
 #include "std.h"
 
-// extern int32_t phi_gyr, theta_gyr;
+extern uint8_t in_flip;
 
 #ifndef GUIDANCE_FLIP_H
 #define GUIDANCE_FLIP_H
