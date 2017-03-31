@@ -36,16 +36,86 @@
 #include "stabilization/stabilization_attitude_rc_setpoint.h"
 #include "stabilization/stabilization_attitude.h"
 
+#include "paparazzi.h"
+#include "math/pprz_algebra_int.h"
+#include "subsystems/radio_control.h"
+
+
+// Single pitch/roll flip - reliable
+//
+//#define STOP_ACCELERATE_CMD_ANGLE 90
+//#define START_DECELERATE_CMD_ANGLE 255.0
+//#define START_RECOVER_CMD_ANGLE 255.0
+//#define FIRST_THRUST_LEVEL 9000
+//#define FIRST_THRUST_DURATION 0.6
+//#define FINAL_THRUST_LEVEL 9000
+//#define FINAL_THRUST_DURATION 0.8
+//#define FLIP_PITCH 1
+
+// Double roll flip - stil some overshoot
+//
+//#define STOP_ACCELERATE_CMD_ANGLE 550.0
+//#define START_DECELERATE_CMD_ANGLE 560.0
+//#define START_RECOVER_CMD_ANGLE 615.0
+//#define FIRST_THRUST_LEVEL 9000
+//#define FIRST_THRUST_DURATION 0.6
+//#define FINAL_THRUST_LEVEL 9000
+//#define FINAL_THRUST_DURATION 0.8
+//#define FLIP_ROLL 1
+
+// Single roll flip - some overshoot
+//
+//#define STOP_ACCELERATE_CMD_ANGLE 170
+//#define START_DECELERATE_CMD_ANGLE 190.0
+//#define START_RECOVER_CMD_ANGLE 270.0
+//#define FIRST_THRUST_LEVEL 9000
+//#define FIRST_THRUST_DURATION 0.6
+//#define FINAL_THRUST_LEVEL 9000
+//#define FINAL_THRUST_DURATION 0.8
+//#define FLIP_ROLL 1
+
+
+// Single pitch flip - decelerates too fast
+//
+//#define STOP_ACCELERATE_CMD_ANGLE 180
+//#define START_DECELERATE_CMD_ANGLE 230.0
+//#define START_RECOVER_CMD_ANGLE 270.0
+//#define FIRST_THRUST_LEVEL 9000
+//#define FIRST_THRUST_DURATION 0.6
+//#define FINAL_THRUST_LEVEL 9000
+//#define FINAL_THRUST_DURATION 0.8
+//#define FLIP_PITCH 1
+
+//// Fast throttle up
+//
+//#define STOP_ACCELERATE_CMD_ANGLE 1.0
+//#define START_DECELERATE_CMD_ANGLE 1.0
+//#define START_RECOVER_CMD_ANGLE 2.0
+//#define FIRST_THRUST_LEVEL 9000
+//#define FIRST_THRUST_DURATION 1.0
+//#define FINAL_THRUST_LEVEL 9000
+//#define FINAL_THRUST_DURATION 0.1
+
+// Evasive maneuver - roll
+#define FIRST_THRUST_LEVEL 6500
+#define FIRST_THRUST_DURATION 0
+#define STRAIGHT_FLIGHT_DURATION 1.0
+#define STOP_EVADE_ANGLE 40.0
+#define FINAL_THRUST_LEVEL 9000
+#define FINAL_THRUST_DURATION 0.8
+#define EVADE_ROLL 1
+
+// default values
 #ifndef STOP_ACCELERATE_CMD_ANGLE
-#define STOP_ACCELERATE_CMD_ANGLE 170.0
+#define STOP_ACCELERATE_CMD_ANGLE 180.0
 #endif
 
 #ifndef START_DECELERATE_CMD_ANGLE
-#define START_DECELERATE_CMD_ANGLE 190.0 //255.0 // 615 //-115.0
+#define START_DECELERATE_CMD_ANGLE 230.0 //190.0 //255.0 // 615 //-115.0
 #endif
 
 #ifndef START_RECOVER_CMD_ANGLE
-#define START_RECOVER_CMD_ANGLE 270.0 //255.0 // 615 //-115.0
+#define START_RECOVER_CMD_ANGLE 270.0 // 270.0 //255.0 // 615 //-115.0
 #endif
 
 #ifndef FIRST_THRUST_LEVEL
@@ -65,14 +135,18 @@
 #define FLIP_PITCH 0
 #endif
 #ifndef FLIP_ROLL
-#define FLIP_ROLL 1
+#define FLIP_ROLL 0
+#endif
+#ifndef EVADE_ROLL
+#define EVADE_ROLL 0
 #endif
 
 uint8_t in_flip;
+int32_t auto_pitch = 0;
+int32_t auto_roll = 0;
 
 uint32_t flip_counter;
 uint8_t flip_state;
-bool flip_rollout;
 int32_t heading_save;
 uint8_t autopilot_mode_old;
 struct Int32Vect2 flip_cmd_earth;
@@ -83,12 +157,13 @@ void guidance_flip_enter(void)
 {
   flip_counter = 0;
   flip_state = 0;
-  flip_rollout = false;
   heading_save = stabilization_attitude_get_heading_i();
   autopilot_mode_old = autopilot_mode;
   phi_gyr = 0;
   theta_gyr = 0;
   in_flip = 0;
+  auto_pitch = 0;
+  auto_roll = 0;
 }
 
 void guidance_flip_run(void)
@@ -119,6 +194,11 @@ void guidance_flip_run(void)
 
 
   switch (flip_state) {
+
+    //----------------------------------------------------------------------------------------------------------------------
+    //---GAIN-HEIGHT--------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------------
+
     case 0:
       in_flip =1;
 
@@ -139,10 +219,17 @@ void guidance_flip_run(void)
         	theta_gyr = theta; // initialize the theta estimate with the current theta
         	flip_state = 11;
         }
-        else flip_state = 100; // return to attitude mode
+        else if (EVADE_ROLL) {
+          flip_state = 21;
+        }
+        else flip_state = 101; // return to attitude mode
         // TODO: Add a combined pitch and roll flip
       }
       break;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    //---ROLL-FLIP----------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------------
 
     case 1:
       stabilization_cmd[COMMAND_ROLL]   = 7100; // Rolling command
@@ -169,7 +256,7 @@ void guidance_flip_run(void)
 
       if (phi_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(START_DECELERATE_CMD_ANGLE))) { // && phi < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_ACCELERATE_CMD_ANGLE))) {
         timer_save = timer;
-        flip_state = 3;
+        flip_state++;
       }
       break;
 
@@ -184,9 +271,13 @@ void guidance_flip_run(void)
 
       if (phi_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(START_RECOVER_CMD_ANGLE))) { // && phi < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_ACCELERATE_CMD_ANGLE))) {
         timer_save = timer;
-        flip_state = 20;
+        flip_state = 100;
       }
       break;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    //---PITCH-FLIP---------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------------
 
     case 11:
       stabilization_cmd[COMMAND_ROLL]   = 0;
@@ -211,13 +302,63 @@ void guidance_flip_run(void)
       // Integrate gyro for pitch estimate
       theta_gyr += -q/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
 
-      if (theta_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(START_RECOVER_CMD_ANGLE))) { // && theta < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_ACCELERATE_CMD_ANGLE))) {
+      if (theta_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(START_DECELERATE_CMD_ANGLE))) { // && theta < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_ACCELERATE_CMD_ANGLE))) {
         timer_save = timer;
-        flip_state = 20;
+        flip_state++;
       }
       break;
 
-    case 20: // recovery with stabilization
+    case 13:
+         stabilization_cmd[COMMAND_ROLL]   = 0;
+         stabilization_cmd[COMMAND_PITCH]  = 9600;
+         stabilization_cmd[COMMAND_YAW]    = 0;
+         stabilization_cmd[COMMAND_THRUST] = 9000; //1600 //Min thrust?
+
+         // Integrate gyro for pitch estimate
+         theta_gyr += -q/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
+
+         if (theta_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(START_RECOVER_CMD_ANGLE))) { // && theta < ANGLE_BFP_OF_REAL(RadOfDeg(STOP_ACCELERATE_CMD_ANGLE))) {
+           timer_save = timer;
+           flip_state = 100;
+         }
+         break;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    //---EVADE-ROLL---------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------------
+    case 21:
+         // straight flight
+         auto_pitch = -MAX_PPRZ*2/3;
+         stabilization_attitude_run(autopilot_in_flight);
+         stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
+
+         if (timer > BFP_OF_REAL(STRAIGHT_FLIGHT_DURATION, 12)) {
+            phi_gyr = phi; // initialize the phi estimate with the current phi
+            flip_state++;
+            auto_pitch = 0;
+         }
+         break;
+
+    case 22:
+         // Max open loop roll
+         stabilization_cmd[COMMAND_ROLL]   = 7100; // Rolling command
+         stabilization_cmd[COMMAND_PITCH]  = 0;
+         stabilization_cmd[COMMAND_YAW]    = 0;
+         stabilization_cmd[COMMAND_THRUST] = 6050; // 5600 // --> Left (5600-8000/2) = 1600, right --> (5600+8000/2) = 9600
+
+         // Integrate gyros for angle estimates
+         phi_gyr += p/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
+
+         if (phi_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(STOP_EVADE_ANGLE))) {
+             flip_state = 100;
+         }
+         break;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    //---RECOVER------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------------
+
+    case 100: // recovery with stabilization
       flip_cmd_earth.x = 0;
       flip_cmd_earth.y = 0;
       stabilization_attitude_set_earth_cmd_i(&flip_cmd_earth,
@@ -242,7 +383,6 @@ void guidance_flip_run(void)
       in_flip = 0;
 
       stab_att_sp_euler.psi = heading_save;
-      flip_rollout = false;
       flip_counter = 0;
       timer_save = 0;
       flip_state = 0;

@@ -335,7 +335,7 @@ void stabilization_attitude_run(bool  in_flight)
     switch_prev_state = 1;
   }
   else if (in_flip == 0 || autopilot_mode == AP_MODE_RC_DIRECT) {
-    // reset if flip is finished or if it was incomplete
+    // reset if is finished or if it was incomplete
     autopilot_mode_auto2 = AP_MODE_ATTITUDE_DIRECT;
   }
 

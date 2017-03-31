@@ -31,6 +31,8 @@
 #include "std.h"
 
 extern uint8_t in_flip;
+extern int32_t auto_pitch;
+extern int32_t auto_roll;
 
 #ifndef GUIDANCE_FLIP_H
 #define GUIDANCE_FLIP_H

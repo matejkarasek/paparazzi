@@ -33,6 +33,8 @@
 #include "firmwares/rotorcraft/autopilot_rc_helpers.h"
 #include "mcu_periph/sys_time.h"
 
+#include "firmwares/rotorcraft/guidance/guidance_flip.h"
+
 #ifndef STABILIZATION_ATTITUDE_DEADBAND_A
 #define STABILIZATION_ATTITUDE_DEADBAND_A 0
 #endif
@@ -51,7 +53,7 @@ float care_free_heading = 0;
 static int32_t get_rc_roll(void)
 {
   const int32_t max_rc_phi = (int32_t) ANGLE_BFP_OF_REAL(STABILIZATION_ATTITUDE_SP_MAX_PHI);
-  int32_t roll = radio_control.values[RADIO_ROLL];
+  int32_t roll = TRIM_PPRZ(radio_control.values[RADIO_ROLL] + auto_roll);
 #if STABILIZATION_ATTITUDE_DEADBAND_A
   DeadBand(roll, STABILIZATION_ATTITUDE_DEADBAND_A);
   return roll * max_rc_phi / (MAX_PPRZ - STABILIZATION_ATTITUDE_DEADBAND_A);
@@ -63,7 +65,7 @@ static int32_t get_rc_roll(void)
 static int32_t get_rc_pitch(void)
 {
   const int32_t max_rc_theta = (int32_t) ANGLE_BFP_OF_REAL(STABILIZATION_ATTITUDE_SP_MAX_THETA);
-  int32_t pitch = radio_control.values[RADIO_PITCH];
+  int32_t pitch = TRIM_PPRZ(radio_control.values[RADIO_PITCH] + auto_pitch);
 #if STABILIZATION_ATTITUDE_DEADBAND_E
   DeadBand(pitch, STABILIZATION_ATTITUDE_DEADBAND_E);
   return pitch * max_rc_theta / (MAX_PPRZ - STABILIZATION_ATTITUDE_DEADBAND_E);
