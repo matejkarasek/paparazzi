@@ -96,26 +96,26 @@
 //#define FINAL_THRUST_LEVEL 9000
 //#define FINAL_THRUST_DURATION 0.1
 
-//// Evasive maneuver - roll
-//#define FIRST_THRUST_LEVEL 6500
-//#define FIRST_THRUST_DURATION 0
-//#define STRAIGHT_FLIGHT_DURATION 1.0
-//#define STOP_EVADE_ANGLE 30.0
-//#define FINAL_THRUST_LEVEL 9000
-//#define FINAL_THRUST_DURATION 0.8
-//#define EVADE_ROLL 1
-
-// Pitch doublets
+// Evasive maneuver - roll
 #define FIRST_THRUST_LEVEL 6500
-#define FIRST_THRUST_DURATION 0.0
-#define STRAIGHT_FLIGHT_DURATION 0.0
-#define DOUBLET_DURATION 1.0
-#define FINAL_THRUST_LEVEL 6500
-#define FINAL_THRUST_DURATION 0
-#define PITCH_CMD_NOMINAL 0
-#define PITCH_CMD_DELTA -MAX_PPRZ/3
-#define PITCH_DOUBLET 1
-#define DOUBLET_REPETITIONS 10
+#define FIRST_THRUST_DURATION 0
+#define STRAIGHT_FLIGHT_DURATION 1.0
+#define STOP_EVADE_ANGLE 30.0
+#define FINAL_THRUST_LEVEL 9000
+#define FINAL_THRUST_DURATION 0.8
+#define EVADE_ROLL 1
+
+//// Pitch doublets
+//#define FIRST_THRUST_LEVEL 6500
+//#define FIRST_THRUST_DURATION 0.0
+//#define STRAIGHT_FLIGHT_DURATION 0.6
+//#define DOUBLET_DURATION 1.0
+//#define FINAL_THRUST_LEVEL 6500
+//#define FINAL_THRUST_DURATION 0
+//#define PITCH_CMD_NOMINAL -MAX_PPRZ*15/60
+//#define PITCH_CMD_DELTA -MAX_PPRZ/4
+//#define PITCH_DOUBLET 1
+//#define DOUBLET_REPETITIONS 10
 
 //// Pitch sweep
 //#define FIRST_THRUST_LEVEL 6500
@@ -159,6 +159,9 @@
 #ifndef DOUBLET_DURATION
 #define DOUBLET_DURATION 0.0
 #endif
+#ifndef DOUBLET_REPETITIONS
+#define DOUBLET_REPETITIONS 1
+#endif
 #ifndef PITCH_CMD_NOMINAL
 #define PITCH_CMD_NOMINAL 0
 #endif
@@ -198,6 +201,7 @@ pprz_t auto_roll = 0;
 
 uint32_t flip_counter;
 uint32_t doublet_cnt;
+uint8_t sequence_cnt;
 uint8_t flip_state;
 int32_t heading_save;
 uint8_t autopilot_mode_old;
@@ -279,7 +283,8 @@ void guidance_flip_run(void)
         }
         else if (PITCH_DOUBLET) {
           flip_state = 31;
-          doublet_cnt = 1;
+          doublet_cnt = 2;
+          sequence_cnt = 1;
         }
         else if (PITCH_SWEEP) {
           flip_state = 41;
@@ -389,7 +394,7 @@ void guidance_flip_run(void)
     //----------------------------------------------------------------------------------------------------------------------
     case 21:
          // straight flight
-         auto_pitch = 0; //-MAX_PPRZ*2/3;
+         auto_pitch = -MAX_PPRZ*2/3;
          stabilization_attitude_run(autopilot_in_flight);
          stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
 
@@ -403,7 +408,7 @@ void guidance_flip_run(void)
     case 22:
          // Max open loop roll
          stabilization_cmd[COMMAND_ROLL]   = 7100; // Rolling command
-         stabilization_cmd[COMMAND_PITCH]  = 0;
+         stabilization_cmd[COMMAND_PITCH]  = 7000;
          stabilization_cmd[COMMAND_YAW]    = 0;
          stabilization_cmd[COMMAND_THRUST] = 6050; // 5600 // --> Left (5600-8000/2) = 1600, right --> (5600+8000/2) = 9600
 
@@ -450,7 +455,14 @@ void guidance_flip_run(void)
 
       if ((timer - timer_save) > BFP_OF_REAL(DOUBLET_DURATION/doublet_cnt, 12)) {
         if (doublet_cnt > DOUBLET_REPETITIONS) {
-          flip_state++;
+          if (sequence_cnt == 2) {
+            flip_state++;
+          }
+          else {
+            flip_state = 32;
+            doublet_cnt = 2;
+            sequence_cnt++;
+          }
         }
         else {
           flip_state = 32;
@@ -469,6 +481,7 @@ void guidance_flip_run(void)
       if ((timer - timer_save) > BFP_OF_REAL(STRAIGHT_FLIGHT_DURATION, 12)) {
         flip_state = 100;
         timer_save = timer;
+        auto_pitch = 0;
       }
       break;
 
@@ -497,13 +510,14 @@ void guidance_flip_run(void)
       stabilization_attitude_set_earth_cmd_i(&flip_cmd_earth,
                                              heading_save);
       stabilization_attitude_run(autopilot_in_flight);
-
-      stabilization_cmd[COMMAND_THRUST] = FINAL_THRUST_LEVEL; //Thrust to stop falling
-
+      auto_pitch = 0;
       if ((timer - timer_save) > BFP_OF_REAL(FINAL_THRUST_DURATION, 12)) {
         flip_state++;
       }
       break;
+
+      stabilization_cmd[COMMAND_THRUST] = FINAL_THRUST_LEVEL; //Thrust to stop falling
+
 
     default:
 
