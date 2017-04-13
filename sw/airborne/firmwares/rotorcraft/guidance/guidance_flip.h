@@ -29,10 +29,11 @@
  * Use it with caution!
  */
 #include "std.h"
+#include "paparazzi.h"
 
 extern uint8_t in_flip;
-extern int32_t auto_pitch;
-extern int32_t auto_roll;
+extern pprz_t auto_pitch;
+extern pprz_t auto_roll;
 
 #ifndef GUIDANCE_FLIP_H
 #define GUIDANCE_FLIP_H

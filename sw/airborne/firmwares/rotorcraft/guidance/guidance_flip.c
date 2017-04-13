@@ -96,14 +96,35 @@
 //#define FINAL_THRUST_LEVEL 9000
 //#define FINAL_THRUST_DURATION 0.1
 
-// Evasive maneuver - roll
+//// Evasive maneuver - roll
+//#define FIRST_THRUST_LEVEL 6500
+//#define FIRST_THRUST_DURATION 0
+//#define STRAIGHT_FLIGHT_DURATION 1.0
+//#define STOP_EVADE_ANGLE 30.0
+//#define FINAL_THRUST_LEVEL 9000
+//#define FINAL_THRUST_DURATION 0.8
+//#define EVADE_ROLL 1
+
+// Pitch doublets
 #define FIRST_THRUST_LEVEL 6500
-#define FIRST_THRUST_DURATION 0
-#define STRAIGHT_FLIGHT_DURATION 1.0
-#define STOP_EVADE_ANGLE 40.0
-#define FINAL_THRUST_LEVEL 9000
-#define FINAL_THRUST_DURATION 0.8
-#define EVADE_ROLL 1
+#define FIRST_THRUST_DURATION 0.0
+#define STRAIGHT_FLIGHT_DURATION 0.0
+#define DOUBLET_DURATION 1.0
+#define FINAL_THRUST_LEVEL 6500
+#define FINAL_THRUST_DURATION 0
+#define PITCH_CMD_NOMINAL 0
+#define PITCH_CMD_DELTA -MAX_PPRZ/3
+#define PITCH_DOUBLET 1
+#define DOUBLET_REPETITIONS 10
+
+//// Pitch sweep
+//#define FIRST_THRUST_LEVEL 6500
+//#define FIRST_THRUST_DURATION 0.0
+//#define SWEEP_DURATION 5
+//#define FINAL_THRUST_LEVEL 6500
+//#define FINAL_THRUST_DURATION 0
+//#define PITCH_CMD_DELTA -MAX_PPRZ
+//#define PITCH_SWEEP 1
 
 // default values
 #ifndef STOP_ACCELERATE_CMD_ANGLE
@@ -131,6 +152,28 @@
 #define FINAL_THRUST_DURATION 0.8
 #endif
 
+
+#ifndef STRAIGHT_FLIGHT_DURATION
+#define STRAIGHT_FLIGHT_DURATION 0.0
+#endif
+#ifndef DOUBLET_DURATION
+#define DOUBLET_DURATION 0.0
+#endif
+#ifndef PITCH_CMD_NOMINAL
+#define PITCH_CMD_NOMINAL 0
+#endif
+#ifndef PITCH_CMD_DELTA
+#define PITCH_CMD_DELTA -MAX_PPRZ/3
+#endif
+
+#ifndef SWEEP_DURATION
+#define SWEEP_DURATION 0
+#endif
+
+#ifndef STOP_EVADE_ANGLE
+#define STOP_EVADE_ANGLE 30.0
+#endif
+
 #ifndef FLIP_PITCH
 #define FLIP_PITCH 0
 #endif
@@ -141,11 +184,20 @@
 #define EVADE_ROLL 0
 #endif
 
+#ifndef PITCH_DOUBLET
+#define PITCH_DOUBLET 0
+#endif
+
+#ifndef PITCH_SWEEP
+#define PITCH_SWEEP 0
+#endif
+
 uint8_t in_flip;
-int32_t auto_pitch = 0;
-int32_t auto_roll = 0;
+pprz_t auto_pitch = 0;
+pprz_t auto_roll = 0;
 
 uint32_t flip_counter;
+uint32_t doublet_cnt;
 uint8_t flip_state;
 int32_t heading_save;
 uint8_t autopilot_mode_old;
@@ -153,9 +205,12 @@ struct Int32Vect2 flip_cmd_earth;
 
 int32_t phi_gyr, theta_gyr;
 
+float timer_fl;
+
 void guidance_flip_enter(void)
 {
   flip_counter = 0;
+  doublet_cnt = 0;
   flip_state = 0;
   heading_save = stabilization_attitude_get_heading_i();
   autopilot_mode_old = autopilot_mode;
@@ -212,18 +267,24 @@ void guidance_flip_run(void)
 
       if (timer > BFP_OF_REAL(FIRST_THRUST_DURATION, 12)) {
         if (FLIP_ROLL && ~FLIP_PITCH) {
-        	phi_gyr = phi; // initialize the phi estimate with the current phi
-        	flip_state = 1;
+          phi_gyr = phi; // initialize the phi estimate with the current phi
+          flip_state = 1;
         }
         else if (FLIP_PITCH && ~FLIP_ROLL) {
-        	theta_gyr = theta; // initialize the theta estimate with the current theta
-        	flip_state = 11;
+          theta_gyr = theta; // initialize the theta estimate with the current theta
+          flip_state = 11;
         }
         else if (EVADE_ROLL) {
           flip_state = 21;
         }
+        else if (PITCH_DOUBLET) {
+          flip_state = 31;
+          doublet_cnt = 1;
+        }
+        else if (PITCH_SWEEP) {
+          flip_state = 41;
+        }
         else flip_state = 101; // return to attitude mode
-        // TODO: Add a combined pitch and roll flip
       }
       break;
 
@@ -328,7 +389,7 @@ void guidance_flip_run(void)
     //----------------------------------------------------------------------------------------------------------------------
     case 21:
          // straight flight
-         auto_pitch = -MAX_PPRZ*2/3;
+         auto_pitch = 0; //-MAX_PPRZ*2/3;
          stabilization_attitude_run(autopilot_in_flight);
          stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
 
@@ -353,6 +414,78 @@ void guidance_flip_run(void)
              flip_state = 100;
          }
          break;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    //---PITCH-DOUBLET------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------------
+    case 31:
+      // straight flight
+      auto_pitch = PITCH_CMD_NOMINAL; //-MAX_PPRZ*2/3;
+      stabilization_attitude_run(autopilot_in_flight);
+      stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
+
+      if ((timer - timer_save) > BFP_OF_REAL(STRAIGHT_FLIGHT_DURATION, 12)) {
+        flip_state++;
+        timer_save = timer;
+      }
+      break;
+    case 32:
+      // doublet
+      auto_pitch = PITCH_CMD_NOMINAL + PITCH_CMD_DELTA; //-MAX_PPRZ*2/3;
+      stabilization_attitude_run(autopilot_in_flight);
+      stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
+
+      if ((timer - timer_save) > BFP_OF_REAL(DOUBLET_DURATION/doublet_cnt, 12)) {
+        flip_state++;
+        timer_save = timer;
+        doublet_cnt++;
+      }
+      break;
+
+    case 33:
+      // doublet
+      auto_pitch = PITCH_CMD_NOMINAL - PITCH_CMD_DELTA; //-MAX_PPRZ*2/3;
+      stabilization_attitude_run(autopilot_in_flight);
+      stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
+
+      if ((timer - timer_save) > BFP_OF_REAL(DOUBLET_DURATION/doublet_cnt, 12)) {
+        if (doublet_cnt > DOUBLET_REPETITIONS) {
+          flip_state++;
+        }
+        else {
+          flip_state = 32;
+          doublet_cnt++;
+        }
+        timer_save = timer;
+        }
+      break;
+
+    case 34:
+      // doublet
+      auto_pitch = PITCH_CMD_NOMINAL; //-MAX_PPRZ*2/3;
+      stabilization_attitude_run(autopilot_in_flight);
+      stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
+
+      if ((timer - timer_save) > BFP_OF_REAL(STRAIGHT_FLIGHT_DURATION, 12)) {
+        flip_state = 100;
+        timer_save = timer;
+      }
+      break;
+
+      //----------------------------------------------------------------------------------------------------------------------
+      //---PITCH-SWEEP------------------------------------------------------------------------------------------------------
+      //----------------------------------------------------------------------------------------------------------------------
+    case 41:
+      timer_fl = (timer - timer_save) / (1<<12);
+      auto_pitch = PITCH_CMD_DELTA*sinf(3*timer_fl); //-MAX_PPRZ*2/3;
+      stabilization_attitude_run(autopilot_in_flight);
+      stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
+
+      if (timer > BFP_OF_REAL(SWEEP_DURATION, 12)) {
+        flip_state=100;
+        auto_pitch = 0;
+      }
+      break;
 
     //----------------------------------------------------------------------------------------------------------------------
     //---RECOVER------------------------------------------------------------------------------------------------------------
