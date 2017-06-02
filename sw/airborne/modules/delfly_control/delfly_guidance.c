@@ -102,8 +102,8 @@ void delfly_guidance_run (void) {
         nav_set_heading_towards_carrot();
       }
       //TODO: set position and velocity set-point
-      delfly_guidance.sp.heading = 0;
-//      delfly_guidance.sp.heading = nav_heading;
+//      delfly_guidance.sp.heading = 0;
+      delfly_guidance.sp.heading = nav_heading;
       VECT3_COPY(delfly_guidance.sp.pos /*in NED*/, nav_carrot_ned /*in NED*/);
       VECT3_COPY(delfly_guidance.sp.vel /*in NED*/, nav_velocity_ned /*in NED*/);
     } break;
