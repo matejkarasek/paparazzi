@@ -613,18 +613,16 @@ static inline void nav_set_heading_towards_carrot (void) {
   nav_set_heading_towards( POS_FLOAT_OF_BFP(navigation_carrot.x), POS_FLOAT_OF_BFP(navigation_carrot.y) );
 }
 
-
 /************** Oval Navigation **********************************************/
 
-/** Navigation along a figure O. One side leg is defined by waypoints [p1] and
-    [p2].
-    The navigation goes through 4 states: OC1 (half circle next to [p1]),
-    OR21 (route [p2] to [p1], OC2 (half circle next to [p2]) and OR12
-    (opposite leg).
+#ifndef LINE_START_FUNCTION
+#define LINE_START_FUNCTION {}
+#endif
+#ifndef LINE_STOP_FUNCTION
+#define LINE_STOP_FUNCTION {}
+#endif
 
-    Initial state is the route along the desired segment (OC2).
-*/
-
+enum oval_status { OR12, OC2, OR21, OC1 };
 enum oval_status oval_status;
 uint8_t nav_oval_count;
 
@@ -634,6 +632,12 @@ void nav_oval_init(void)
   nav_oval_count = 0;
 }
 
+/**
+ * Navigation along a figure O. One side leg is defined by waypoints [p1] and [p2].
+ * The navigation goes through 4 states: OC1 (half circle next to [p1]),
+ * OR21 (route [p2] to [p1], OC2 (half circle next to [p2]) and OR12 (opposite leg).
+ * Initial state is the route along the desired segment (OC2).
+ */
 void nav_oval(uint8_t p1, uint8_t p2, float radius)
 {
   radius = - radius; /* Historical error ? */
@@ -678,42 +682,38 @@ void nav_oval(uint8_t p1, uint8_t p2, float radius)
   switch (oval_status) {
     case OC1 :
       nav_circle(&p1_center, POS_BFP_OF_REAL(-radius));
-      nav_set_heading_towards_carrot();
       if (NavQdrCloseTo(INT32_DEG_OF_RAD(qdr_out_1) - qdr_anticipation)) {
         oval_status = OR12;
         InitStage();
-//        LINE_START_FUNCTION;
+        LINE_START_FUNCTION;
       }
       return;
 
     case OR12:
-      nav_route2(&p1_out, &p2_in, ROUTE_SPEED);
-      nav_set_heading_from_to(&p1_out, &p2_in);
+      nav_route(&p1_out, &p2_in);
       if (nav_approaching_from(&p2_in, &p1_out, CARROT)) {
         oval_status = OC2;
         nav_oval_count++;
         InitStage();
-//        LINE_STOP_FUNCTION;
+        LINE_STOP_FUNCTION;
       }
       return;
 
     case OC2 :
       nav_circle(&p2_center, POS_BFP_OF_REAL(-radius));
-      nav_set_heading_towards_carrot();
       if (NavQdrCloseTo(INT32_DEG_OF_RAD(qdr_out_2) - qdr_anticipation)) {
         oval_status = OR21;
         InitStage();
-//        LINE_START_FUNCTION;
+        LINE_START_FUNCTION;
       }
       return;
 
     case OR21:
-      nav_route2(&waypoints[p2].enu_i, &waypoints[p1].enu_i, ROUTE_SPEED);
-      nav_set_heading_from_to(&waypoints[p2].enu_i, &waypoints[p1].enu_i);
+      nav_route(&waypoints[p2].enu_i, &waypoints[p1].enu_i);
       if (nav_approaching_from(&waypoints[p1].enu_i, &waypoints[p2].enu_i, CARROT)) {
         oval_status = OC1;
         InitStage();
-//        LINE_STOP_FUNCTION;
+        LINE_STOP_FUNCTION;
       }
       return;
 
@@ -721,3 +721,116 @@ void nav_oval(uint8_t p1, uint8_t p2, float radius)
       return;
   }
 }
+
+
+// ****************************************************
+// Implementation introduced by Torbjoern - not working
+// ****************************************************
+//
+///************** Oval Navigation **********************************************/
+//
+///** Navigation along a figure O. One side leg is defined by waypoints [p1] and
+//    [p2].
+//    The navigation goes through 4 states: OC1 (half circle next to [p1]),
+//    OR21 (route [p2] to [p1], OC2 (half circle next to [p2]) and OR12
+//    (opposite leg).
+//
+//    Initial state is the route along the desired segment (OC2).
+//*/
+//
+//enum oval_status oval_status;
+//uint8_t nav_oval_count;
+//
+//void nav_oval_init(void)
+//{
+//  oval_status = OC2;
+//  nav_oval_count = 0;
+//}
+//
+//void nav_oval(uint8_t p1, uint8_t p2, float radius)
+//{
+//  radius = - radius; /* Historical error ? */
+//  int32_t alt = waypoints[p1].enu_i.z;
+//  waypoints[p2].enu_i.z = alt;
+//
+//  float p2_p1_x = waypoints[p1].enu_f.x - waypoints[p2].enu_f.x;
+//  float p2_p1_y = waypoints[p1].enu_f.y - waypoints[p2].enu_f.y;
+//  float d = sqrtf(p2_p1_x * p2_p1_x + p2_p1_y * p2_p1_y);
+//
+//  /* Unit vector from p1 to p2 */
+//  int32_t u_x = POS_BFP_OF_REAL(p2_p1_x / d);
+//  int32_t u_y = POS_BFP_OF_REAL(p2_p1_y / d);
+//
+//  /* The half circle centers and the other leg */
+//  struct EnuCoor_i p1_center = { waypoints[p1].enu_i.x + radius * -u_y,
+//           waypoints[p1].enu_i.y + radius * u_x,
+//           alt
+//  };
+//  struct EnuCoor_i p1_out = { waypoints[p1].enu_i.x + 2 * radius * -u_y,
+//           waypoints[p1].enu_i.y + 2 * radius * u_x,
+//           alt
+//  };
+//
+//  struct EnuCoor_i p2_in = { waypoints[p2].enu_i.x + 2 * radius * -u_y,
+//           waypoints[p2].enu_i.y + 2 * radius * u_x,
+//           alt
+//  };
+//  struct EnuCoor_i p2_center = { waypoints[p2].enu_i.x + radius * -u_y,
+//           waypoints[p2].enu_i.y + radius * u_x,
+//           alt
+//  };
+//
+//  int32_t qdr_out_2 = INT32_ANGLE_PI - int32_atan2_2(u_y, u_x);
+//  int32_t qdr_out_1 = qdr_out_2 + INT32_ANGLE_PI;
+//  if (radius < 0) {
+//    qdr_out_2 += INT32_ANGLE_PI;
+//    qdr_out_1 += INT32_ANGLE_PI;
+//  }
+//  int32_t qdr_anticipation = ANGLE_BFP_OF_REAL(radius > 0 ? -15 : 15);
+//
+//  switch (oval_status) {
+//    case OC1 :
+//      nav_circle(&p1_center, POS_BFP_OF_REAL(-radius));
+//      nav_set_heading_towards_carrot();
+//      if (NavQdrCloseTo(INT32_DEG_OF_RAD(qdr_out_1) - qdr_anticipation)) {
+//        oval_status = OR12;
+//        InitStage();
+////        LINE_START_FUNCTION;
+//      }
+//      return;
+//
+//    case OR12:
+//      nav_route2(&p1_out, &p2_in, ROUTE_SPEED);
+//      nav_set_heading_from_to(&p1_out, &p2_in);
+//      if (nav_approaching_from(&p2_in, &p1_out, CARROT)) {
+//        oval_status = OC2;
+//        nav_oval_count++;
+//        InitStage();
+////        LINE_STOP_FUNCTION;
+//      }
+//      return;
+//
+//    case OC2 :
+//      nav_circle(&p2_center, POS_BFP_OF_REAL(-radius));
+//      nav_set_heading_towards_carrot();
+//      if (NavQdrCloseTo(INT32_DEG_OF_RAD(qdr_out_2) - qdr_anticipation)) {
+//        oval_status = OR21;
+//        InitStage();
+////        LINE_START_FUNCTION;
+//      }
+//      return;
+//
+//    case OR21:
+//      nav_route2(&waypoints[p2].enu_i, &waypoints[p1].enu_i, ROUTE_SPEED);
+//      nav_set_heading_from_to(&waypoints[p2].enu_i, &waypoints[p1].enu_i);
+//      if (nav_approaching_from(&waypoints[p1].enu_i, &waypoints[p2].enu_i, CARROT)) {
+//        oval_status = OC1;
+//        InitStage();
+////        LINE_STOP_FUNCTION;
+//      }
+//      return;
+//
+//    default: /* Should not occur !!! Doing nothing */
+//      return;
+//  }
+//}

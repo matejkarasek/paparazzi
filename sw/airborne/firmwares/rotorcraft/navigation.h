@@ -144,12 +144,13 @@ extern void nav_circle(struct EnuCoor_i *wp_center, int32_t radius);
 #define NavQdrCloseTo(x) CloseDegAngles(((x) >> INT32_ANGLE_FRAC), NavCircleQdr())
 #define NavCourseCloseTo(x) {}
 
-enum oval_status { OR12, OC2, OR21, OC1 };
 
+/*********** Navigation along an oval *************************************/
 extern void nav_oval_init(void);
 extern void nav_oval(uint8_t, uint8_t, float);
 extern uint8_t nav_oval_count;
 #define Oval(a, b, c) nav_oval((b), (a), (c))
+
 
 /*********** Navigation along a line *************************************/
 extern double navigation_route_step;
