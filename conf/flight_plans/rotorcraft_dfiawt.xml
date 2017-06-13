@@ -13,7 +13,10 @@
     <waypoint x="-3" y="0" name="p2"/>
 	<waypoint x="0" y="-3" name="p3"/>
     <waypoint x="-3" y="-3" name="p4"/>
-    <waypoint x="3" y="3" name="p5"/>
+	<waypoint x="-1.5" y="-1.5" name="p41"/>
+	<waypoint x="0" y="0" name="p42"/>
+	<waypoint x="1.5" y="1.5" name="p43"/>
+	<waypoint x="3" y="3" name="p5"/>
     <waypoint x="1" y="0" name="px"/>
     <waypoint x="0" y="1" name="py"/>
     <waypoint x="4.5" y="-4.5" name="_FA1"/>
@@ -64,7 +67,13 @@
     <block name="oval">
       <oval p1="p3" p2="p2" radius="2"/>
     </block>
-    <block name="very_small_circle">
+    <block name="diagonal_line">
+      <go from="p4" hmode="route" wp="p41"/>
+	  <go from="p41" hmode="route" wp="p42"/>
+	  <go from="p42" hmode="route" wp="p43"/>
+	  <go from="p43" hmode="route" wp="p5"/>
+	</block>
+	<block name="very_small_circle">
       <circle radius="0.5" wp="p1"/>
     </block>
     <block name="small_circle">

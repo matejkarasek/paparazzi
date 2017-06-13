@@ -308,7 +308,10 @@ void nav_route(struct EnuCoor_i *wp_start, struct EnuCoor_i *wp_end)
 
   nav_segment_start = *wp_start;
   nav_segment_end = *wp_end;
-  horizontal_mode = HORIZONTAL_MODE_ROUTE;
+//  horizontal_mode = HORIZONTAL_MODE_ROUTE;
+  horizontal_mode = HORIZONTAL_MODE_CIRCLE;
+
+  nav_set_heading_towards_waypoint(wp_end);
 
   dist2_to_wp = get_dist2_to_point(wp_end);
 }
@@ -682,6 +685,7 @@ void nav_oval(uint8_t p1, uint8_t p2, float radius)
   switch (oval_status) {
     case OC1 :
       nav_circle(&p1_center, POS_BFP_OF_REAL(-radius));
+      nav_set_heading_towards_carrot();
       if (NavQdrCloseTo(INT32_DEG_OF_RAD(qdr_out_1) - qdr_anticipation)) {
         oval_status = OR12;
         InitStage();
@@ -691,6 +695,8 @@ void nav_oval(uint8_t p1, uint8_t p2, float radius)
 
     case OR12:
       nav_route(&p1_out, &p2_in);
+//      nav_route2(&p1_out, &p2_in, ROUTE_SPEED);
+//      nav_set_heading_from_to(&p1_out, &p2_in);
       if (nav_approaching_from(&p2_in, &p1_out, CARROT)) {
         oval_status = OC2;
         nav_oval_count++;
@@ -701,6 +707,7 @@ void nav_oval(uint8_t p1, uint8_t p2, float radius)
 
     case OC2 :
       nav_circle(&p2_center, POS_BFP_OF_REAL(-radius));
+      nav_set_heading_towards_carrot();
       if (NavQdrCloseTo(INT32_DEG_OF_RAD(qdr_out_2) - qdr_anticipation)) {
         oval_status = OR21;
         InitStage();
@@ -710,6 +717,8 @@ void nav_oval(uint8_t p1, uint8_t p2, float radius)
 
     case OR21:
       nav_route(&waypoints[p2].enu_i, &waypoints[p1].enu_i);
+//      nav_route2(&p1_out, &p2_in, ROUTE_SPEED);
+//      nav_set_heading_from_to(&p1_out, &p2_in);
       if (nav_approaching_from(&waypoints[p1].enu_i, &waypoints[p2].enu_i, CARROT)) {
         oval_status = OC1;
         InitStage();
