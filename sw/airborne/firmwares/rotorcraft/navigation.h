@@ -50,9 +50,10 @@ extern struct EnuCoor_i nav_segment_start, nav_segment_end;
 extern struct EnuCoor_i nav_circle_center;
 extern int32_t nav_circle_radius, nav_circle_qdr, nav_circle_radians;
 #define HORIZONTAL_MODE_WAYPOINT  0
-#define HORIZONTAL_MODE_ROUTE     1
+#define HORIZONTAL_MODE_ROUTE     1 // used in the wind tunnel, controls both longitudinal and lateral position
 #define HORIZONTAL_MODE_CIRCLE    2
 #define HORIZONTAL_MODE_ATTITUDE  3
+#define HORIZONTAL_MODE_LATERAL   4 // used out of wind tunnel, controls only lateral position
 extern int32_t nav_roll, nav_pitch;     ///< with #INT32_ANGLE_FRAC
 extern int32_t nav_heading; ///< with #INT32_ANGLE_FRAC
 extern float nav_radius;

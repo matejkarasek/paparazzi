@@ -10,8 +10,8 @@
     <waypoint name="STDBY" x="-0.7" y="-0.8"/>
     <waypoint name="TD" x="0.8" y="-1.7"/>
     <waypoint x="1.5" y="-1.5" name="p1"/>
-    <waypoint x="-3" y="0" name="p2"/>
-	<waypoint x="0" y="-3" name="p3"/>
+    <waypoint x="-2.5" y="-0.5" name="p2"/>
+	<waypoint x="-0.5" y="-2.5" name="p3"/>
     <waypoint x="-3" y="-3" name="p4"/>
 	<waypoint x="-1.5" y="-1.5" name="p41"/>
 	<waypoint x="0" y="0" name="p42"/>
@@ -64,8 +64,11 @@
     <block name="circle_around_p1" strip_button="Encircle P1" strip_icon="flat_theme/circle-right.png">
       <circle radius="2" wp="p1"/>
     </block>
-    <block name="oval">
+    <block name="oval 2m">
       <oval p1="p3" p2="p2" radius="2"/>
+    </block>
+    <block name="oval 1m">
+      <oval p1="p3" p2="p2" radius="1"/>
     </block>
     <block name="diagonal_line">
       <go from="p4" hmode="route" wp="p41"/>

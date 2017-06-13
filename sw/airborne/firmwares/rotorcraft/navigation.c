@@ -308,8 +308,13 @@ void nav_route(struct EnuCoor_i *wp_start, struct EnuCoor_i *wp_end)
 
   nav_segment_start = *wp_start;
   nav_segment_end = *wp_end;
-//  horizontal_mode = HORIZONTAL_MODE_ROUTE;
+
+  // use in the windtunnel
+  // horizontal_mode = HORIZONTAL_MODE_ROUTE;
+
+  // use out of the windtunnel
   horizontal_mode = HORIZONTAL_MODE_CIRCLE;
+  VECT2_COPY(navigation_carrot, navigation_target)
 
   nav_set_heading_towards_waypoint(wp_end);
 
