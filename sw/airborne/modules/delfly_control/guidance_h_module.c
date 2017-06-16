@@ -208,6 +208,7 @@ void guidance_h_module_run_traj( bool_t in_flight ) {
        * in rad, with #INT32_ANGLE_FRAC                   */
       pseudo_heading_d   = delfly_guidance.gains.h.lateral_ratio*pseudo_cmd_lat_acc*INT32_ANGLE_PI_4*(1<<(INT32_SPEED_FRAC-INT32_ACCEL_FRAC))/(delfly_state.h.speed_wind*100);
       INT32_STRIM(pseudo_heading_d, MAX_HEADING_DELTA);
+//      pseudo_heading_d = 0;
 
       } else {
       delfly_guidance.cmd.h_acc = delfly_guidance.gains.fwd.states.pos * delfly_guidance.err.fwd.states.pos

@@ -173,9 +173,9 @@
   <section name="DELFLY_GUIDANCE" prefix="DELFLY_GUIDANCE_">
   	<define name="COMPLEMENTARY_HEADING_GAIN" value="100"/>
   	<define name="LATERAL_RATIO" value="75"/><!-- LS: 75, MS: 60, 2 m/s: 75-->
-  	<define name="LATERAL_PGAIN" value="80"/>
-  	<define name="LATERAL_DGAIN" value="10"/><!-- LS: 10, MS: 20, 2 m/s: 40-->
-  	<define name="LATERAL_IGAIN" value="10"/><!-- LS: 10, 2 m/s: 13 -->
+  	<define name="LATERAL_PGAIN" value="40"/>
+  	<define name="LATERAL_DGAIN" value="0"/><!-- LS: 10, MS: 20, 2 m/s: 40-->
+  	<define name="LATERAL_IGAIN" value="0"/><!-- LS: 10, 2 m/s: 13 -->
   	<define name="VERTICAL_POLE" value="-1"/>
   	<define name="USE_SPEED_REF" value="FALSE"/>
   </section><!--DELFLY_GUIDANCE-->

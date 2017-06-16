@@ -98,7 +98,7 @@ void delfly_guidance_run (void) {
       nav_carrot_ned.z = -nav_flight_altitude;
       // re-set heading set-point if carrot has changed
 //      if ( !VECT3_EQUALS(nav_carrot_ned, delfly_guidance.sp.pos) ) {
-      if (horizontal_mode == HORIZONTAL_MODE_CIRCLE) {
+      if (horizontal_mode == HORIZONTAL_MODE_CIRCLE || horizontal_mode == HORIZONTAL_MODE_LATERAL) {
         nav_set_heading_towards_carrot();
       }
       //TODO: set position and velocity set-point

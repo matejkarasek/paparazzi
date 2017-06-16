@@ -313,10 +313,13 @@ void nav_route(struct EnuCoor_i *wp_start, struct EnuCoor_i *wp_end)
   // horizontal_mode = HORIZONTAL_MODE_ROUTE;
 
   // use out of the windtunnel
-  horizontal_mode = HORIZONTAL_MODE_CIRCLE;
+  horizontal_mode = HORIZONTAL_MODE_LATERAL;
   VECT2_COPY(navigation_carrot, navigation_target)
 
-  nav_set_heading_towards_waypoint(wp_end);
+  // Now the carrot is placed immediately to wp_end
+  // This is ok for heading, but not for lateral control. Use the closest point at the straight line instead.
+
+  nav_set_heading_towards_waypoint(wp_end); // this is probably not necessary
 
   dist2_to_wp = get_dist2_to_point(wp_end);
 }
