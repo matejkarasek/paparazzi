@@ -108,6 +108,7 @@ void state_estimation_init (void) {
 
   VECT2_ZERO( delfly_state.h.wind );
   INT32_ZERO( delfly_state.h.speed_wind );
+  delfly_state_set_windspeed(0.8);
 
   INT32_ZERO( delfly_state.v.pos );
   INT32_ZERO( delfly_state.v.vel );

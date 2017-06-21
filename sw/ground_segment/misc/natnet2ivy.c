@@ -881,9 +881,13 @@ int main(int argc, char** argv)
 {
   // Set the default tracking system position and angle
   struct EcefCoor_d tracking_ecef;
-  tracking_ecef.x = 3924332;
-  tracking_ecef.y = 300362;
-  tracking_ecef.z = 5002197;
+//  tracking_ecef.x = 3924332;
+//  tracking_ecef.y = 300362;
+//  tracking_ecef.z = 5002197;
+  tracking_ecef.x = 3924305;
+  tracking_ecef.y = 300360;
+  tracking_ecef.z = 5002163;
+
   tracking_offset_angle = 0.0/57.6;//90.0/57.6; //33.0 / 57.6;
   ltp_def_from_ecef_d(&tracking_ltp, &tracking_ecef);
 

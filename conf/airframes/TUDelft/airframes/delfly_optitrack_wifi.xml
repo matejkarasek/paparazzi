@@ -195,9 +195,12 @@
 
   <section name="GPS" prefix="GPS_">
     <define name="USE_DATALINK_SMALL" value="1"/>
-    <define name="LOCAL_ECEF_ORIGIN_X" value="392433200"/>
+    <define name="LOCAL_ECEF_ORIGIN_X" value="392430500"/>
+    <define name="LOCAL_ECEF_ORIGIN_Y" value="30036000"/>
+    <define name="LOCAL_ECEF_ORIGIN_Z" value="500216300"/>
+    <!--define name="LOCAL_ECEF_ORIGIN_X" value="392433200"/>
     <define name="LOCAL_ECEF_ORIGIN_Y" value="30036200"/>
-    <define name="LOCAL_ECEF_ORIGIN_Z" value="500219700"/>
+    <define name="LOCAL_ECEF_ORIGIN_Z" value="500219700"/-->
   </section><!--GPS-->
  
   <section name="GUIDANCE_H" prefix="GUIDANCE_H_">
