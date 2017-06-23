@@ -1,36 +1,39 @@
 <!DOCTYPE flight_plan SYSTEM "flight_plan.dtd">
 
-<flight_plan alt="1.5" ground_alt="0" lat0="51.990634" lon0="4.376789" max_dist_from_home="20" name="Rotorcraft Optitrack (Delft)" security_height="0.3">
+<flight_plan alt="1.85" ground_alt="0" lat0="51.990634" lon0="4.376789" max_dist_from_home="20" name="Rotorcraft Optitrack (Delft)" security_height="0.3">
   <header>
 #include "autopilot.h"
 </header>
   <waypoints>
-    <!--waypoint name="HOME" x="0.0" y="0.0"/>
+    <waypoint name="HOME" x="0.0" y="0.0"/>
     <waypoint name="CLIMB" x="-1" y="-1"/>
     <waypoint name="STDBY" x="-1" y="-1"/>
     <waypoint name="TD" x="-1" y="-1"/>
     <waypoint x="2" y="0" name="p1"/>
-    <waypoint x="0" y="-2" name="p2"/>
-	<waypoint x="3" y="-2" name="p3"/>
-	<waypoint x="-1" y="-1" name="p4"/>
-	<waypoint x="4" y="-1" name="p5"/>
-    <waypoint x="1" y="0" name="px"/>
-    <waypoint x="0" y="1" name="py"/>
-    <waypoint x="6.5" y="-2.5" name="_FA1"/>
-    <waypoint x="-3.5" y="-2.5" name="_FA2"/>
-	<waypoint x="-3.5" y="2.5" name="_FA3"/>
-	<waypoint x="6.5" y="2.5" name="_FA4"/-->
-	<waypoint name="HOME" x="0.0" y="0.0"/>
-    <waypoint name="CLIMB" x="-1" y="-1"/>
-    <waypoint name="STDBY" x="-1" y="-1"/>
-    <waypoint name="TD" x="-1" y="-1"/>
-    <waypoint x="2.5" y="0" name="p1"/>
-    <waypoint x="-1" y="-2" name="p2"/>
-	<waypoint x="2.5" y="-2" name="p3"/>
-	<waypoint x="-1.5" y="-1" name="p4"/>
-	<waypoint x="3" y="-1" name="p5"/>
-    <waypoint x="1" y="0" name="px"/>
-    <waypoint x="0" y="1" name="py"/>
+    <waypoint x="-1" y="-2" name="p2_center"/>
+	<waypoint x="2" y="-2" name="p3_center"/>
+	<waypoint x="-1" y="-2.1" name="p2_left10"/>
+	<waypoint x="2" y="-2.1" name="p3_left10"/>
+	<waypoint x="-1" y="-2.2" name="p2_left20"/>
+	<waypoint x="2" y="-2.2" name="p3_left20"/>
+	<waypoint x="-1" y="-2.3" name="p2_left30"/>
+	<waypoint x="2" y="-2.3" name="p3_left30"/>
+	<waypoint x="-1" y="-2.4" name="p2_left40"/>
+	<waypoint x="2" y="-2.4" name="p3_left40"/>
+	<waypoint x="-1" y="-2.5" name="p2_left50"/>
+	<waypoint x="2" y="-2.5" name="p3_left50"/>
+	<waypoint x="-1" y="-1.9" name="p2_right10"/>
+	<waypoint x="2" y="-1.9" name="p3_right10"/>
+	<waypoint x="-1" y="-1.8" name="p2_right20"/>
+	<waypoint x="2" y="-1.8" name="p3_right20"/>
+	<waypoint x="-1" y="-1.7" name="p2_right30"/>
+	<waypoint x="2" y="-1.7" name="p3_right30"/>
+	<waypoint x="-1" y="-1.6" name="p2_right40"/>
+	<waypoint x="2" y="-1.6" name="p3_right40"/>
+	<waypoint x="-1" y="-1.5" name="p2_right50"/>
+	<waypoint x="2" y="-1.5" name="p3_right50"/>
+	<!--waypoint x="1" y="0" name="px"/>
+    <waypoint x="0" y="1" name="py"/-->
     <waypoint x="6.5" y="-2.5" name="_FA1"/>
     <waypoint x="-3.5" y="-2.5" name="_FA2"/>
 	<waypoint x="-3.5" y="2.5" name="_FA3"/>
@@ -56,7 +59,7 @@
       <call fun="NavSetWaypointHere(WP_TD)"/-->
     </block>
     <block name="Holding point">
-      <deroute block="circle_around_p1"/>
+      <deroute block="oval center"/>
       <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
     </block>
     <block name="Start Engine">
@@ -76,19 +79,40 @@
     <block name="circle_around_p1" strip_button="Encircle P1" strip_icon="flat_theme/circle-right.png">
       <circle radius="2" wp="p1"/>
     </block>
-    <block name="oval 2m">
-      <oval p1="p3" p2="p2" radius="2"/>
+    <block name="oval right 50">
+      <oval p1="p3_right50" p2="p2_right50" radius="2"/>
     </block>
-    <block name="oval 1m">
-      <oval p1="p5" p2="p4" radius="1"/>
+    <block name="oval right 40">
+      <oval p1="p3_right40" p2="p2_right40" radius="2"/>
     </block>
-    <block name="very_small_circle">
-      <circle radius="0.5" wp="p1"/>
+    <block name="oval right 30">
+      <oval p1="p3_right30" p2="p2_right30" radius="2"/>
     </block>
-    <block name="small_circle">
-      <circle radius="1" wp="p1"/>
+    <block name="oval right 20">
+      <oval p1="p3_right20" p2="p2_right20" radius="2"/>
     </block>
-    <block name="height step" strip_button="step up & down" strip_icon="flat_theme/survey_rect_ns.png">
+    <block name="oval right 10">
+      <oval p1="p3_right10" p2="p2_right10" radius="2"/>
+    </block>
+    <block name="oval center">
+      <oval p1="p3_center" p2="p2_center" radius="2"/>
+    </block>
+    <block name="oval left 10">
+      <oval p1="p3_left10" p2="p2_left10" radius="2"/>
+    </block>
+    <block name="oval left 20">
+      <oval p1="p3_left20" p2="p2_left20" radius="2"/>
+    </block>
+    <block name="oval left 30">
+      <oval p1="p3_left30" p2="p2_left30" radius="2"/>
+    </block>
+	<block name="oval left 40">
+      <oval p1="p3_left40" p2="p2_left40" radius="2"/>
+    </block>
+	<block name="oval left 50">
+      <oval p1="p3_left50" p2="p2_left50" radius="2"/>
+    </block>
+	<!--block name="height step" strip_button="step up & down" strip_icon="flat_theme/survey_rect_ns.png">
       <call fun="NavCopyWaypoint(WP_TD,WP_p1)"/>
       <circle radius="2" until="stage_time > 5" wp="TD"/>
       <call fun="NavSetWaypointAlt(WP_TD, 2.0)"/>
@@ -109,7 +133,7 @@
         <go approaching_time="0.5" wp="p3"/>
         <go approaching_time="0.5" wp="p4"/>
       </while>
-    </block>
+    </block-->
     <block name="land here">
       <call fun="NavSetWaypointHere(WP_TD)"/>
     </block>
