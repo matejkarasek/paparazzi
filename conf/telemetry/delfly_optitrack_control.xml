@@ -15,8 +15,8 @@
       <message name="DL_VALUE"               period="1.5"   phase="0.75"/><!-- 2n bytes -->
       <message name="ENERGY"                 period="3."    phase="1.5"/> <!-- 14 bytes -->
       <!--message name="GPS_DIAGNOSTICS"        period="1"   phase="0."/--><!-- 14 bytes -->
-      <message name="GPS"					 period=".25"   />
-      <message name="GPS_INT"                period="0.5"   />
+<!--      <message name="GPS"					 period=".25"   />-->
+<!--      <message name="GPS_INT"                period="0.5"   />-->
       <message name="INS"                    period="0.25"  />
       <message name="INS_REF"                period="6."    />
       <!--message name="ROTORCRAFT_CMD"         period="0.5"   phase="0.25"/-->
@@ -24,7 +24,7 @@
       <message name="ROTORCRAFT_NAV_STATUS"  period="0.5"   />            <!-- 15 bytes -->
       <message name="ROTORCRAFT_STATUS"      period="1.5"   phase="0.75"/><!-- 17 bytes -->
       <!--message name="RPM_SENSOR"             period="0.25"  /-->
-      <message name="STAB_ATTITUDE_INT"      period="0.5"   />
+<!--      <message name="STAB_ATTITUDE_INT"      period="0.5"   /-->
       <message name="UART_ERRORS"            period="3."    phase="0."/>  <!-- 7 bytes -->
       <message name="WP_MOVED"               period="1.5"/>
       <message name="ROTORCRAFT_TUNE_HOVER"  period=".1"/>
