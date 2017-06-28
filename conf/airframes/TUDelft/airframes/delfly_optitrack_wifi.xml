@@ -102,7 +102,8 @@
     <set servo="ELEVATOR" value="(1-SRVO_kill)*@PITCH"/>
     <set servo="RUDDER" value="(1-SRVO_kill)*@YAW"/>
     <set servo="LEDS" value="$ledscontrol"/>
-    <set servo="LEDS2" value="$logcontrol"/>
+    <set servo="LEDS2" value="$ledscontrol"/>
+	<!--set servo="LEDS2" value="$logcontrol"/--><!-- To be used when the SD card for on-board logging is present -->    
   </command_laws>
 
 
