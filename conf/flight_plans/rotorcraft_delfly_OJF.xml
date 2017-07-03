@@ -1,6 +1,6 @@
 <!DOCTYPE flight_plan SYSTEM "flight_plan.dtd">
 
-<flight_plan alt="1.80" ground_alt="0" lat0="51.990634" lon0="4.376789" max_dist_from_home="20" name="Rotorcraft Optitrack (Delft)" security_height="0.3">
+<flight_plan alt="1.75" ground_alt="0" lat0="51.990634" lon0="4.376789" max_dist_from_home="20" name="Rotorcraft Optitrack (Delft)" security_height="0.3">
   <header>
 #include "autopilot.h"
 </header>
@@ -9,35 +9,35 @@
     <waypoint name="CLIMB" x="-1" y="-1"/>
     <waypoint name="STDBY" x="-1" y="-1"/>
     <waypoint name="TD" x="-1" y="-1"/>
-    <waypoint x="1" y="0" name="p1"/>
-    <waypoint x="-2" y="-2" name="p2_center"/>
-	<waypoint x="1" y="-2" name="p3_center"/>
-	<waypoint x="-2" y="-2.1" name="p2_left10"/>
-	<waypoint x="1" y="-2.1" name="p3_left10"/>
-	<waypoint x="-2" y="-2.2" name="p2_left20"/>
-	<waypoint x="1" y="-2.2" name="p3_left20"/>
-	<waypoint x="-2" y="-2.3" name="p2_left30"/>
-	<waypoint x="1" y="-2.3" name="p3_left30"/>
-	<waypoint x="-2" y="-2.4" name="p2_left40"/>
-	<waypoint x="1" y="-2.4" name="p3_left40"/>
-	<waypoint x="-2" y="-2.5" name="p2_left50"/>
-	<waypoint x="1" y="-2.5" name="p3_left50"/>
-	<waypoint x="-2" y="-1.9" name="p2_right10"/>
-	<waypoint x="1" y="-1.9" name="p3_right10"/>
-	<waypoint x="-2" y="-1.8" name="p2_right20"/>
-	<waypoint x="1" y="-1.8" name="p3_right20"/>
-	<waypoint x="-2" y="-1.7" name="p2_right30"/>
-	<waypoint x="1" y="-1.7" name="p3_right30"/>
-	<waypoint x="-2" y="-1.6" name="p2_right40"/>
-	<waypoint x="1" y="-1.6" name="p3_right40"/>
-	<waypoint x="-2" y="-1.5" name="p2_right50"/>
-	<waypoint x="1" y="-1.5" name="p3_right50"/>
+    <waypoint x="0.5" y="-0.5" name="p1"/>
+    <waypoint x="-2.2" y="-2.5" name="p2_center"/>
+	<waypoint x="0.5" y="-2.5" name="p3_center"/>
+	<waypoint x="-2.2" y="-2.6" name="p2_left10"/>
+	<waypoint x="0.5" y="-2.6" name="p3_left10"/>
+	<waypoint x="-2.2" y="-2.7" name="p2_left20"/>
+	<waypoint x="0.5" y="-2.7" name="p3_left20"/>
+	<waypoint x="-2.2" y="-2.8" name="p2_left30"/>
+	<waypoint x="0.5" y="-2.8" name="p3_left30"/>
+	<waypoint x="-2.2" y="-2.9" name="p2_left40"/>
+	<waypoint x="0.5" y="-2.9" name="p3_left40"/>
+	<waypoint x="-2.2" y="-3" name="p2_left50"/>
+	<waypoint x="0.5" y="-3" name="p3_left50"/>
+	<waypoint x="-2.2" y="-2.4" name="p2_right10"/>
+	<waypoint x="0.5" y="-2.4" name="p3_right10"/>
+	<waypoint x="-2.2" y="-2.3" name="p2_right20"/>
+	<waypoint x="0.5" y="-2.3" name="p3_right20"/>
+	<waypoint x="-2.2" y="-2.2" name="p2_right30"/>
+	<waypoint x="0.5" y="-2.2" name="p3_right30"/>
+	<waypoint x="-2.2" y="-2.1" name="p2_right40"/>
+	<waypoint x="0.5" y="-2.1" name="p3_right40"/>
+	<waypoint x="-2.2" y="-2" name="p2_right50"/>
+	<waypoint x="0.5" y="-2" name="p3_right50"/>
 	<!--waypoint x="1" y="0" name="px"/>
     <waypoint x="0" y="1" name="py"/-->
-    <waypoint x="5.5" y="-2.5" name="_FA1"/>
-    <waypoint x="-4.5" y="-2.5" name="_FA2"/>
-	<waypoint x="-4.5" y="2.5" name="_FA3"/>
-	<waypoint x="5.5" y="2.5" name="_FA4"/>
+    <waypoint x="5" y="-3" name="_FA1"/>
+    <waypoint x="-5" y="-3" name="_FA2"/>
+	<waypoint x="-5" y="2" name="_FA3"/>
+	<waypoint x="5" y="2" name="_FA4"/>
   </waypoints>
   <sectors>
     <sector color="red" name="Flight_Area">

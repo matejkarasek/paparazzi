@@ -226,7 +226,7 @@
 
   <section name="IMU" prefix="IMU_">
     <define name="BODY_TO_IMU_PHI" value="0." unit="deg"/>
-    <define name="BODY_TO_IMU_THETA" value="232." unit="deg"/>
+    <define name="BODY_TO_IMU_THETA" value="235." unit="deg"/>
     <define name="BODY_TO_IMU_THETA_LS" value="245." unit="deg"/><!-- 0.8 m/s -->
     <define name="BODY_TO_IMU_THETA_MS"	value="225" unit="deg"/><!-- 1.2 m/s -->
     <define name="BODY_TO_IMU_THETA_HS" value="180." unit="deg"/><!-- 2 m/s -->
