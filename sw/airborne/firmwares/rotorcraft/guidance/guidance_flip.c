@@ -407,7 +407,7 @@ void guidance_flip_run(void)
 
     case 22:
          // Max open loop roll
-         stabilization_cmd[COMMAND_ROLL]   = 7100; // Rolling command
+         stabilization_cmd[COMMAND_ROLL]   = 3500; // Rolling command (max 7100 with 6050 thrust cmd)
          stabilization_cmd[COMMAND_PITCH]  = 7000;
          stabilization_cmd[COMMAND_YAW]    = 0;
          stabilization_cmd[COMMAND_THRUST] = 6050; // 5600 // --> Left (5600-8000/2) = 1600, right --> (5600+8000/2) = 9600
