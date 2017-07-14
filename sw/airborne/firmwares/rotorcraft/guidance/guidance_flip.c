@@ -98,11 +98,11 @@
 
 // Evasive maneuver - roll
 #define FIRST_THRUST_LEVEL 6500
-#define FIRST_THRUST_DURATION 0
+#define FIRST_THRUST_DURATION 0.0
 #define STRAIGHT_FLIGHT_DURATION 1.0
 #define STOP_EVADE_ANGLE 30.0
 #define FINAL_THRUST_LEVEL 9000
-#define FINAL_THRUST_DURATION 1.0
+#define FINAL_THRUST_DURATION 2.0
 #define EVADE_ROLL 1
 #define ROLL_DELAY 0.0
 
@@ -140,12 +140,6 @@
 #define START_RECOVER_CMD_ANGLE 270.0 // 270.0 //255.0 // 615 //-115.0
 #endif
 
-#ifndef FIRST_THRUST_LEVEL
-#define FIRST_THRUST_LEVEL 9000
-#endif
-#ifndef FIRST_THRUST_DURATION
-#define FIRST_THRUST_DURATION 0.6
-#endif
 #ifndef FINAL_THRUST_LEVEL
 #define FINAL_THRUST_LEVEL 9000
 #endif
@@ -194,6 +188,10 @@
 
 #ifndef PITCH_SWEEP
 #define PITCH_SWEEP 0
+#endif
+
+#ifndef ROLL_DELAY
+#define ROLL_DELAY 0.0
 #endif
 
 uint8_t in_flip;
@@ -270,7 +268,7 @@ void guidance_flip_run(void)
       stabilization_cmd[COMMAND_THRUST] = FIRST_THRUST_LEVEL; //Thrust to go up first
       timer_save = 0;
 
-      if (timer > BFP_OF_REAL(FIRST_THRUST_DURATION, 12)) {
+      if (timer >= BFP_OF_REAL(FIRST_THRUST_DURATION, 12)) {
         if (FLIP_ROLL && ~FLIP_PITCH) {
           phi_gyr = phi; // initialize the phi estimate with the current phi
           flip_state = 1;
@@ -409,7 +407,7 @@ void guidance_flip_run(void)
 
     case 22:
          // Max open loop roll
-         if (timer > BFP_OF_REAL(ROLL_DELAY, 12)) {
+         if (timer >= BFP_OF_REAL(ROLL_DELAY, 12)) {
              stabilization_cmd[COMMAND_ROLL]   = 3500; // Rolling command (max 7100 with 6050 thrust cmd)
          } else {
          	 stabilization_cmd[COMMAND_ROLL]   = 0;
@@ -423,6 +421,7 @@ void guidance_flip_run(void)
 
          if (phi_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(STOP_EVADE_ANGLE))) {
              flip_state = 100;
+			 timer_save = timer;
          }
          break;
 
@@ -524,9 +523,14 @@ void guidance_flip_run(void)
 
       stabilization_cmd[COMMAND_THRUST] = FINAL_THRUST_LEVEL; //Thrust to stop falling
 	  
-	  if (EVADE_ROLL) {
+	  stab_att_sp_euler.psi = stabilization_attitude_get_heading_i();
+      // reset yaw stabilization loop
+      att_ref_euler_i.euler.psi = stab_att_sp_euler.psi << (REF_ANGLE_FRAC - INT32_ANGLE_FRAC);
+  	  att_ref_euler_i.rate.r = 0;
+  	  att_ref_euler_i.accel.r = 0;
+	  //if (EVADE_ROLL) {
 		stabilization_cmd[COMMAND_YAW] = 0; // no yaw feedback also during the recovery
-	  }
+	  //}
 		
 
 
@@ -540,11 +544,16 @@ void guidance_flip_run(void)
 
       in_flip = 0;
 
+/*
       if (EVADE_ROLL) {
-        stab_att_sp_euler.psi=stabilization_attitude_get_heading_i();
-	  } else {
+		stab_att_sp_euler.psi = stabilization_attitude_get_heading_i();
+		// reset yaw stabilization loop
+        att_ref_euler_i.euler.psi = stab_att_sp_euler.psi << (REF_ANGLE_FRAC - INT32_ANGLE_FRAC);
+  		att_ref_euler_i.rate.r = 0;
+  		att_ref_euler_i.accel.r = 0;	
+	  } else { */
       stab_att_sp_euler.psi = heading_save;
-      }
+      // }
 
       flip_counter = 0;
       timer_save = 0;
