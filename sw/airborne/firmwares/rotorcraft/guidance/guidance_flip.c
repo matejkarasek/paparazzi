@@ -50,7 +50,7 @@
 //#define FIRST_THRUST_DURATION 0.6
 //#define FINAL_THRUST_LEVEL 9000
 //#define FINAL_THRUST_DURATION 0.8
-//#define FLIP_PITCH 1
+//#define FLIP_ROLL 1
 
 // Double roll flip - stil some overshoot
 //
@@ -101,8 +101,8 @@
 #define FIRST_THRUST_DURATION 0.0
 #define STRAIGHT_FLIGHT_DURATION 1.0
 #define STOP_EVADE_ANGLE 30.0
-#define FINAL_THRUST_LEVEL 9000
-#define FINAL_THRUST_DURATION 2.0
+#define FINAL_THRUST_LEVEL 6500
+#define FINAL_THRUST_DURATION 0.8
 #define EVADE_ROLL 1
 #define ROLL_DELAY 0.0
 
@@ -512,27 +512,28 @@ void guidance_flip_run(void)
     case 100: // recovery with stabilization
       flip_cmd_earth.x = 0;
       flip_cmd_earth.y = 0;
-      stabilization_attitude_set_earth_cmd_i(&flip_cmd_earth,
-                                             heading_save);
+      stabilization_attitude_set_earth_cmd_i(&flip_cmd_earth,heading_save);
       stabilization_attitude_run(autopilot_in_flight);
       auto_pitch = 0;
-      if ((timer - timer_save) > BFP_OF_REAL(FINAL_THRUST_DURATION, 12)) {
-        flip_state++;
+
+      if (EVADE_ROLL) {
+         stabilization_cmd[COMMAND_YAW] = 0; // no yaw feedback also during the recovery
+         stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
+
+         stab_att_sp_euler.psi = stabilization_attitude_get_heading_i();
+         // reset yaw stabilization loop
+         att_ref_euler_i.euler.psi = stab_att_sp_euler.psi << (REF_ANGLE_FRAC - INT32_ANGLE_FRAC);
+         att_ref_euler_i.rate.r = 0;
+         att_ref_euler_i.accel.r = 0;
+         stabilization_att_sum_err.psi = 0;
+      } else {
+        stabilization_cmd[COMMAND_THRUST] = FINAL_THRUST_LEVEL; //Thrust to stop falling
       }
-      break;
 
-      stabilization_cmd[COMMAND_THRUST] = FINAL_THRUST_LEVEL; //Thrust to stop falling
-	  
-	  stab_att_sp_euler.psi = stabilization_attitude_get_heading_i();
-      // reset yaw stabilization loop
-      att_ref_euler_i.euler.psi = stab_att_sp_euler.psi << (REF_ANGLE_FRAC - INT32_ANGLE_FRAC);
-  	  att_ref_euler_i.rate.r = 0;
-  	  att_ref_euler_i.accel.r = 0;
-	  //if (EVADE_ROLL) {
-		stabilization_cmd[COMMAND_YAW] = 0; // no yaw feedback also during the recovery
-	  //}
-		
-
+      if ((timer - timer_save) > BFP_OF_REAL(FINAL_THRUST_DURATION, 12)) {
+		     flip_state++;
+		  }
+		  break;
 
     default:
 
@@ -544,16 +545,16 @@ void guidance_flip_run(void)
 
       in_flip = 0;
 
-/*
       if (EVADE_ROLL) {
-		stab_att_sp_euler.psi = stabilization_attitude_get_heading_i();
-		// reset yaw stabilization loop
+        stab_att_sp_euler.psi = stabilization_attitude_get_heading_i();
+        // reset yaw stabilization loop
         att_ref_euler_i.euler.psi = stab_att_sp_euler.psi << (REF_ANGLE_FRAC - INT32_ANGLE_FRAC);
-  		att_ref_euler_i.rate.r = 0;
-  		att_ref_euler_i.accel.r = 0;	
-	  } else { */
-      stab_att_sp_euler.psi = heading_save;
-      // }
+        att_ref_euler_i.rate.r = 0;
+        att_ref_euler_i.accel.r = 0;
+        stabilization_att_sum_err.psi = 0;
+      } else {
+        stab_att_sp_euler.psi = heading_save;
+      }
 
       flip_counter = 0;
       timer_save = 0;
