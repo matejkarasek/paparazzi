@@ -102,8 +102,9 @@
 #define STRAIGHT_FLIGHT_DURATION 1.0
 #define STOP_EVADE_ANGLE 30.0
 #define FINAL_THRUST_LEVEL 9000
-#define FINAL_THRUST_DURATION 0.8
+#define FINAL_THRUST_DURATION 1.0
 #define EVADE_ROLL 1
+#define ROLL_DELAY 0.0
 
 //// Pitch doublets
 //#define FIRST_THRUST_LEVEL 6500
@@ -402,13 +403,18 @@ void guidance_flip_run(void)
             phi_gyr = phi; // initialize the phi estimate with the current phi
             flip_state++;
             auto_pitch = 0;
+			timer_save = timer;
          }
          break;
 
     case 22:
          // Max open loop roll
-         stabilization_cmd[COMMAND_ROLL]   = 3500; // Rolling command (max 7100 with 6050 thrust cmd)
-         stabilization_cmd[COMMAND_PITCH]  = 7000;
+         if (timer > BFP_OF_REAL(ROLL_DELAY, 12)) {
+             stabilization_cmd[COMMAND_ROLL]   = 3500; // Rolling command (max 7100 with 6050 thrust cmd)
+         } else {
+         	 stabilization_cmd[COMMAND_ROLL]   = 0;
+		 }
+         stabilization_cmd[COMMAND_PITCH]  = 9600;
          stabilization_cmd[COMMAND_YAW]    = 0;
          stabilization_cmd[COMMAND_THRUST] = 6050; // 5600 // --> Left (5600-8000/2) = 1600, right --> (5600+8000/2) = 9600
 
@@ -517,6 +523,11 @@ void guidance_flip_run(void)
       break;
 
       stabilization_cmd[COMMAND_THRUST] = FINAL_THRUST_LEVEL; //Thrust to stop falling
+	  
+	  if (EVADE_ROLL) {
+		stabilization_cmd[COMMAND_YAW] = 0; // no yaw feedback also during the recovery
+	  }
+		
 
 
     default:
@@ -529,7 +540,12 @@ void guidance_flip_run(void)
 
       in_flip = 0;
 
+      if (EVADE_ROLL) {
+        stab_att_sp_euler.psi=stabilization_attitude_get_heading_i();
+	  } else {
       stab_att_sp_euler.psi = heading_save;
+      }
+
       flip_counter = 0;
       timer_save = 0;
       flip_state = 0;
