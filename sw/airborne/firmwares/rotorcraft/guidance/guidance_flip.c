@@ -105,6 +105,9 @@
 #define FINAL_THRUST_DURATION 0.8
 #define EVADE_ROLL 1
 #define ROLL_DELAY 0.0
+#define PITCH_CMD_FINAL -MAX_PPRZ*1/3
+#define PITCH_CMD_NOMINAL -MAX_PPRZ*2/3
+
 
 //// Pitch doublets
 //#define FIRST_THRUST_LEVEL 6500
@@ -159,6 +162,9 @@
 #endif
 #ifndef PITCH_CMD_NOMINAL
 #define PITCH_CMD_NOMINAL 0
+#endif
+#ifndef PITCH_CMD_FINAL
+#define PITCH_CMD_FINAL 0
 #endif
 #ifndef PITCH_CMD_DELTA
 #define PITCH_CMD_DELTA -MAX_PPRZ/3
@@ -393,7 +399,7 @@ void guidance_flip_run(void)
     //----------------------------------------------------------------------------------------------------------------------
     case 21:
          // straight flight
-         auto_pitch = -MAX_PPRZ*2/3;
+         auto_pitch = PITCH_CMD_NOMINAL;
          stabilization_attitude_run(autopilot_in_flight);
          stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
 
@@ -406,9 +412,9 @@ void guidance_flip_run(void)
          break;
 
     case 22:
-         // Max open loop roll
+         // Open loop manoeuver
          if (timer >= BFP_OF_REAL(ROLL_DELAY, 12)) {
-             stabilization_cmd[COMMAND_ROLL]   = 3500; // Rolling command (max 7100 with 6050 thrust cmd)
+             stabilization_cmd[COMMAND_ROLL]   = 2000; // Rolling command (max 7100 with 6050 thrust cmd)
          } else {
          	 stabilization_cmd[COMMAND_ROLL]   = 0;
 		 }
@@ -420,10 +426,38 @@ void guidance_flip_run(void)
          phi_gyr += p/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
 
          if (phi_gyr > ANGLE_BFP_OF_REAL(RadOfDeg(STOP_EVADE_ANGLE))) {
-             flip_state = 100;
+             if (PITCH_CMD_FINAL == 0) {
+               flip_state = 100;
+               auto_pitch = 0;
+             }
+             else {
+               flip_state = 23;
+               auto_pitch = PITCH_CMD_FINAL;
+             }
 			 timer_save = timer;
          }
          break;
+
+    case 23:
+          // recovery with straight flight
+          auto_pitch = PITCH_CMD_FINAL;
+          stabilization_attitude_run(autopilot_in_flight);
+          stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
+          stabilization_cmd[COMMAND_YAW] = 0; // no yaw feedback also during the recovery
+
+          stab_att_sp_euler.psi = stabilization_attitude_get_heading_i();
+          // reset yaw stabilization loop
+          att_ref_euler_i.euler.psi = stab_att_sp_euler.psi << (REF_ANGLE_FRAC - INT32_ANGLE_FRAC);
+          att_ref_euler_i.rate.r = 0;
+          att_ref_euler_i.accel.r = 0;
+          stabilization_att_sum_err.psi = 0;
+
+          if ((timer - timer_save) > BFP_OF_REAL(STRAIGHT_FLIGHT_DURATION, 12)) {
+            flip_state = 100;
+            timer_save = timer;
+            auto_pitch = 0;
+          }
+          break;
 
     //----------------------------------------------------------------------------------------------------------------------
     //---PITCH-DOUBLET------------------------------------------------------------------------------------------------------
@@ -514,7 +548,6 @@ void guidance_flip_run(void)
       flip_cmd_earth.y = 0;
       stabilization_attitude_set_earth_cmd_i(&flip_cmd_earth,heading_save);
       stabilization_attitude_run(autopilot_in_flight);
-      auto_pitch = 0;
 
       if (EVADE_ROLL) {
          stabilization_cmd[COMMAND_YAW] = 0; // no yaw feedback also during the recovery
@@ -544,6 +577,7 @@ void guidance_flip_run(void)
       autopilot_set_mode(AP_MODE_ATTITUDE_DIRECT);
 
       in_flip = 0;
+      auto_pitch = 0;
 
       if (EVADE_ROLL) {
         stab_att_sp_euler.psi = stabilization_attitude_get_heading_i();
