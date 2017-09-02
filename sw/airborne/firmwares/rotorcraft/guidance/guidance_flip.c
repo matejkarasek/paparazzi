@@ -96,14 +96,26 @@
 //#define FINAL_THRUST_LEVEL 9000
 //#define FINAL_THRUST_DURATION 0.1
 
-// Evasive maneuver - roll
+//// Evasive maneuver - roll & pitch, angular limit
+//#define FIRST_THRUST_LEVEL 6500
+//#define FIRST_THRUST_DURATION 0.0
+//#define STRAIGHT_FLIGHT_DURATION 1.0
+//#define STOP_EVADE_ANGLE 30.0
+//#define FINAL_THRUST_LEVEL 6500
+//#define FINAL_THRUST_DURATION 0.8
+//#define EVADE_ROLL 1
+//#define ROLL_DELAY 0.0
+//#define PITCH_CMD_FINAL -MAX_PPRZ*1/3
+//#define PITCH_CMD_NOMINAL -MAX_PPRZ*2/3
+
+// Evasive maneuver - roll & pitch, time limit
 #define FIRST_THRUST_LEVEL 6500
 #define FIRST_THRUST_DURATION 0.0
 #define STRAIGHT_FLIGHT_DURATION 1.0
-#define STOP_EVADE_ANGLE 30.0
+#define STOP_EVADE_TIME 0.25
 #define FINAL_THRUST_LEVEL 6500
 #define FINAL_THRUST_DURATION 0.8
-#define EVADE_ROLL 1
+#define EVADE_ROLL_PITCH 1
 #define ROLL_DELAY 0.0
 #define PITCH_CMD_FINAL -MAX_PPRZ*1/3
 #define PITCH_CMD_NOMINAL -MAX_PPRZ*2/3
@@ -178,6 +190,11 @@
 #define STOP_EVADE_ANGLE 30.0
 #endif
 
+#ifndef STOP_EVADE_TIME
+#define STOP_EVADE_TIME 0.25
+#endif
+
+
 #ifndef FLIP_PITCH
 #define FLIP_PITCH 0
 #endif
@@ -186,6 +203,9 @@
 #endif
 #ifndef EVADE_ROLL
 #define EVADE_ROLL 0
+#endif
+#ifndef EVADE_ROLL_PITCH
+#define EVADE_ROLL_PITCH 0
 #endif
 
 #ifndef PITCH_DOUBLET
@@ -286,13 +306,16 @@ void guidance_flip_run(void)
         else if (EVADE_ROLL) {
           flip_state = 21;
         }
-        else if (PITCH_DOUBLET) {
+        else if (EVADE_ROLL_PITCH) {
           flip_state = 31;
+        }
+        else if (PITCH_DOUBLET) {
+          flip_state = 41;
           doublet_cnt = 2;
           sequence_cnt = 1;
         }
         else if (PITCH_SWEEP) {
-          flip_state = 41;
+          flip_state = 51;
         }
         else flip_state = 101; // return to attitude mode
       }
@@ -414,7 +437,7 @@ void guidance_flip_run(void)
     case 22:
          // Open loop manoeuver
          if (timer >= BFP_OF_REAL(ROLL_DELAY, 12)) {
-             stabilization_cmd[COMMAND_ROLL]   = 2000; // Rolling command (max 7100 with 6050 thrust cmd)
+             stabilization_cmd[COMMAND_ROLL]   = 1000; // Rolling command (max 7100 with 6050 thrust cmd)
          } else {
          	 stabilization_cmd[COMMAND_ROLL]   = 0;
 		 }
@@ -459,10 +482,75 @@ void guidance_flip_run(void)
           }
           break;
 
+          //----------------------------------------------------------------------------------------------------------------------
+          //---EVADE-ROLL-PITCH---------------------------------------------------------------------------------------------------
+          //----------------------------------------------------------------------------------------------------------------------
+    case 31:
+      // straight flight
+      auto_pitch = PITCH_CMD_NOMINAL;
+      stabilization_attitude_run(autopilot_in_flight);
+      stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
+
+      if (timer > BFP_OF_REAL(STRAIGHT_FLIGHT_DURATION, 12)) {
+        phi_gyr = phi; // initialize the phi estimate with the current phi
+        flip_state++;
+        auto_pitch = 0;
+        timer_save = timer;
+      }
+      break;
+
+    case 32:
+      // Open loop manoeuver
+      if (timer >= BFP_OF_REAL(ROLL_DELAY, 12)) {
+        stabilization_cmd[COMMAND_ROLL]   = 2500; // Rolling command (max 7100 with 6050 thrust cmd)
+      } else {
+        stabilization_cmd[COMMAND_ROLL]   = 0;
+      }
+      stabilization_cmd[COMMAND_PITCH]  = 4800;
+      stabilization_cmd[COMMAND_YAW]    = 0;
+      stabilization_cmd[COMMAND_THRUST] = 6050; // 5600 // --> Left (5600-8000/2) = 1600, right --> (5600+8000/2) = 9600
+
+      // Integrate gyros for angle estimates
+      phi_gyr += p/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
+
+      if ((timer - timer_save) > BFP_OF_REAL(STOP_EVADE_TIME, 12)) {
+        if (PITCH_CMD_FINAL == 0) {
+          flip_state = 100;
+          auto_pitch = 0;
+        }
+        else {
+          flip_state = 33;
+          auto_pitch = PITCH_CMD_FINAL;
+        }
+        timer_save = timer;
+      }
+      break;
+
+    case 33:
+      // recovery with straight flight
+      auto_pitch = PITCH_CMD_FINAL;
+      stabilization_attitude_run(autopilot_in_flight);
+      stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
+      stabilization_cmd[COMMAND_YAW] = 0; // no yaw feedback also during the recovery
+
+      stab_att_sp_euler.psi = stabilization_attitude_get_heading_i();
+      // reset yaw stabilization loop
+      att_ref_euler_i.euler.psi = stab_att_sp_euler.psi << (REF_ANGLE_FRAC - INT32_ANGLE_FRAC);
+      att_ref_euler_i.rate.r = 0;
+      att_ref_euler_i.accel.r = 0;
+      stabilization_att_sum_err.psi = 0;
+
+      if ((timer - timer_save) > BFP_OF_REAL(STRAIGHT_FLIGHT_DURATION, 12)) {
+        flip_state = 100;
+        timer_save = timer;
+        auto_pitch = 0;
+      }
+      break;
+
     //----------------------------------------------------------------------------------------------------------------------
     //---PITCH-DOUBLET------------------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------------------
-    case 31:
+    case 41:
       // straight flight
       auto_pitch = PITCH_CMD_NOMINAL; //-MAX_PPRZ*2/3;
       stabilization_attitude_run(autopilot_in_flight);
@@ -473,7 +561,7 @@ void guidance_flip_run(void)
         timer_save = timer;
       }
       break;
-    case 32:
+    case 42:
       // doublet
       auto_pitch = PITCH_CMD_NOMINAL + PITCH_CMD_DELTA; //-MAX_PPRZ*2/3;
       stabilization_attitude_run(autopilot_in_flight);
@@ -486,7 +574,7 @@ void guidance_flip_run(void)
       }
       break;
 
-    case 33:
+    case 43:
       // doublet
       auto_pitch = PITCH_CMD_NOMINAL - PITCH_CMD_DELTA; //-MAX_PPRZ*2/3;
       stabilization_attitude_run(autopilot_in_flight);
@@ -498,20 +586,20 @@ void guidance_flip_run(void)
             flip_state++;
           }
           else {
-            flip_state = 32;
+            flip_state = 42;
             doublet_cnt = 2;
             sequence_cnt++;
           }
         }
         else {
-          flip_state = 32;
+          flip_state = 42;
           doublet_cnt++;
         }
         timer_save = timer;
         }
       break;
 
-    case 34:
+    case 44:
       // doublet
       auto_pitch = PITCH_CMD_NOMINAL; //-MAX_PPRZ*2/3;
       stabilization_attitude_run(autopilot_in_flight);
@@ -527,7 +615,7 @@ void guidance_flip_run(void)
       //----------------------------------------------------------------------------------------------------------------------
       //---PITCH-SWEEP------------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------------------------
-    case 41:
+    case 51:
       timer_fl = (timer - timer_save) / (1<<12);
       auto_pitch = PITCH_CMD_DELTA*sinf(3*timer_fl); //-MAX_PPRZ*2/3;
       stabilization_attitude_run(autopilot_in_flight);
