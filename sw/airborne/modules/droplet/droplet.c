@@ -84,7 +84,7 @@ void droplet_init(void)
   obst_count_1 = 0;    // counter for sequential obstacle detections in phase 1
   obst_free_3 = 0;     // counter for sequential no-obstacle detections in phase 3
   obst_dect_4 = 0;     // counter for sequential obstacle detections in phase 4
-  obst_time = 0;          // timer for phase 2 and 4
+  obst_time = 0;       // timer for phase 2 and 4
 
   droplet_state = DROPLET_UNDEFINED;
   prev_time = 0;
@@ -224,11 +224,22 @@ void run_droplet_low_texture(uint32_t disparities_high, uint32_t disparities_tot
   }
   */
 
+  if (first_droplet){
+    // decide whether the first droplet should be CW or CCW
+    if (count_disps_left > count_disps_right) {
+      droplet_turn_direction=1;
+    }
+    else {
+      droplet_turn_direction=-1;
+    }
+  }
+
   // Control logic
   switch(droplet_state){
     case DROPLET_UNOBSTRUCTED: // unobstructed flight
       if (histogram_obs > obst_thr_1 || count_disps_left < disp_thr_1 || count_disps_right < disp_thr_1 ) { // if true, obstacle in sight
         droplet_state = DROPLET_AVOID;
+        first_droplet = 0;
       }
       break;
     case DROPLET_AVOID: // avoid
@@ -242,9 +253,6 @@ void run_droplet_low_texture(uint32_t disparities_high, uint32_t disparities_tot
         droplet_state = DROPLET_UNDEFINED;
         obst_free_3 = 0; // set zero for later
         obst_time = get_sys_time_float();
-
-        // reverse turn direction
-        droplet_turn_direction=-droplet_turn_direction;
       }
       break;
     case DROPLET_UNDEFINED: // fly straight, but be aware of undetected obstacles
@@ -257,17 +265,9 @@ void run_droplet_low_texture(uint32_t disparities_high, uint32_t disparities_tot
       if (obst_dect_4 > obst_cons_5) { // if true, obstacle is consistent
         droplet_state = DROPLET_AVOID; // go back to phase 3
         obst_dect_4 = 0; // set zero for later
-        if (first_droplet){
-        // decide whether the first droplet should be CW or CCW
-        if (count_disps_left > count_disps_right) {
-          droplet_turn_direction=1;
-          }
-        else {
-          droplet_turn_direction=-1;
-          }
-        first_droplet=0;
-        }
       } else if (1000*(get_sys_time_float() - obst_time) > obst_wait_4) {
+        // reverse turn direction
+        droplet_turn_direction=-droplet_turn_direction;
         droplet_state = DROPLET_UNOBSTRUCTED;
         obst_dect_4 = 0;
       }
