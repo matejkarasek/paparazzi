@@ -210,8 +210,8 @@
 
   <section name="GUIDANCE_V" prefix="GUIDANCE_V_">
 	  <define name="HOVER_KP" value="276"/>
-	  <define name="HOVER_KD" value="300"/>
-	  <define name="HOVER_KI" value="100"/>
+	  <define name="HOVER_KD" value="1"/>
+	  <define name="HOVER_KI" value="1"/>
 	  <!--define name="NOMINAL_HOVER_THROTTLE" value="0.77"/-->
 	  <define name="NOMINAL_HOVER_THROTTLE" value="0.9"/>
 	  <define name="ADAPT_THROTTLE_ENABLED" value="FALSE"/>
