@@ -105,6 +105,7 @@ void droplet_periodic(void){
     obst_dect_4 = 0;
     obst_time = get_sys_time_float();
     droplet_state = DROPLET_UNDEFINED;
+    first_droplet = 1;
     return;
   }
 
