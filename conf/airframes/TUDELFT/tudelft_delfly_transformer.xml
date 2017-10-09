@@ -85,7 +85,7 @@
 	<servos driver="Pwm">
 		<servo name="MOTOR_LEFT" no="5" min="1100" neutral="1100" max="1900"/> 
     	<servo name="MOTOR_RIGHT" no="4" min="1100" neutral="1100" max="1900"/> <!-- maximum corrected to compensate for the motor differences -->
-    	<servo name="DIHEDRAL" no="0" min="1170" neutral="1420" max="1670"/> <!--Trimmed for moment equilibrium with WiFi module-->
+    	<servo name="DIHEDRAL" no="0" min="1120" neutral="1370" max="1620"/> <!--Trimmed for moment equilibrium with FPV system-->
 		<servo name="WING_DEF" no="1" min="955" neutral="1555" max="2155"/>
 	</servos>
 	
@@ -116,7 +116,8 @@
 	
 	<section name="IMU" prefix="IMU_">
 		<define name="BODY_TO_IMU_PHI"   value="90" unit="deg"/>
-    	<define name="BODY_TO_IMU_THETA" value="-10." unit="deg"/>
+    	<!--define name="BODY_TO_IMU_THETA" value="-10." unit="deg"/-->
+		<define name="BODY_TO_IMU_THETA" value="0." unit="deg"/>
 		<define name="BODY_TO_IMU_PSI" value="180." unit="deg"/>
 		
 		<!-- MAGNETO CALIBRATION DELFT - calibration still needs to be done !!! -->

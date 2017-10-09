@@ -41,7 +41,7 @@
 #include "subsystems/radio_control.h"
 
 
-// Single pitch/roll flip - reliable
+//// Single pitch/roll flip - reliable
 //
 //#define STOP_ACCELERATE_CMD_ANGLE 90
 //#define START_DECELERATE_CMD_ANGLE 255.0
@@ -51,6 +51,17 @@
 //#define FINAL_THRUST_LEVEL 9000
 //#define FINAL_THRUST_DURATION 0.8
 //#define FLIP_ROLL 1
+
+// Single pitch/roll flip - for heavy FPV Transformer
+
+#define STOP_ACCELERATE_CMD_ANGLE 90
+#define START_DECELERATE_CMD_ANGLE 255.0
+#define START_RECOVER_CMD_ANGLE 255.0
+#define FIRST_THRUST_LEVEL 9000
+#define FIRST_THRUST_DURATION 0.7
+#define FINAL_THRUST_LEVEL 9000
+#define FINAL_THRUST_DURATION 0.9
+#define FLIP_ROLL 1
 
 // Double roll flip - stil some overshoot
 //
@@ -108,17 +119,17 @@
 //#define PITCH_CMD_FINAL -MAX_PPRZ*1/3
 //#define PITCH_CMD_NOMINAL -MAX_PPRZ*2/3
 
-// Evasive maneuver - roll & pitch, time limit
-#define FIRST_THRUST_LEVEL 6500
-#define FIRST_THRUST_DURATION 0.0
-#define STRAIGHT_FLIGHT_DURATION 1.0
-#define STOP_EVADE_TIME 0.25
-#define FINAL_THRUST_LEVEL 6500
-#define FINAL_THRUST_DURATION 0.8
-#define EVADE_ROLL_PITCH 1
-#define ROLL_DELAY 0.0
-#define PITCH_CMD_FINAL -MAX_PPRZ*1/3
-#define PITCH_CMD_NOMINAL -MAX_PPRZ*2/3
+//// Evasive maneuver - roll & pitch, time limit
+//#define FIRST_THRUST_LEVEL 6500
+//#define FIRST_THRUST_DURATION 0.0
+//#define STRAIGHT_FLIGHT_DURATION 1.0
+//#define STOP_EVADE_TIME 0.25
+//#define FINAL_THRUST_LEVEL 6500
+//#define FINAL_THRUST_DURATION 0.8
+//#define EVADE_ROLL_PITCH 1
+//#define ROLL_DELAY 0.0
+//#define PITCH_CMD_FINAL -MAX_PPRZ*1/3
+//#define PITCH_CMD_NOMINAL -MAX_PPRZ*2/3
 
 
 //// Pitch doublets
