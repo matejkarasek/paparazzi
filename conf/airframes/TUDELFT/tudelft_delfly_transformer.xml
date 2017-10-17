@@ -29,7 +29,7 @@
 			<configure name="USE_MAGNETOMETER" value="0"/>
 			<configure name="AHRS_PROPAGATE_FREQUENCY" value="500"/>
 			<define name="LOW_NOISE_TIME" value="50"/> <!--Set the time of the ahrs alignement, 1 = 100 samples = 0.2s at 500 Hz -->
-			<define name="USE_PERSISTENT_SETTINGS" value="TRUE"/>
+			<define name="USE_PERSISTENT_SETTINGS" value="FALSE"/>
 			
 			<define name="USE_BARO_BOARD" value="1"/>
 			<define name="BARO_PERIODIC_FREQUENCY" value="100"/>			
@@ -85,7 +85,7 @@
 	<servos driver="Pwm">
 		<servo name="MOTOR_LEFT" no="5" min="1100" neutral="1100" max="1900"/> 
     	<servo name="MOTOR_RIGHT" no="4" min="1100" neutral="1100" max="1900"/> <!-- maximum corrected to compensate for the motor differences -->
-    	<servo name="DIHEDRAL" no="0" min="1120" neutral="1370" max="1620"/> <!--Trimmed for moment equilibrium with FPV system-->
+    	<servo name="DIHEDRAL" no="0" min="1185" neutral="1435" max="1685"/> <!--Trimmed for moment equilibrium with FPV system-->
 		<servo name="WING_DEF" no="1" min="955" neutral="1555" max="2155"/>
 	</servos>
 	
@@ -186,11 +186,11 @@
 		
 		<!-- feedback -->
 		<define name="PHI_PGAIN" value="3000"/>
-		<define name="PHI_DGAIN" value="750"/>
+		<define name="PHI_DGAIN" value="750"/><!--750 agressive, 500 with FPV-->
 		<define name="PHI_IGAIN" value="0"/>
 		
 		<define name="THETA_PGAIN" value="7800"/>
-		<define name="THETA_DGAIN" value="1000"/>
+		<define name="THETA_DGAIN" value="1000"/><!--1000 agressive, 700 with FPV-->
 		<define name="THETA_IGAIN" value="0"/>
 		
 		<define name="PSI_PGAIN" value="4000"/>

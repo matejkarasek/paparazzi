@@ -52,16 +52,16 @@
 //#define FINAL_THRUST_DURATION 0.8
 //#define FLIP_ROLL 1
 
-// Single pitch/roll flip - for heavy FPV Transformer
-
-#define STOP_ACCELERATE_CMD_ANGLE 90
-#define START_DECELERATE_CMD_ANGLE 255.0
-#define START_RECOVER_CMD_ANGLE 255.0
-#define FIRST_THRUST_LEVEL 9000
-#define FIRST_THRUST_DURATION 0.7
-#define FINAL_THRUST_LEVEL 9000
-#define FINAL_THRUST_DURATION 0.9
-#define FLIP_ROLL 1
+//// Single pitch/roll flip - for heavy FPV Transformer
+//
+//#define STOP_ACCELERATE_CMD_ANGLE 90
+//#define START_DECELERATE_CMD_ANGLE 255.0
+//#define START_RECOVER_CMD_ANGLE 255.0
+//#define FIRST_THRUST_LEVEL 9000
+//#define FIRST_THRUST_DURATION 0.7
+//#define FINAL_THRUST_LEVEL 9000
+//#define FINAL_THRUST_DURATION 0.9
+//#define FLIP_ROLL 1
 
 // Double roll flip - stil some overshoot
 //
@@ -119,17 +119,17 @@
 //#define PITCH_CMD_FINAL -MAX_PPRZ*1/3
 //#define PITCH_CMD_NOMINAL -MAX_PPRZ*2/3
 
-//// Evasive maneuver - roll & pitch, time limit
-//#define FIRST_THRUST_LEVEL 6500
-//#define FIRST_THRUST_DURATION 0.0
-//#define STRAIGHT_FLIGHT_DURATION 1.0
-//#define STOP_EVADE_TIME 0.25
-//#define FINAL_THRUST_LEVEL 6500
-//#define FINAL_THRUST_DURATION 0.8
-//#define EVADE_ROLL_PITCH 1
-//#define ROLL_DELAY 0.0
-//#define PITCH_CMD_FINAL -MAX_PPRZ*1/3
-//#define PITCH_CMD_NOMINAL -MAX_PPRZ*2/3
+// Evasive maneuver - roll & pitch, time limit
+#define FIRST_THRUST_LEVEL 6500
+#define FIRST_THRUST_DURATION 0.0
+#define STRAIGHT_FLIGHT_DURATION 1.0
+#define STOP_EVADE_TIME 0.25
+#define FINAL_THRUST_LEVEL 6500
+#define FINAL_THRUST_DURATION 0.8
+#define EVADE_ROLL_PITCH 1
+#define ROLL_DELAY 0.0
+#define PITCH_CMD_FINAL -MAX_PPRZ*1/4 //-MAX_PPRZ*1/3 // max pitch set to 60 deg!!!
+#define PITCH_CMD_NOMINAL -MAX_PPRZ*1/2 // -MAX_PPRZ*2/3
 
 
 //// Pitch doublets
@@ -513,13 +513,13 @@ void guidance_flip_run(void)
     case 32:
       // Open loop manoeuver
       if (timer >= BFP_OF_REAL(ROLL_DELAY, 12)) {
-        stabilization_cmd[COMMAND_ROLL]   = 2500; // Rolling command (max 7100 with 6050 thrust cmd)
+        stabilization_cmd[COMMAND_ROLL]   = 1500; // Rolling command (max 7100 with 6050 thrust cmd)
       } else {
         stabilization_cmd[COMMAND_ROLL]   = 0;
       }
-      stabilization_cmd[COMMAND_PITCH]  = 4800;
+      stabilization_cmd[COMMAND_PITCH]  = 8000;
       stabilization_cmd[COMMAND_YAW]    = 0;
-      stabilization_cmd[COMMAND_THRUST] = 6050; // 5600 // --> Left (5600-8000/2) = 1600, right --> (5600+8000/2) = 9600
+      stabilization_cmd[COMMAND_THRUST] = radio_control.values[RADIO_THROTTLE]; //6050; // 5600 // --> Left (5600-8000/2) = 1600, right --> (5600+8000/2) = 9600
 
       // Integrate gyros for angle estimates
       phi_gyr += p/PERIODIC_FREQUENCY;   // RATE_FRAC = ANGLE_FRAC
@@ -542,7 +542,7 @@ void guidance_flip_run(void)
       auto_pitch = PITCH_CMD_FINAL;
       stabilization_attitude_run(autopilot_in_flight);
       stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
-      stabilization_cmd[COMMAND_YAW] = 0; // no yaw feedback also during the recovery
+      stabilization_cmd[COMMAND_YAW] = 9600; // no yaw feedback also during the recovery
 
       stab_att_sp_euler.psi = stabilization_attitude_get_heading_i();
       // reset yaw stabilization loop
@@ -648,7 +648,7 @@ void guidance_flip_run(void)
       stabilization_attitude_set_earth_cmd_i(&flip_cmd_earth,heading_save);
       stabilization_attitude_run(autopilot_in_flight);
 
-      if (EVADE_ROLL) {
+      if (EVADE_ROLL || EVADE_ROLL_PITCH) {
          stabilization_cmd[COMMAND_YAW] = 0; // no yaw feedback also during the recovery
          stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
 
@@ -678,7 +678,7 @@ void guidance_flip_run(void)
       in_flip = 0;
       auto_pitch = 0;
 
-      if (EVADE_ROLL) {
+      if (EVADE_ROLL || EVADE_ROLL_PITCH) {
         stab_att_sp_euler.psi = stabilization_attitude_get_heading_i();
         // reset yaw stabilization loop
         att_ref_euler_i.euler.psi = stab_att_sp_euler.psi << (REF_ANGLE_FRAC - INT32_ANGLE_FRAC);
