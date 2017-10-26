@@ -85,7 +85,7 @@
 	<servos driver="Pwm">
 		<servo name="MOTOR_LEFT" no="5" min="1100" neutral="1100" max="1900"/> 
     	<servo name="MOTOR_RIGHT" no="4" min="1100" neutral="1100" max="1900"/> <!-- maximum corrected to compensate for the motor differences -->
-    	<servo name="DIHEDRAL" no="0" min="1185" neutral="1435" max="1685"/> <!--Trimmed for moment equilibrium with FPV system-->
+    	<servo name="DIHEDRAL" no="0" min="1210" neutral="1460" max="1710"/> <!--Trimmed for moment equilibrium-->
 		<servo name="WING_DEF" no="1" min="955" neutral="1555" max="2155"/>
 	</servos>
 	
@@ -98,8 +98,8 @@
 	
 	<command_laws>
 		<call fun="motor_mixing_run(autopilot_motors_on,FALSE,values)"/>
-		<set servo="MOTOR_LEFT" value="@THRUST+0.5*@ROLL+0.1*ABS(@ROLL)"/>
-    	<set servo="MOTOR_RIGHT" value="@THRUST-0.5*@ROLL+0.1*ABS(@ROLL)"/>
+		<set servo="MOTOR_LEFT" value="@THRUST+0.5*@ROLL"/> <!-- +0.1*ABS(@ROLL) -->
+    	<set servo="MOTOR_RIGHT" value="@THRUST-0.5*@ROLL"/>
     	<set servo="DIHEDRAL" value="@PITCH"/>
 		<set servo="WING_DEF" value="@YAW"/>
 	</command_laws>

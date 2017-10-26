@@ -513,11 +513,11 @@ void guidance_flip_run(void)
     case 32:
       // Open loop manoeuver
       if (timer >= BFP_OF_REAL(ROLL_DELAY, 12)) {
-        stabilization_cmd[COMMAND_ROLL]   = 1500; // Rolling command (max 7100 with 6050 thrust cmd)
+        stabilization_cmd[COMMAND_ROLL]   = 2730; // Rolling command (max 7100 with 6050 thrust cmd)
       } else {
         stabilization_cmd[COMMAND_ROLL]   = 0;
       }
-      stabilization_cmd[COMMAND_PITCH]  = 8000;
+      stabilization_cmd[COMMAND_PITCH]  = 4395;
       stabilization_cmd[COMMAND_YAW]    = 0;
       stabilization_cmd[COMMAND_THRUST] = radio_control.values[RADIO_THROTTLE]; //6050; // 5600 // --> Left (5600-8000/2) = 1600, right --> (5600+8000/2) = 9600
 
@@ -542,7 +542,7 @@ void guidance_flip_run(void)
       auto_pitch = PITCH_CMD_FINAL;
       stabilization_attitude_run(autopilot_in_flight);
       stabilization_cmd[COMMAND_THRUST]=radio_control.values[RADIO_THROTTLE];
-      stabilization_cmd[COMMAND_YAW] = 9600; // no yaw feedback also during the recovery
+      stabilization_cmd[COMMAND_YAW] = 0; // no yaw feedback also during the recovery
 
       stab_att_sp_euler.psi = stabilization_attitude_get_heading_i();
       // reset yaw stabilization loop
@@ -550,6 +550,11 @@ void guidance_flip_run(void)
       att_ref_euler_i.rate.r = 0;
       att_ref_euler_i.accel.r = 0;
       stabilization_att_sum_err.psi = 0;
+
+      // start turning after a delay
+      if ((timer - timer_save) > BFP_OF_REAL(0.6, 12)) {
+        stabilization_cmd[COMMAND_YAW] = 0;
+      }
 
       if ((timer - timer_save) > BFP_OF_REAL(STRAIGHT_FLIGHT_DURATION, 12)) {
         flip_state = 100;
