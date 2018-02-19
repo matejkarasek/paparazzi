@@ -18,10 +18,10 @@
     <waypoint x="-0.10" y="-0.70" alt="1.32" name="PIV3"/>    
     <waypoint lat="51.9906308" lon="4.3767945" alt="2" name="p1"/>
     <waypoint lat="51.9906420" lon="4.3768256" alt="2" name="p2"/>
-    <waypoint lat="51.9906316" lon="4.3768384" name="_FA1"/>
-    <waypoint lat="51.9906120" lon="4.3767901" name="_FA2"/>
-    <waypoint lat="51.9906309" lon="4.3767675" name="_FA3"/>
-    <waypoint lat="51.9906522" lon="4.3768134" name="_FA4"/>
+    <waypoint x="-1.5" y="0" name="_FA1"/>
+    <waypoint x="1.5" y="0" name="_FA2"/>
+    <waypoint x="1.5" y="3" name="_FA3"/>
+    <waypoint x="-1.5" y="3" name="_FA4"/>
   </waypoints>
   <sectors>
     <sector color="red" name="FlightArea">
