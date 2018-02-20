@@ -1,27 +1,25 @@
 <!DOCTYPE flight_plan SYSTEM "flight_plan.dtd">
 
-<flight_plan alt="1.32" ground_alt="0" lat0="51.990634" lon0="4.376789" max_dist_from_home="60" name="Rotorcraft Open Jet Facility of the Delft University of Technology" security_height="0.3">
+<flight_plan alt="1.70" ground_alt="0" lat0="51.990634" lon0="4.376789" max_dist_from_home="60" name="Rotorcraft Open Jet Facility of the Delft University of Technology" security_height="0.3">
   <header>
 #include "autopilot.h"
 #include "modules/delfly_utils/delfly_utils.h"
 </header>
   <waypoints>
     <waypoint name="HOME" x="0.0" y="0.0"/>
-    <waypoint name="CLIMB" x="1.2" y="-0.6"/>
-    <waypoint name="STDBY" x="-0.10" y="-0.6"/>
-    <waypoint name="TD" x="0.8" y="-1.7" alt="1.32"/>
-    <waypoint name="TD2" x="0.0" y="0.5" alt="1.82"/>
-    <waypoint x="0.0" y="0.5" alt="1.32" name="TARGET"/>
-    <waypoint x="0.5" y="0.5" alt="1.32" name="TARGET2"/><!-- waypoint lateral step -->
-    <waypoint x="-0.10" y="-0.60" alt="1.32" name="PIV1"/>
-    <waypoint x="-0.10" y="-0.65" alt="1.32" name="PIV2"/>
-    <waypoint x="-0.10" y="-0.70" alt="1.32" name="PIV3"/>    
-    <waypoint lat="51.9906308" lon="4.3767945" alt="2" name="p1"/>
-    <waypoint lat="51.9906420" lon="4.3768256" alt="2" name="p2"/>
-    <waypoint x="-1.5" y="0" name="_FA1"/>
-    <waypoint x="1.5" y="0" name="_FA2"/>
-    <waypoint x="1.5" y="3" name="_FA3"/>
-    <waypoint x="-1.5" y="3" name="_FA4"/>
+    <waypoint name="CLIMB" x="0.0" y="0.0"/>
+    <waypoint name="STDBY" x="0.0" y="0.0"/>
+    <waypoint name="TD" x="0.0" y="0.0" alt="1.70"/>
+    <waypoint name="TD2" x="0.0" y="0.5" alt="1.70"/>
+    <waypoint name="TARGET" x="0.0" y="0.0" alt="1.70"/>
+    <waypoint name="TARGET2" x="0.5" y="0.0" alt="1.70"/> <!-- waypoint lateral step -->
+    <waypoint name="PIV1" x="0" y="0.40" alt="1.70"/>
+    <waypoint name="PIV2" x="0" y="0.45" alt="1.70"/>
+    <waypoint name="PIV3" x="0" y="0.50" alt="1.70"/>    
+    <waypoint name="_FA1" x="-1.5" y="-1.5"/>
+    <waypoint name="_FA2" x="1.5" y="-1.5"/>
+    <waypoint name="_FA3" x="1.5" y="1.5"/>
+    <waypoint name="_FA4" x="-1.5" y="1.5"/>
   </waypoints>
   <sectors>
     <sector color="red" name="FlightArea">
@@ -65,11 +63,11 @@
       <!--call fun="{ nav_StopPosControl(); windtunnel_set_periodic( FALSE ); FALSE; }"/-->
       <stay wp="STDBY"/>
     </block>
-    <block name="Go to target" strip_button="orange tulip (target)" strip_icon="target.png">
+    <block name="Go to target" strip_button="Target" strip_icon="target.png">
       <call fun="nav_set_heading_deg(0)"/>
       <stay wp="TARGET"/>
     </block>
-    <block name="Go to Tulip" strip_button="red tulip" strip_icon="tulip.png">
+    <block name="Go to Tulip" strip_button="PIV" strip_icon="tulip.png">
       <call fun="nav_set_heading_deg(0)"/>
       <!--stay wp="TARGET2"/-->
       <call fun="{NavGotoWaypoint(WP_PIV); NavVerticalAutoThrottleMode(RadOfDeg(0.000000)); NavVerticalAltitudeMode(WaypointAlt(WP_PIV), 0.); TRUE;}"/>
@@ -90,9 +88,6 @@
       <deroute block="Go to target"/>
     </block>
     
-    <block name="stay_p1">
-      <circle wp="p1" radius="1.5"/>
-    </block>
     <block name="Decrease Altitude">
       <call fun="NavSetWaypointHere(WP_TD)"/>
       <call fun="{ waypoint_set_alt( WP_TD, GetPosAlt() - 1 ); FALSE; }"/>

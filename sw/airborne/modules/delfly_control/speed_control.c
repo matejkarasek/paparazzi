@@ -88,6 +88,8 @@ void speed_control_init (void) {
   speed_control.fb_gains.adapt.ver = SPEED_CONTROL_ADAPT_VER_GAIN;
 
   speed_control_set_pitch_offset(SPEED_CONTROL_PITCH_OFFSET);
+  speed_control_set_airspeed(SPEED_CONTROL_AIR_SPEED);
+  delfly_state_set_windspeed(SPEED_CONTROL_AIR_SPEED);
 
   VECT2_ZERO(speed_control_var.ref.velocity.xy);
   VECT2_ZERO(speed_control_var.ref.acceleration.xy);
@@ -187,10 +189,10 @@ static inline void speed_control_gain_scheduling (int32_t air_speed) {
   }
 }
 
-static inline void speed_control_set_airspeed (int32_t air_speed) {
-  if ( speed_control_var.now.air_speed == air_speed ) {
-    return; //nothing to do
-  }
+void speed_control_set_airspeed (int32_t air_speed) {
+//  if ( speed_control_var.now.air_speed == air_speed ) {
+//    return; //nothing to do
+//  }
 
   speed_control_gain_scheduling(air_speed);
   speed_control_var.now.air_speed = air_speed;

@@ -8,9 +8,9 @@
     <!--/dl_settings>
     <dl_settings NAME="PIV_Utils"-->
       <dl_setting var="delfly_wp_piv" min="1" step="1" max="3" values="WP_PIV1|WP_PIV2|WP_PIV3" module="delfly_utils/delfly_utils" shortname="WP" handler="piv_select_wp" persistent="true"/>
-      <dl_setting var="piv_wp_north*100" min="-100" step="1" max="0" module="delfly_utils/delfly_utils" shortname="wp_north" handler="piv_set_wp_north" persistent="true"/>
-      <dl_setting var="piv_east*100" min="-25" step="0.1" max="50" module="delfly_utils/delfly_utils" shortname="east" handler="piv_set_east" persistent="true"/>
-      <dl_setting var="piv_height*100" min="100" step="1" max="200" module="delfly_utils/delfly_utils" shortname="height" handler="piv_set_height" persistent="true"/>
+      <dl_setting var="piv_wp_north*100" min="-100" step="1" max="100" module="delfly_utils/delfly_utils" shortname="wp_north" handler="piv_set_wp_north" persistent="true"/>
+      <dl_setting var="piv_east*100" min="-50" step="0.1" max="50" module="delfly_utils/delfly_utils" shortname="east" handler="piv_set_east" persistent="true"/>
+      <dl_setting var="piv_height*100" min="120" step="1" max="220" module="delfly_utils/delfly_utils" shortname="height" handler="piv_set_height" persistent="true"/>
       <dl_setting var="piv_wp" min="1" step="1" max="0" module="delfly_utils/delfly_utils" shortname="WP_PIV"/> 
     </dl_settings>  
   </dl_settings>
