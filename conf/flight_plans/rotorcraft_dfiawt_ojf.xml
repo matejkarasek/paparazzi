@@ -9,13 +9,13 @@
     <waypoint name="HOME" x="0.0" y="0.0"/>
     <waypoint name="CLIMB" x="0.0" y="0.0"/>
     <waypoint name="STDBY" x="0.0" y="0.0"/>
-    <waypoint name="TD" x="0.0" y="0.0" alt="1.52"/>
-    <waypoint name="TD2" x="0.0" y="0.5" alt="1.52"/>
-    <waypoint name="TARGET" x="0.0" y="-0.06" alt="1.52"/>
-    <waypoint name="TARGET2" x="0.5" y="-0.06" alt="1.52"/> <!-- waypoint lateral step -->
-    <waypoint name="PIV1" x="0" y="-0.06" alt="1.52"/>
-    <waypoint name="PIV2" x="0" y="0.45" alt="1.52"/>
-    <waypoint name="PIV3" x="0" y="0.50" alt="1.52"/>    
+    <waypoint name="TD" x="0.0" y="0.0" alt="1.42"/>
+    <waypoint name="TD2" x="0.0" y="0.5" alt="1.42"/>
+    <waypoint name="TARGET" x="0.0" y="0.09" alt="1.42"/>
+    <waypoint name="TARGET2" x="0.5" y="0.09" alt="1.42"/> <!-- waypoint lateral step -->
+    <waypoint name="PIV1" x="0" y="0.09" alt="1.42"/>
+    <waypoint name="PIV2" x="0" y="0.45" alt="1.42"/>
+    <waypoint name="PIV3" x="0" y="0.50" alt="1.42"/>    
     <waypoint name="_FA1" x="-1.5" y="-1.5"/>
     <waypoint name="_FA2" x="1.5" y="-1.5"/>
     <waypoint name="_FA3" x="1.5" y="1.5"/>
