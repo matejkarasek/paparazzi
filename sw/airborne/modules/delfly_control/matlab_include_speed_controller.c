@@ -33,12 +33,12 @@ struct FloatVect2 matlab_flapfreq_matrix_v12 = {.x = 0.0058, .y = -0.0200};
 
 /* V = 2.5 */
 int32_t matlab_airspeed_v25 = 40960;
-int32_t matlab_pitch_equilibrium_v25 = 8723;
-int32_t matlab_throttle_equilibrium_v25 = 8766;
+int32_t matlab_pitch_equilibrium_v25 = 16384*0.7; // 0.7 rad //8723;
+int32_t matlab_throttle_equilibrium_v25 = 128*70; // 68% throttle //8766;
 float matlab_flapfreq_equilibrium_v25 = 11.1989;
-struct Int32Vect2 matlab_pitch_matrix_v25 = {.x = -778, .y = -525};
-struct Int32Vect2 matlab_throttle_matrix_v25 = {.x = 523, .y = -596};
-struct FloatVect2 matlab_flapfreq_matrix_v25 = {.x = 0.0132, .y = -0.0151};
+struct Int32Vect2 matlab_pitch_matrix_v25 = {.x = -778, .y = -525}; //{.x = -778, .y = -525};
+struct Int32Vect2 matlab_throttle_matrix_v25 = {.x = 523, .y = -596}; //{.x = 523, .y = -596};
+struct FloatVect2 matlab_flapfreq_matrix_v25 = {.x = 0.0132, .y = -0.0151}; //{.x = 0.0132, .y = -0.0151};
 
 /* V = 5.0 */
 int32_t matlab_airspeed_v50 = 81920;
