@@ -72,17 +72,21 @@ static inline void autopilot_arming_set(bool motors_on)
  */
 static inline bool autopilot_arming_check_valid(void)
 {
-  if (!PITCH_STICK_CENTERED()) {
-    autopilot.arming_status = AP_ARMING_STATUS_PITCH_NOT_CENTERED;
-  } else if (!ROLL_STICK_CENTERED()) {
-    autopilot.arming_status = AP_ARMING_STATUS_ROLL_NOT_CENTERED;
-  } else if (!YAW_STICK_CENTERED()) {
-    autopilot.arming_status = AP_ARMING_STATUS_YAW_NOT_CENTERED;
-  } else if (autopilot_get_mode() != MODE_MANUAL) {
+//  if (!PITCH_STICK_CENTERED()) {
+//    autopilot.arming_status = AP_ARMING_STATUS_PITCH_NOT_CENTERED;
+//  } else if (!ROLL_STICK_CENTERED()) {
+//    autopilot.arming_status = AP_ARMING_STATUS_ROLL_NOT_CENTERED;
+//  } else if (!YAW_STICK_CENTERED()) {
+//    autopilot.arming_status = AP_ARMING_STATUS_YAW_NOT_CENTERED;
+//  } else
+
+  if (autopilot_get_mode() != MODE_MANUAL) {
     autopilot.arming_status = AP_ARMING_STATUS_NOT_MODE_MANUAL;
-  } else if (autopilot_unarmed_in_auto) {
-    autopilot.arming_status = AP_ARMING_STATUS_UNARMED_IN_AUTO;
-  } else if (THROTTLE_STICK_DOWN()) {
+  }
+  //else if (autopilot_unarmed_in_auto) {
+  //  autopilot.arming_status = AP_ARMING_STATUS_UNARMED_IN_AUTO;
+  //}
+  else if (THROTTLE_STICK_DOWN()) {
     autopilot.arming_status = AP_ARMING_STATUS_THROTTLE_DOWN;
   } else {
     return true; // all checks valid
