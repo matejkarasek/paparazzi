@@ -21,8 +21,7 @@
       <module name="radio_control" type="ppm">
         <configure name="RADIO_CONTROL_PPM_PIN" value="SERVO6"/>
         <define name="RADIO_KILL_SWITCH" value="RADIO_GEAR"/>
-            <define name="RADIO_YAW" value="RADIO_ROLL"/>
-          </module>
+      </module>
 
       <configure name="USE_MAGNETOMETER" value="0"/>
       <configure name="AHRS_PROPAGATE_FREQUENCY" value="500"/>
