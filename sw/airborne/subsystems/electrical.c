@@ -48,9 +48,11 @@
 #define COMMAND_CURRENT_ESTIMATION COMMAND_THRUST
 #endif
 
-#ifndef BAT_CHECKER_DELAY
-#define BAT_CHECKER_DELAY 5
-#endif
+//#ifndef BAT_CHECKER_DELAY
+//#define BAT_CHECKER_DELAY 5
+//#endif
+
+#define BAT_CHECKER_DELAY 2
 
 #define ELECTRICAL_PERIODIC_FREQ 10
 static float period_to_hour = 1 / 3600.f / ELECTRICAL_PERIODIC_FREQ;
@@ -108,7 +110,8 @@ void electrical_init(void)
   electrical.bat_critical = false;
 
 #if defined ADC_CHANNEL_VSUPPLY
-  adc_buf_channel(ADC_CHANNEL_VSUPPLY, &electrical_priv.vsupply_adc_buf, DEFAULT_AV_NB_SAMPLE);
+//  adc_buf_channel(ADC_CHANNEL_VSUPPLY, &electrical_priv.vsupply_adc_buf, DEFAULT_AV_NB_SAMPLE);
+  adc_buf_channel(ADC_CHANNEL_VSUPPLY, &electrical_priv.vsupply_adc_buf, 470); // average over 470 samples, sampling 8kHz --> average over 1/17 s ~ 1 flapping cycle
 #endif
 
   /* measure current if available, otherwise estimate it */

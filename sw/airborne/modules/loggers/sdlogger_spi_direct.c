@@ -34,6 +34,7 @@
 #include "modules/loggers/pprzlog_tp.h"
 #include "subsystems/datalink/telemetry.h"
 #include "led.h"
+#include "subsystems/electrical.h"
 
 #if SDLOGGER_ON_ARM
 #include "autopilot.h"
@@ -45,8 +46,8 @@
 #endif
 
 #ifdef LOGGER_LED
-#define LOGGER_LED_ON LED_ON(LOGGER_LED);
-#define LOGGER_LED_OFF LED_OFF(LOGGER_LED);
+#define LOGGER_LED_ON LED_OFF(LOGGER_LED); // with Lisa/MXS, LED_OFF actually turns the led on, and vice versa...
+#define LOGGER_LED_OFF LED_ON(LOGGER_LED);
 #else
 #define LOGGER_LED_ON {}
 #define LOGGER_LED_OFF {}
@@ -109,6 +110,8 @@ void sdlogger_spi_direct_init(void)
   sdlogger_spi.device.char_available = (char_available_t)sdlogger_spi_direct_char_available;
   sdlogger_spi.device.get_byte = (get_byte_t)sdlogger_spi_direct_get_byte;
   sdlogger_spi.device.periph = &sdlogger_spi;
+
+  LOGGER_LED_OFF;
 
 }
 
@@ -246,6 +249,12 @@ void sdlogger_spi_direct_periodic(void)
     default:
       break;
   }
+
+  if (electrical.bat_low)
+  {
+    RunOnceEvery(20, LED_TOGGLE(LOGGER_LED));
+  }
+
 }
 
 void sdlogger_spi_direct_start(void) {}
