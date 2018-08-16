@@ -111,8 +111,6 @@ void sdlogger_spi_direct_init(void)
   sdlogger_spi.device.get_byte = (get_byte_t)sdlogger_spi_direct_get_byte;
   sdlogger_spi.device.periph = &sdlogger_spi;
 
-  LOGGER_LED_OFF;
-
 }
 
 /**
@@ -252,8 +250,18 @@ void sdlogger_spi_direct_periodic(void)
 
   if (electrical.bat_low)
   {
-    RunOnceEvery(20, LED_TOGGLE(LOGGER_LED));
+    RunOnceEvery(20, LED_TOGGLE(LOGGER_LED)); // LED blinks when battery is low
   }
+  else if (radio_control.values[0] > 2000) // LED goes off when we give throttle
+  {
+    LED_ON(LOGGER_LED);
+    LED_ON(2);
+  }
+  else
+  {
+      LED_OFF(LOGGER_LED);
+      LED_ON(2);
+    }
 
 }
 
