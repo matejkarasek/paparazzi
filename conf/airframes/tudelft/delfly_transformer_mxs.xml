@@ -82,7 +82,7 @@
     <module name="ins"/>
     <module name="logger_sd_spi_direct.xml">
       <define name="SDLOGGER_CONTROL_SWITCH" value="RADIO_GEAR"/>
-      <define name="LOGGER_LED" value="1"/> 
+      <define name="LOGGER_LED" value="2"/> 
     </module>
     <module name="adc_generic">
       <define name="USE_ADC_2" value="1"/>

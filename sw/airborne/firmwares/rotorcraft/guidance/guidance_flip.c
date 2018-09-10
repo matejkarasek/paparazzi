@@ -41,16 +41,16 @@
 #include "subsystems/radio_control.h"
 
 
-//// Single pitch/roll flip - reliable (light MXS Transformer)
-//
-//#define STOP_ACCELERATE_CMD_ANGLE 90
-//#define START_DECELERATE_CMD_ANGLE 255.0
-//#define START_RECOVER_CMD_ANGLE 255.0
-//#define FIRST_THRUST_LEVEL 9000
-//#define FIRST_THRUST_DURATION 0.4
-//#define FINAL_THRUST_LEVEL 9000
-//#define FINAL_THRUST_DURATION 0.5
-//#define FLIP_PITCH 1
+// Single pitch/roll flip - reliable (light MXS Transformer)
+
+#define STOP_ACCELERATE_CMD_ANGLE 90
+#define START_DECELERATE_CMD_ANGLE 255.0
+#define START_RECOVER_CMD_ANGLE 255.0
+#define FIRST_THRUST_LEVEL 9000
+#define FIRST_THRUST_DURATION 0.4
+#define FINAL_THRUST_LEVEL 9000
+#define FINAL_THRUST_DURATION 0.5
+#define FLIP_ROLL 1
 
 //// Single pitch/roll flip - for heavy FPV Transformer
 //
@@ -145,19 +145,19 @@
 //#define PITCH_DOUBLET 1
 //#define DOUBLET_REPETITIONS 1
 
-// Roll doublets
-#define FIRST_THRUST_LEVEL 6500
-#define FIRST_THRUST_DURATION 0.0
-#define STRAIGHT_FLIGHT_DURATION 0.5
-#define THROTTLE_FACTOR 1.0
-#define DOUBLET_DURATION 0.75
-#define FINAL_THRUST_LEVEL 6500
-#define FINAL_THRUST_DURATION 0
-#define ROLL_CMD_NOMINAL 0
-#define PITCH_CMD_NOMINAL -MAX_PPRZ/2
-#define ROLL_CMD_DELTA -MAX_PPRZ/3
-#define ROLL_DOUBLET 1
-#define DOUBLET_REPETITIONS 2
+//// Roll doublets
+//#define FIRST_THRUST_LEVEL 6500
+//#define FIRST_THRUST_DURATION 0.0
+//#define STRAIGHT_FLIGHT_DURATION 0.5
+//#define THROTTLE_FACTOR 1.0
+//#define DOUBLET_DURATION 0.75
+//#define FINAL_THRUST_LEVEL 6500
+//#define FINAL_THRUST_DURATION 0
+//#define ROLL_CMD_NOMINAL 0
+//#define PITCH_CMD_NOMINAL -MAX_PPRZ/2
+//#define ROLL_CMD_DELTA -MAX_PPRZ/3
+//#define ROLL_DOUBLET 1
+//#define DOUBLET_REPETITIONS 2
 
 //// Pitch sweep
 //#define FIRST_THRUST_LEVEL 6500

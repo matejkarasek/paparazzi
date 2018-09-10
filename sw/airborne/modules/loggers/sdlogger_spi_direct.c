@@ -252,16 +252,16 @@ void sdlogger_spi_direct_periodic(void)
   {
     RunOnceEvery(20, LED_TOGGLE(LOGGER_LED)); // LED blinks when battery is low
   }
-  else if (radio_control.values[0] > 2000) // LED goes off when we give throttle
-  {
-    LED_ON(LOGGER_LED);
-    LED_ON(2);
-  }
-  else
-  {
-      LED_OFF(LOGGER_LED);
-      LED_ON(2);
-    }
+//  else if (radio_control.values[0] > 2000) // LED goes off when we give throttle
+//  {
+//    LED_ON(LOGGER_LED);
+//    LED_ON(2);
+//  }
+//  else
+//  {
+//      LED_OFF(LOGGER_LED);
+//      LED_ON(2);
+//    }
 
 }
 
