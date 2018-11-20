@@ -107,29 +107,29 @@
 //#define FINAL_THRUST_LEVEL 9000
 //#define FINAL_THRUST_DURATION 0.1
 
-//// Evasive maneuver - roll & pitch, angular limit
-//#define FIRST_THRUST_LEVEL 6500
-//#define FIRST_THRUST_DURATION 0.0
-//#define STRAIGHT_FLIGHT_DURATION 1.0
-//#define STOP_EVADE_ANGLE 30.0
-//#define FINAL_THRUST_LEVEL 6500
-//#define FINAL_THRUST_DURATION 0.8
-//#define EVADE_ROLL 1
-//#define ROLL_DELAY 0.0
-//#define PITCH_CMD_FINAL -MAX_PPRZ/4
-//#define PITCH_CMD_NOMINAL -MAX_PPRZ*2/3
-
-// Evasive maneuver - roll & pitch, angular limit, heavier IMAV DelFly for demos
-#define FIRST_THRUST_LEVEL 7000
+// Evasive maneuver - roll & pitch, angular limit
+#define FIRST_THRUST_LEVEL 6500
 #define FIRST_THRUST_DURATION 0.0
 #define STRAIGHT_FLIGHT_DURATION 1.0
 #define STOP_EVADE_ANGLE 30.0
-#define FINAL_THRUST_LEVEL 6000
+#define FINAL_THRUST_LEVEL 6500
 #define FINAL_THRUST_DURATION 0.8
 #define EVADE_ROLL 1
 #define ROLL_DELAY 0.0
 #define PITCH_CMD_FINAL 0
 #define PITCH_CMD_NOMINAL -MAX_PPRZ*2/3
+
+//// Evasive maneuver - roll & pitch, angular limit, heavier IMAV DelFly for demos
+//#define FIRST_THRUST_LEVEL 7000
+//#define FIRST_THRUST_DURATION 0.0
+//#define STRAIGHT_FLIGHT_DURATION 1.0
+//#define STOP_EVADE_ANGLE 30.0
+//#define FINAL_THRUST_LEVEL 6000
+//#define FINAL_THRUST_DURATION 0.8
+//#define EVADE_ROLL 1
+//#define ROLL_DELAY 0.0
+//#define PITCH_CMD_FINAL 0
+//#define PITCH_CMD_NOMINAL -MAX_PPRZ*2/3
 
 //// Evasive maneuver - roll & pitch, time limit
 //#define FIRST_THRUST_LEVEL 6500
@@ -508,7 +508,7 @@ void guidance_flip_run(void)
          } else {
          	 stabilization_cmd[COMMAND_ROLL]   = 0;
 		 }
-         stabilization_cmd[COMMAND_PITCH]  = 500; //4000; //9600;
+         stabilization_cmd[COMMAND_PITCH]  = 2000; //4000; //9600;
          stabilization_cmd[COMMAND_YAW]    = 0;
          stabilization_cmd[COMMAND_THRUST] = 6050; // 5600 // --> Left (5600-8000/2) = 1600, right --> (5600+8000/2) = 9600
 
