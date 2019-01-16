@@ -48,11 +48,9 @@
 #define COMMAND_CURRENT_ESTIMATION COMMAND_THRUST
 #endif
 
-//#ifndef BAT_CHECKER_DELAY
-//#define BAT_CHECKER_DELAY 5
-//#endif
-
-#define BAT_CHECKER_DELAY 2
+#ifndef BAT_CHECKER_DELAY
+#define BAT_CHECKER_DELAY 5
+#endif
 
 #define ELECTRICAL_PERIODIC_FREQ 10
 static float period_to_hour = 1 / 3600.f / ELECTRICAL_PERIODIC_FREQ;
