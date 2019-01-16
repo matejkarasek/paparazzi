@@ -45,6 +45,9 @@
 
 #include "state.h"
 
+#include "firmwares/rotorcraft/guidance/guidance_flip.h"
+
+
 #ifndef GUIDANCE_H_AGAIN
 #define GUIDANCE_H_AGAIN 0
 #endif

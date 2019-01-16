@@ -1,0 +1,68 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="delfly_vision">
+  <doc>
+    <description>Vision module for (tail less) DelFlies that reads the data from a stereoboard mady by Christophe de Wagter of TU Delft and sends commands to the DelFly.</description>
+    <configure name="STEREO_UART" value="UARTX" description="Sets the UART port number of the connected camera (required)"/>
+    <configure name="STEREO_BAUD" value="BXXXXX" description="Sets the BAUD rate of the connected camera (required: must be same as camera)"/>
+	<configure name="LASER_UART" value="UART2" description="select which uart it is connected to"/>
+    <configure name="LASER_BAUD" value="38400" description="set the baudrate of the uart"/>
+    <define name="LASER_NUM_SENSORS" value="0" description="Total amount of laser range sensors on the airframe"/>
+    <define name="LASER_ORIENTATIONS" value="0,0" type="float[]" description="The orientation per laser range sensor in the order: elevation,heading. The array is built up like (elv_1, head_1, elv_2, head_2,...elv_n, head_n) with n=LASER_RANGE_ARRAY_NUM_SENSORS"/>
+    	    
+  </doc>
+  <settings>
+    <dl_settings>
+      <dl_settings name="delfly_vision">
+        <dl_setting shortname="altitude_setp"      var="altitude_setp"    min="0.1" step="0.05" max="2"/>
+        <dl_setting shortname="sp_theta_gate"      var="sp_theta_gate"    min="-1" step="0.05" max="0"/>
+        <dl_setting shortname="gate_filter_tc"     var="filt_gate_tc"     min="0.05" step="0.05" max="1"/>
+        <dl_setting shortname="initial_position"   var="position_along_gate_field_init"     min="-5" step="0.25" max="10"/>
+        <dl_setting shortname="sp_theta_follow"    var="sp_theta_follow"  min="-1" step="0.05" max="0"/>
+        <dl_setting shortname="line_slope_tc"      var="filt_line_slope_tc"     min="0.05" step="0.05" max="1"/>
+        <dl_setting shortname="line_offset_tc"     var="filt_line_offset_tc"     min="0.05" step="0.05" max="1"/>
+        <dl_setting shortname="obstacle_filter_tc" var="filt_obst_tc"     min="0.05" step="0.05" max="1"/>
+        <dl_setting shortname="cam_y_slope"        var="y_slope"          min="-0.5" step="0.05" max="0.5"/>
+        <dl_setting shortname="cam_y_lat_error"    var="y_offset"         min="-0.5" step="0.05" max="0.5"/>
+        <dl_setting shortname="follow_yaw_rate"    var="follow_yaw_rate"  min="0" step="0.05" max="2"/>
+        <dl_setting shortname="phi_p_gain"         var="phi_gains.p"      min="0" step="0.05" max="10."/>
+        <dl_setting shortname="phi_i_gain"         var="phi_gains.i"      min="0" step="0.05" max="10."/>
+        <dl_setting shortname="theta_p_gain"       var="theta_gains.p"    min="0" step="0.05" max="10."/>
+        <dl_setting shortname="theta_i_gain"       var="theta_gains.i"    min="0" step="0.05" max="10."/>
+        <dl_setting shortname="thrust_p_gain"      var="thrust_gains.p"   min="0" step="0.05" max="10."/>
+        <dl_setting shortname="thrust_i_gain"      var="thrust_gains.i"   min="0" step="0.05" max="10."/>
+      </dl_settings>
+    </dl_settings>
+  </settings>
+  <header>
+    <file name="delfly_vision.h"/>
+  </header>
+  <init fun="delfly_vision_init()"/>
+  <periodic fun="delfly_vision_periodic()" freq="25" autorun="TRUE"/>
+  <event fun="delfly_vision_event()"/>
+  <makefile>
+    <!-- Configure default UART port and baudrate for Stereocam -->
+    <configure name="STEREO_UART" default="UART3" case="upper|lower"/>
+    <configure name="STEREO_BAUD" default="B921600"/>
+    
+    <!-- Enable UART and set baudrate -->
+    <define name="USE_$(STEREO_UART_UPPER)"/>
+    <define name="UART_LINK" value="$(STEREO_UART_LOWER)"/>
+    <define name="$(STEREO_UART_UPPER)_BAUD" value="$(STEREO_BAUD)"/>
+    
+    <define name="USE_$(LASER_UART_UPPER)"/>
+    <define name="LASER_UART" value="$(LASER_UART_LOWER)"/>
+    <define name="USE_$(LASER_UART_UPPER)_TX" value="FALSE"/>
+    <define name="$(LASER_UART_UPPER)_BAUD" value="$(LASER_BAUD)"/>
+        
+    <!-- Sources and PPRZLink for transport -->
+    <file name="delfly_vision.c"/>
+    <file name="pprz_transport.c" dir="pprzlink/src"/>
+<!--    <configure name="PPRZLINK_LIB_VERSION" value="1.0"/-->
+   	<raw>
+      ap.CFLAGS += -DGUIDANCE_V_MODE_MODULE_SETTING=GUIDANCE_V_MODE_MODULE
+      ap.CFLAGS += -DGUIDANCE_H_MODE_MODULE_SETTING=GUIDANCE_H_MODE_MODULE
+    </raw>
+  </makefile>
+</module>
+
