@@ -50,6 +50,17 @@
 #define USE_FLIP_MODE 0
 #endif
 
+/** explicitly define to zero to disable feed-forward rate term by default */
+#ifndef STABILIZATION_ATTITUDE_PHI_FFDGAIN
+#define STABILIZATION_ATTITUDE_PHI_FFDGAIN 0
+#endif
+#ifndef STABILIZATION_ATTITUDE_THETA_FFDGAIN
+#define STABILIZATION_ATTITUDE_THETA_FFDGAIN 0
+#endif
+#ifndef STABILIZATION_ATTITUDE_PSI_FFDGAIN
+#define STABILIZATION_ATTITUDE_PSI_FFDGAIN 0
+#endif
+
 struct Int32AttitudeGains  stabilization_gains;
 
 /* warn if some gains are still negative */
@@ -156,6 +167,10 @@ void stabilization_attitude_init(void)
                STABILIZATION_ATTITUDE_THETA_DDGAIN,
                STABILIZATION_ATTITUDE_PSI_DDGAIN);
 
+  VECT3_ASSIGN(stabilization_gains.ffd,
+               STABILIZATION_ATTITUDE_PHI_FFDGAIN,
+               STABILIZATION_ATTITUDE_THETA_FFDGAIN,
+               STABILIZATION_ATTITUDE_PSI_FFDGAIN);
 
   INT_EULERS_ZERO(stabilization_att_sum_err);
 
@@ -221,21 +236,36 @@ void stabilization_attitude_run(bool  in_flight)
   INT_RATES_ZERO(att_ref_euler_i.accel);
 #endif
 
+  const struct Int32Eulers att_ref_scaled = {
+      OFFSET_AND_ROUND(att_ref_euler_i.euler.phi, (REF_ANGLE_FRAC - INT32_ANGLE_FRAC)),
+      OFFSET_AND_ROUND(att_ref_euler_i.euler.theta, (REF_ANGLE_FRAC - INT32_ANGLE_FRAC)),
+      OFFSET_AND_ROUND(att_ref_euler_i.euler.psi, (REF_ANGLE_FRAC - INT32_ANGLE_FRAC))
+    };
+  const struct Int32Rates rate_ref_scaled = {
+      OFFSET_AND_ROUND(att_ref_euler_i.rate.p, (REF_RATE_FRAC - INT32_RATE_FRAC)),
+      OFFSET_AND_ROUND(att_ref_euler_i.rate.q, (REF_RATE_FRAC - INT32_RATE_FRAC)),
+      OFFSET_AND_ROUND(att_ref_euler_i.rate.r, (REF_RATE_FRAC - INT32_RATE_FRAC))
+    };
+
   /* compute feedforward command */
   stabilization_att_ff_cmd[COMMAND_ROLL] =
-    OFFSET_AND_ROUND(stabilization_gains.dd.x * att_ref_euler_i.accel.p, 5);
+    OFFSET_AND_ROUND(stabilization_gains.dd.x * att_ref_euler_i.accel.p, 5) +
+    stabilization_gains.ffd.x * rate_ref_scaled.p;
   stabilization_att_ff_cmd[COMMAND_PITCH] =
-    OFFSET_AND_ROUND(stabilization_gains.dd.y * att_ref_euler_i.accel.q, 5);
+    OFFSET_AND_ROUND(stabilization_gains.dd.y * att_ref_euler_i.accel.q, 5) +
+    stabilization_gains.ffd.y * rate_ref_scaled.q;
   stabilization_att_ff_cmd[COMMAND_YAW] =
-    OFFSET_AND_ROUND(stabilization_gains.dd.z * att_ref_euler_i.accel.r, 5);
+    OFFSET_AND_ROUND(stabilization_gains.dd.z * att_ref_euler_i.accel.r, 5) +
+    stabilization_gains.ffd.z * rate_ref_scaled.r;
+
+  /* with FFD gain of 100, reference rate of 180deg/s (3.14 rad/s)
+   * INT32_RATE_FRAC = 12, CMD_SHIFT = 11
+   * fb cmd: 100 * 3.14 * 2^INT32_RATE_FRAC / 2^CMD_SHIFT = 628
+   * max possible command is 9600
+   */
 
   /* compute feedback command */
   /* attitude error            */
-  const struct Int32Eulers att_ref_scaled = {
-    OFFSET_AND_ROUND(att_ref_euler_i.euler.phi, (REF_ANGLE_FRAC - INT32_ANGLE_FRAC)),
-    OFFSET_AND_ROUND(att_ref_euler_i.euler.theta, (REF_ANGLE_FRAC - INT32_ANGLE_FRAC)),
-    OFFSET_AND_ROUND(att_ref_euler_i.euler.psi, (REF_ANGLE_FRAC - INT32_ANGLE_FRAC))
-  };
   struct Int32Eulers att_err;
   struct Int32Eulers *ltp_to_body_euler = stateGetNedToBodyEulers_i();
   EULERS_DIFF(att_err, att_ref_scaled, (*ltp_to_body_euler));
@@ -250,11 +280,6 @@ void stabilization_attitude_run(bool  in_flight)
   }
 
   /* rate error                */
-  const struct Int32Rates rate_ref_scaled = {
-    OFFSET_AND_ROUND(att_ref_euler_i.rate.p, (REF_RATE_FRAC - INT32_RATE_FRAC)),
-    OFFSET_AND_ROUND(att_ref_euler_i.rate.q, (REF_RATE_FRAC - INT32_RATE_FRAC)),
-    OFFSET_AND_ROUND(att_ref_euler_i.rate.r, (REF_RATE_FRAC - INT32_RATE_FRAC))
-  };
   struct Int32Rates rate_err;
   struct Int32Rates *body_rate = stateGetBodyRates_i();
   RATES_DIFF(rate_err, rate_ref_scaled, (*body_rate));
@@ -290,8 +315,7 @@ void stabilization_attitude_run(bool  in_flight)
     OFFSET_AND_ROUND((stabilization_att_fb_cmd[COMMAND_PITCH] + stabilization_att_ff_cmd[COMMAND_PITCH]), CMD_SHIFT);
 
   stabilization_cmd[COMMAND_YAW] =
-	OFFSET_AND_ROUND((8*stabilization_att_fb_cmd[COMMAND_YAW] + stabilization_att_ff_cmd[COMMAND_YAW]), CMD_SHIFT) + radio_control.values[RADIO_YAW];
-//  stabilization_cmd[COMMAND_YAW] = radio_control.values[RADIO_YAW];
+    OFFSET_AND_ROUND((stabilization_att_fb_cmd[COMMAND_YAW] + stabilization_att_ff_cmd[COMMAND_YAW]), CMD_SHIFT);
 
   /* bound the result */
   BoundAbs(stabilization_cmd[COMMAND_ROLL], MAX_PPRZ);
