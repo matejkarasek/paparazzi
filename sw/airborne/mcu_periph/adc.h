@@ -37,10 +37,8 @@
 #include <inttypes.h>
 #include "mcu_periph/adc_arch.h"
 
-//#define MAX_AV_NB_SAMPLE 0x20
+#define MAX_AV_NB_SAMPLE 0x20
 #define DEFAULT_AV_NB_SAMPLE 0x20
-
-#define MAX_AV_NB_SAMPLE 500
 
 
 /**

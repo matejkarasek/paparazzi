@@ -149,12 +149,13 @@
 #define UART1_GPIO_TX GPIO9
 #endif /* REMAP_UART1 */
 
-// commented out not to interfere with the additional ADC on the same pin
-//#define UART2_GPIO_AF GPIO_AF7
-//#define UART2_GPIO_PORT_RX GPIOA
-//#define UART2_GPIO_RX GPIO3
-//#define UART2_GPIO_PORT_TX GPIOA
-//#define UART2_GPIO_TX GPIO2
+#if !USE_ADC_7 && !USE_PWM_INPUT2 /* ADC_7 and RPM sensing use the pins of UART2 (PA2 & PA3)*/
+#define UART2_GPIO_AF GPIO_AF7
+#define UART2_GPIO_PORT_RX GPIOA
+#define UART2_GPIO_RX GPIO3
+#define UART2_GPIO_PORT_TX GPIOA
+#define UART2_GPIO_TX GPIO2
+#endif
 
 #if REMAP_UART3 // For UART4 we need to remap UART 3
 #define UART3_GPIO_AF GPIO_AF7
@@ -358,21 +359,12 @@
 #define ADC_3_GPIO_PIN GPIO1
 #endif
 
-//#if USE_ADC_4
-//#define AD2_1_CHANNEL 15
-//#define ADC_4 AD2_1
-//#define ADC_4_GPIO_PORT GPIOC
-//#define ADC_4_GPIO_PIN GPIO5
-//#endif
-
-// assigning ADC_4 to pin PA3 (ADC123_IN3)
 #if USE_ADC_4
-#define AD2_1_CHANNEL 3
+#define AD2_1_CHANNEL 15
 #define ADC_4 AD2_1
-#define ADC_4_GPIO_PORT GPIOA
-#define ADC_4_GPIO_PIN GPIO3
+#define ADC_4_GPIO_PORT GPIOC
+#define ADC_4_GPIO_PIN GPIO5
 #endif
-
 
 // Internal ADC for battery enabled by default
 #ifndef USE_ADC_5
@@ -385,19 +377,11 @@
 #define ADC_5_GPIO_PIN GPIO4
 #endif
 
-//#if USE_ADC_6
-//#define AD2_2_CHANNEL 12
-//#define ADC_6 AD2_2
-//#define ADC_6_GPIO_PORT GPIOC
-//#define ADC_6_GPIO_PIN GPIO2
-//#endif
-
-// assigning ADC_6 to pin PA0 (ADC123_IN0)
 #if USE_ADC_6
-#define AD2_2_CHANNEL 0
+#define AD2_2_CHANNEL 12
 #define ADC_6 AD2_2
-#define ADC_6_GPIO_PORT GPIOA
-#define ADC_6_GPIO_PIN GPIO0
+#define ADC_6_GPIO_PORT GPIOC
+#define ADC_6_GPIO_PIN GPIO2
 #endif
 
 #if USE_ADC_7
@@ -434,7 +418,7 @@
 #define USE_PWM3 1
 #define USE_PWM4 1
 
-#ifndef USE_PWM5 // this allows to disable servo 5 on Lisa MXS
+#ifndef USE_PWM5 // this allows to disable servo 5 on Lisa MXS when using PA0 as ADC
 #define USE_PWM5 1
 #endif
 
@@ -504,18 +488,17 @@
 #define PWM_SERVO_4_OC_BIT 0
 #endif
 
-// commented out not to interfere with the additional ADC on the same pin
-//#if USE_PWM5
-//#define PWM_SERVO_5 4
-//#define PWM_SERVO_5_TIMER TIM5
-//#define PWM_SERVO_5_GPIO GPIOA
-//#define PWM_SERVO_5_PIN GPIO0
-//#define PWM_SERVO_5_AF GPIO_AF2
-//#define PWM_SERVO_5_OC TIM_OC1
-//#define PWM_SERVO_5_OC_BIT (1<<0)
-//#else
+#if USE_PWM5
+#define PWM_SERVO_5 4
+#define PWM_SERVO_5_TIMER TIM5
+#define PWM_SERVO_5_GPIO GPIOA
+#define PWM_SERVO_5_PIN GPIO0
+#define PWM_SERVO_5_AF GPIO_AF2
+#define PWM_SERVO_5_OC TIM_OC1
+#define PWM_SERVO_5_OC_BIT (1<<0)
+#else
 #define PWM_SERVO_5_OC_BIT 0
-//#endif
+#endif
 
 #if USE_PWM6
 #define PWM_SERVO_6 5
